@@ -69,6 +69,9 @@ The following arguments are supported in the `provider` block:
 
 * `insecure` - (Optional) Explicitly allow the provider to perform "insecure"
 SSL requests. If omitted, default value is `false`.
+* `nsxpassword` - (Optional) This is the password for connecting to the NSX
+server.  It must be provided, but it can also be sourced from the `NSXPASSWORD`
+environment variable.
 * `nsxusername` - (Optional) This is the user name for connecting to the NSX
 server.  It must be provided, but it can also be sourced from the `NSXUSERNAME`
 environment variable.
