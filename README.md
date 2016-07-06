@@ -62,3 +62,15 @@ $ export NSXPASSWORD='password'
 $ export NSXSERVER='apnsx020'
 $ terraform plan
 ```
+
+### Argument Reference
+
+The following arguments are supported in the `provider` block:
+
+* `insecure` - (Optional) Explicitly allow the provider to perform "insecure"
+SSL requests. If omitted, default value is `false`.
+* `nsxusername` - (Optional) This is the user name for connecting to the NSX
+server.  It must be provided, but it can also be sourced from the `NSXUSERNAME`
+environment variable.
+* `nsxserver` - (Optional) This is the NSX server to connect to.  It must be
+provided, but it can also be sourced from the `NSXSERVER` environment variable.
