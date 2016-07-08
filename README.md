@@ -117,3 +117,28 @@ server.  It must be provided, but it can also be sourced from the `NSXUSERNAME`
 environment variable.
 * `nsxserver` - (Optional) This is the NSX server to connect to.  It must be
 provided, but it can also be sourced from the `NSXSERVER` environment variable.
+
+## NSX_LOGICAL_SWITCH Resource
+
+The LOGICAL_SWITCH resource allows the creation and management of a logical
+switch (sometimes virtual wire, port group or universal switch).
+
+### Example Usage
+
+```terra
+resource "nsx_logical_switch" "test" {
+    desc = "test desc"
+    tenantid = "testid"
+    scopeid = "vdnscope-19"
+}
+```
+
+### Arguement Reference
+
+The following arguments are supported:
+ 
+* `desc` - (Required) A longer description for the logical switch.
+* `tenantid` - (Required) The ID of the tenant that logical switch is to be
+associated with.
+* `scopeid` - (Required) The ID of transport zone that the logical switch is
+to be associated with.
