@@ -1,3 +1,5 @@
 terraform-provider-nsx
 terraform.tfstate
 terraform.tfstate.backup
+terraform.log
+*.swp
