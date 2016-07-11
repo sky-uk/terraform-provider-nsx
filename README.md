@@ -126,9 +126,10 @@ switch (sometimes virtual wire, port group or universal switch).
 ### Example Usage
 
 ```terra
-resource "nsx_logical_switch" "test" {
-    desc = "test desc"
-    tenantid = "testid"
+resource "nsx_logical_switch" "virtual_wire" {
+    desc = "Terraform managed Logical Switch"
+    name = "tf_test"
+    tenantid = "tf_testid"
     scopeid = "vdnscope-19"
 }
 ```
@@ -138,6 +139,7 @@ resource "nsx_logical_switch" "test" {
 The following arguments are supported:
  
 * `desc` - (Required) A longer description for the logical switch.
+* `name` - (Required) The name of the logical switch to be created.
 * `tenantid` - (Required) The ID of the tenant that logical switch is to be
 associated with.
 * `scopeid` - (Required) The ID of transport zone that the logical switch is
