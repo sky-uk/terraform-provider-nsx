@@ -54,19 +54,19 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
         nsxusername := d.Get("nsxusername").(string)
 
 	if nsxusername == "" {
-		return nil, fmt.Errorf("nsxusername must be provided.")
+		return nil, fmt.Errorf("nsxusername must be provided")
 	}
 
         nsxpassword := d.Get("nsxpassword").(string)
 
 	if nsxpassword == "" {
-		return nil, fmt.Errorf("nsxpassword must be provided.")
+		return nil, fmt.Errorf("nsxpassword must be provided")
 	}
 
         nsxserver := d.Get("nsxserver").(string)
 
 	if nsxserver == "" {
-		return nil, fmt.Errorf("nsxserver must be provided.")
+		return nil, fmt.Errorf("nsxserver must be provided")
 	}
 
 	config := Config{

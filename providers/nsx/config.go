@@ -5,6 +5,7 @@ import (
 	"log"
 )
 
+// Config is a struct for containing the provider parameters.
 type Config struct {
 	Debug         bool
 	Insecure      bool
@@ -13,7 +14,7 @@ type Config struct {
 	NSXServer     string
 }
 
-// Client() returns a new client for accessing VMWare vSphere.
+// Client returns a new client for accessing VMWare vSphere.
 func (c *Config) Client() (*client.NSXClient, error) {
 	log.Printf("[INFO] VMWare NSX Client configured for URL: %s", c.NSXServer)
         nsxclient := client.NewNSXClient("https://"+c.NSXServer, c.NSXUserName, c.NSXPassword, c.Insecure, c.Debug)
