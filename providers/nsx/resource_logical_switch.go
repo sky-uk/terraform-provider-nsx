@@ -22,6 +22,12 @@ func resourceLogicalSwitch() *schema.Resource {
                 ForceNew: true,
             },
 
+            "name": {
+                Type:     schema.TypeString,
+                Required: true,
+                ForceNew: true,
+            },
+
             "tenantid": {
                 Type:     schema.TypeString,
                 Required: true,
@@ -39,19 +45,37 @@ func resourceLogicalSwitch() *schema.Resource {
 
 func resourceLogicalSwitchCreate(d *schema.ResourceData, m interface{}) error {
     nsxclient := m.(*client.NSXClient)
+    var desc, name, tenantid, scopeid string
 
     if v, ok := d.GetOk("desc"); ok {
-        desc := v.(string)
-        log.Printf("[DEBUG] Create Logical Switch - desc := ", desc)
+        desc = v.(string)
     } else {
         return fmt.Errorf("desc argument is required")
     }
 
-    create_api := virtualwire.NewCreate("test", "test desc", "test", "vdnscope-19")
+    if v, ok := d.GetOk("name"); ok {
+        name = v.(string)
+    } else {
+        return fmt.Errorf("name argument is required")
+    }
+
+    if v, ok := d.GetOk("tenantid"); ok {
+        tenantid = v.(string)
+    } else {
+        return fmt.Errorf("tenantid argument is required")
+    }
+
+    if v, ok := d.GetOk("scopeid"); ok {
+        scopeid = v.(string)
+    } else {
+        return fmt.Errorf("scopeid argument is required")
+    }
+
+    log.Printf(fmt.Sprintf("[DEBUG] virtualwire.NewCreate(%s, %s, %s, %s)", name, desc, tenantid, scopeid))
+    create_api := virtualwire.NewCreate(name, desc, tenantid, scopeid)
     nsxclient.Do(create_api)
 
     if create_api.StatusCode() != 201 {
-        log.Printf(create_api.GetResponse())
         return errors.New(create_api.GetResponse())
     }
 
