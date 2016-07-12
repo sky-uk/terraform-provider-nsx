@@ -11,7 +11,9 @@ with the proper credentials before it can be used.
 * [Authentication](#authentication)
   * [Static Credentials](#static-credentials)
   * [Environment Variables](#environment-variables)
-  * [Argument Reference](#argument-reference)
+  * [Argument Reference](#provider-argument-reference)
+* [NSX_LOGICAL_SWITCH Resource](#nsx-logical-switch-resource)
+  * [Example Usage](#nsx-logical-switch-resource-example-usage)
 
 ## Installation
 
@@ -110,7 +112,7 @@ $ export NSXSERVER='apnsx020'
 $ terraform plan
 ```
 
-### Argument Reference
+### <a name="provider-argument-reference"></a> Argument Reference
 
 The following arguments are supported in the `provider` block:
 
@@ -132,7 +134,7 @@ provided, but it can also be sourced from the `NSXSERVER` environment variable.
 The LOGICAL_SWITCH resource allows the creation and management of a logical
 switch (sometimes virtual wire, port group or universal switch).
 
-### Example Usage
+### <a name='nsx-logical-switch-resource-example-usage'></a>Example Usage
 
 ```terra
 resource "nsx_logical_switch" "virtual_wire" {
