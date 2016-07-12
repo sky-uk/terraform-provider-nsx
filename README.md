@@ -4,6 +4,15 @@ A Terraform provider for VMware NSX.  The NSX provider is used to interact
 with resources supported by VMware NSX.  The provider needs to be configured
 with the proper credentials before it can be used.
 
+## Contents
+
+* [Installation](#installation)
+* [Getting Started](#getting-started)
+* [Authentication](#authentication)
+  * [Static Credentials](#static-credentials)
+  * [Environment Variables](#environment-variables)
+  * [Arguement Reference](#arguement-reference)
+
 ## Installation
 
 These instructions were tested against version 1.6.2 of Go and Terraform
