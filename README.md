@@ -9,8 +9,8 @@ with the proper credentials before it can be used.
 * [Installation](#installation)
 * [Getting Started](#getting-started)
 * [Authentication](#authentication)
-* [NSX_LOGICAL_SWITCH Resource](#nsx-logical-switch-resource)
-* [NSX_EDGE INTERFACE Resource](#nsx-edge-interface-resource)
+* [NSX_LOGICAL_SWITCH Resource](#nsx_logical_switch-resource)
+* [NSX_EDGE INTERFACE Resource](#nsx_edge_interface-resource)
 
 ## Installation
 
