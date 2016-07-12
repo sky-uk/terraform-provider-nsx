@@ -11,10 +11,10 @@ with the proper credentials before it can be used.
 * [Authentication](#authentication)
   * [Static Credentials](#static-credentials)
   * [Environment Variables](#environment-variables)
-  * [Argument Reference](#argument-reference-1)
+  * [Argument Reference](#argument-reference)
 * [NSX_LOGICAL_SWITCH Resource](#nsx-logical-switch-resource)
   * [Example Usage](#example-usage)
-  * [Argument Reference](#argument-reference-2)
+  * [Argument Reference](#argument-reference)
 
 ## Installation
 
