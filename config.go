@@ -1,7 +1,7 @@
 package main
 
 import (
-	"git.devops.int.ovp.bskyb.com/paas/gonsx/client"
+        "github.com/sky-uk/gonsx"
 	"log"
 )
 
@@ -15,8 +15,8 @@ type Config struct {
 }
 
 // Client returns a new client for accessing VMWare vSphere.
-func (c *Config) Client() (*client.NSXClient, error) {
+func (c *Config) Client() (*gonsx.NSXClient, error) {
 	log.Printf("[INFO] VMWare NSX Client configured for URL: %s", c.NSXServer)
-	nsxclient := client.NewNSXClient("https://"+c.NSXServer, c.NSXUserName, c.NSXPassword, c.Insecure, c.Debug)
+	nsxclient := gonsx.NewNSXClient("https://"+c.NSXServer, c.NSXUserName, c.NSXPassword, c.Insecure, c.Debug)
 	return nsxclient, nil
 }

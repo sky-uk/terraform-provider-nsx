@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
-	"git.devops.int.ovp.bskyb.com/paas/gonsx/client"
-	"git.devops.int.ovp.bskyb.com/paas/gonsx/client/api/virtualwire"
+        "github.com/sky-uk/gonsx"
+        "github.com/sky-uk/gonsx/api/virtualwire"
 	"github.com/hashicorp/terraform/helper/schema"
 	"log"
 )
@@ -44,7 +44,7 @@ func resourceLogicalSwitch() *schema.Resource {
 }
 
 func resourceLogicalSwitchCreate(d *schema.ResourceData, m interface{}) error {
-	nsxclient := m.(*client.NSXClient)
+	nsxclient := m.(*gonsx.NSXClient)
 	var desc, name, tenantid, scopeid string
 
 	// Gather the attributes for the resource.
@@ -88,7 +88,7 @@ func resourceLogicalSwitchCreate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceLogicalSwitchRead(d *schema.ResourceData, m interface{}) error {
-	nsxclient := m.(*client.NSXClient)
+	nsxclient := m.(*gonsx.NSXClient)
 	var name, scopeid string
 
 	// Gather the attributes for the resource.
@@ -129,7 +129,7 @@ func resourceLogicalSwitchRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceLogicalSwitchDelete(d *schema.ResourceData, m interface{}) error {
-	nsxclient := m.(*client.NSXClient)
+	nsxclient := m.(*gonsx.NSXClient)
 	var name, scopeid string
 
 	// Gather the attributes for the resource.
