@@ -11,7 +11,7 @@ with the proper credentials before it can be used.
 * [Authentication](#authentication)
   * [Static Credentials](#static-credentials)
   * [Environment Variables](#environment-variables)
-  * [Arguement Reference](#arguement-reference)
+  * [Argument Reference](#argument-reference)
 
 ## Installation
 
@@ -143,7 +143,7 @@ resource "nsx_logical_switch" "virtual_wire" {
 }
 ```
 
-### Arguement Reference
+### Argument Reference
 
 The following arguments are supported:
  
