@@ -9,12 +9,8 @@ with the proper credentials before it can be used.
 * [Installation](#installation)
 * [Getting Started](#getting-started)
 * [Authentication](#authentication)
-  * [Static Credentials](#static-credentials)
-  * [Environment Variables](#environment-variables)
-  * [Argument Reference](#argument-reference)
 * [NSX_LOGICAL_SWITCH Resource](#nsx-logical-switch-resource)
-  * [Example Usage](#example-usage)
-  * [Argument Reference](#argument-reference)
+* [NSX_EDGE INTERFACE Resource](#nsx-edge-interface-resource)
 
 ## Installation
 
@@ -135,7 +131,7 @@ provided, but it can also be sourced from the `NSXSERVER` environment variable.
 The LOGICAL_SWITCH resource allows the creation and management of a logical
 switch (sometimes virtual wire, port group or universal switch).
 
-### <a name='nsx-logical-switch-resource-example-usage'></a>Example Usage
+### Example Usage
 
 ```terra
 resource "nsx_logical_switch" "virtual_wire" {
@@ -156,3 +152,35 @@ The following arguments are supported:
 associated with.
 * `scopeid` - (Required) The ID of transport zone that the logical switch is
 to be associated with.
+
+
+## NSX_EDGE_INTERFACE Resource
+
+The EDGE_INTERFACE resource allows the creation and management of an edge
+interface on the Distributed Logical Router (DLR).
+
+### Example Usage
+
+```terra
+resource "nsx_edge_interface" "edge_interface" {
+    edgeid = "edge-50"
+    name = "app_virtualwire_one"
+    virtualwireid = "virtualwire-271"
+    gateway = "10.10.10.1"
+    subnetmask = "255.255.255.0"
+    interfacetype = "internal"
+    mtu = "1500"
+}
+```
+
+### Argument Reference
+
+The following arguments are supported:
+ 
+* `edgeid` - (Required) The NSX Edge ID for the Distributed Logical Router (DLR) we wish to use.
+* `name` - (Required) The name of the edge interface we want to create on the DLR.
+* `virtualwireid` - (Required) The ID of the virtual wire/logical switch (see [NSX Logical Switch](#nsx-logical-switch-resource).
+* `gateway` - (Required) Gateway for network.
+* `subnetmask` - (Required) Subnet mask for network.
+* `interfacetype` - (Required) The interface type.
+* `mtu` - (Required) Max transfer unit for the network.
