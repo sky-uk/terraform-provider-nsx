@@ -4,3 +4,4 @@ terraform.tfstate.backup
 terraform.log
 *.swp
 .idea/
+crash.log
