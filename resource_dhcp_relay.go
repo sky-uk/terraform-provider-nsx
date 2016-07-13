@@ -8,22 +8,20 @@ import (
 	"log"
 )
 
-func getAllDhcpRelays(edgeId string, nsxclient *gonsx.NSXClient) (*dhcprelay.DhcpRelay, error) {
+func getAllDhcpRelays(edgeID string, nsxclient *gonsx.NSXClient) (*dhcprelay.DhcpRelay, error) {
 	//
 	// Get All DHCP Relay agents.
 	//
-	api := dhcprelay.NewGetAll(edgeId)
+	api := dhcprelay.NewGetAll(edgeID)
 	// make the api call with nsxclient
 	err := nsxclient.Do(api)
 	// check if we err otherwise read response.
 	if err != nil {
-		//fmt.Println("Error:", err)
-		//return nil, err
 		return nil, err
-	} else {
-		log.Println("Get All Response: ", api.GetResponse())
-		return api.GetResponse(), nil
 	}
+
+	log.Println("Get All Response: ", api.GetResponse())
+	return api.GetResponse(), nil
 }
 
 func resourceDHCPRelay() *schema.Resource {
@@ -116,13 +114,14 @@ func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
 	newRelayAgentsList := append(currentDHCPRelay.RelayAgents, newRelayAgent)
 
 	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.NewUpdate(%s, %s, %s)", dhcpserverip, edgeid, newRelayAgentsList))
-	update_api := dhcprelay.NewUpdate(dhcpserverip, edgeid, newRelayAgentsList)
+	updateAPI := dhcprelay.NewUpdate(dhcpserverip, edgeid, newRelayAgentsList)
 
-	err = nsxclient.Do(update_api)
+	err = nsxclient.Do(updateAPI)
+
 	if err != nil {
 		return fmt.Errorf("Error:", err)
-	} else if update_api.StatusCode() != 204 {
-		return fmt.Errorf("Failed to update the DHCP relay %s", update_api.GetResponse())
+	} else if updateAPI.StatusCode() != 204 {
+		return fmt.Errorf("Failed to update the DHCP relay %s", updateAPI.GetResponse())
 	}
 
 	// If we get here, everything is OK.  Set the ID for the Terraform state
@@ -197,28 +196,28 @@ func resourceDHCPRelayDelete(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if currentDHCPRelay.CheckByVnicIndex(vnicindex) && (len(currentDHCPRelay.RelayAgents) == 1) {
-		delete_api := dhcprelay.NewDelete(edgeid)
-		err = nsxclient.Do(delete_api)
+		deleteAPI := dhcprelay.NewDelete(edgeid)
+		err = nsxclient.Do(deleteAPI)
 		if err != nil {
 			return fmt.Errorf("Error:", err)
-		} else {
-			log.Println("DHCP Relay agent deleted.")
 		}
+
+		log.Println("DHCP Relay agent deleted.")
 	} else {
 		// if we got more than one relay agents, then we have to call update after removing
 		// the entry we want to remove.
 		log.Println("There are other DHCP Relay agents, only removing single entry with update.")
 		newRelayAgentsList := currentDHCPRelay.RemoveByVnicIndex(vnicindex).RelayAgents
 
-		update_api := dhcprelay.NewUpdate(currentDHCPRelay.RelayServer.IpAddress, edgeid, newRelayAgentsList)
-		err = nsxclient.Do(update_api)
+		updateAPI := dhcprelay.NewUpdate(currentDHCPRelay.RelayServer.IpAddress, edgeid, newRelayAgentsList)
+		err = nsxclient.Do(updateAPI)
 
 		if err != nil {
 			return fmt.Errorf("Error:", err)
-		} else if update_api.StatusCode() != 204 {
-			return fmt.Errorf(update_api.GetResponse())
+		} else if updateAPI.StatusCode() != 204 {
+			return fmt.Errorf(updateAPI.GetResponse())
 		} else {
-			log.Printf("Updated DHCP Relay - %s", update_api.GetResponse())
+			log.Printf("Updated DHCP Relay - %s", updateAPI.GetResponse())
 		}
 	}
 
