@@ -1,7 +1,7 @@
 package main
 
 import (
-        "github.com/sky-uk/gonsx"
+	"github.com/sky-uk/gonsx"
 	"log"
 )
 

@@ -3,9 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
-        "github.com/sky-uk/gonsx"
-        "github.com/sky-uk/gonsx/api/edgeinterface"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/sky-uk/gonsx"
+	"github.com/sky-uk/gonsx/api/edgeinterface"
 	"log"
 )
 
@@ -17,9 +17,9 @@ func resourceEdgeInterface() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"edgeid": {
-				  Type:     schema.TypeString,
-				  Required: true,
-				  ForceNew: true,
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
 			},
 
 			"name": {
@@ -29,30 +29,30 @@ func resourceEdgeInterface() *schema.Resource {
 			},
 
 			"virtualwireid": {
-				         Type:     schema.TypeString,
-				         Required: true,
-				         ForceNew: true,
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
 			},
 
 			"gateway": {
-				   Type:     schema.TypeString,
-				   Required: true,
-				   ForceNew: true,
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
 			},
 			"subnetmask": {
-				      Type:     schema.TypeString,
-				      Required: true,
-				      ForceNew: true,
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
 			},
 			"interfacetype": {
-				         Type:     schema.TypeString,
-				         Required: true,
-				         ForceNew: true,
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
 			},
 			"mtu": {
-			       Type:     schema.TypeInt,
-			       Required: true,
-			       ForceNew: true,
+				Type:     schema.TypeInt,
+				Required: true,
+				ForceNew: true,
 			},
 		},
 	}
@@ -61,7 +61,7 @@ func resourceEdgeInterface() *schema.Resource {
 func resourceEdgeInterfaceCreate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
 	var edgeid, name, virtualwireid, gateway, subnetmask, interfacetype string
-        var mtu int
+	var mtu int
 
 	// Gather the attributes for the resource.
 	if v, ok := d.GetOk("edgeid"); ok {
@@ -119,11 +119,11 @@ func resourceEdgeInterfaceCreate(d *schema.ResourceData, m interface{}) error {
 	// and return the response from the READ method.
 	id := (createAPI.GetResponse().FilterByName(name).Index)
 
-        if id != "" {
-	        d.SetId(id)
-        } else {
-                return errors.New("Can not establish the id of the created resource")
-        }
+	if id != "" {
+		d.SetId(id)
+	} else {
+		return errors.New("Can not establish the id of the created resource")
+	}
 
 	return resourceEdgeInterfaceRead(d, m)
 }
@@ -133,11 +133,11 @@ func resourceEdgeInterfaceRead(d *schema.ResourceData, m interface{}) error {
 	var edgeid, name string
 
 	// Gather the attributes for the resource.
-        if v, ok := d.GetOk("edgeid"); ok {
-                edgeid = v.(string)
-        } else {
-                return fmt.Errorf("edgeid argument is required")
-        }
+	if v, ok := d.GetOk("edgeid"); ok {
+		edgeid = v.(string)
+	} else {
+		return fmt.Errorf("edgeid argument is required")
+	}
 
 	if v, ok := d.GetOk("name"); ok {
 		name = v.(string)
@@ -174,11 +174,11 @@ func resourceEdgeInterfaceDelete(d *schema.ResourceData, m interface{}) error {
 	var edgeid, name string
 
 	// Gather the attributes for the resource.
-        if v, ok := d.GetOk("edgeid"); ok {
-                edgeid = v.(string)
-        } else {
-                return fmt.Errorf("edgeid argument is required")
-        }
+	if v, ok := d.GetOk("edgeid"); ok {
+		edgeid = v.(string)
+	} else {
+		return fmt.Errorf("edgeid argument is required")
+	}
 
 	if v, ok := d.GetOk("name"); ok {
 		name = v.(string)

@@ -3,9 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
-        "github.com/sky-uk/gonsx"
-        "github.com/sky-uk/gonsx/api/virtualwire"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/sky-uk/gonsx"
+	"github.com/sky-uk/gonsx/api/virtualwire"
 	"log"
 )
 
