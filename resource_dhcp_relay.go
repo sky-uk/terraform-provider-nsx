@@ -17,7 +17,8 @@ func getAllDhcpRelays(edgeId string, nsxclient *gonsx.NSXClient) (*dhcprelay.Dhc
         err := nsxclient.Do(api)
         // check if we err otherwise read response.
         if err != nil {
-                fmt.Println("Error:", err)
+                //fmt.Println("Error:", err)
+                //return nil, err
                 return nil, err
         } else {
                 log.Println("Get All Response: ", api.GetResponse())
@@ -95,25 +96,33 @@ func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
         }
 
         if v, ok := d.GetOk("dhcpserverip"); ok {
-                giaddress = v.(string)
+                dhcpserverip = v.(string)
         } else {
                 return fmt.Errorf("dhcpserverip argument is required")
         }
 
         // Create the API, use it and check for errors.
+        log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.getAllDhcpRelays(%s, %s)", edgeid, nsxclient))
         currentDHCPRelay, err := getAllDhcpRelays(edgeid, nsxclient)
 
         if err != nil {
-                return err
+                return fmt.Errorf("Error:", err)
         }
 
+        log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.RelayAgent(%s, %s)", vnicindex, giaddress))
         newRelayAgent := dhcprelay.RelayAgent{VnicIndex: vnicindex, GiAddress: giaddress}
-        newRelayAgentsList := append(currentDHCPRelay.RelayAgents, newRelayAgent)
-        update_api := dhcprelay.NewUpdate(dhcpserverip, edgeid, newRelayAgentsList)
-        err = nsxclient.Do(update_api)
 
-	if err != nil {
-                return err
+        log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.append(%s, %s)", currentDHCPRelay.RelayAgents, newRelayAgent))
+        newRelayAgentsList := append(currentDHCPRelay.RelayAgents, newRelayAgent)
+
+        log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.NewUpdate(%s, %s, %s)", dhcpserverip, edgeid, newRelayAgentsList))
+        update_api := dhcprelay.NewUpdate(dhcpserverip, edgeid, newRelayAgentsList)
+
+        err = nsxclient.Do(update_api)
+        if err != nil {
+                return fmt.Errorf("Error:", err)
+        } else if update_api.StatusCode() != 204 {
+                return fmt.Errorf("Failed to update the DHCP relay %s", update_api.GetResponse())
         }
 
         // If we get here, everything is OK.  Set the ID for the Terraform state
