@@ -10,7 +10,8 @@ with the proper credentials before it can be used.
 * [Getting Started](#getting-started)
 * [Authentication](#authentication)
 * [NSX_LOGICAL_SWITCH Resource](#nsx_logical_switch-resource)
-* [NSX_EDGE INTERFACE Resource](#nsx_edge_interface-resource)
+* [NSX_EDGE_INTERFACE Resource](#nsx_edge_interface-resource)
+* [NSX_DHCP_RELAY Resource](#nsx_dhcp_relay-resource)
 
 ## Installation
 
@@ -184,3 +185,26 @@ The following arguments are supported:
 * `subnetmask` - (Required) Subnet mask for network.
 * `interfacetype` - (Required) The interface type.
 * `mtu` - (Required) Max transfer unit for the network.
+
+## NSX_DHCP_RELAY Resource
+
+The DHCP_RELAY resource allows the creation and management of a DHCP
+relay for an edge interface on the Distributed Logical Router (DLR).
+
+### Example Usage
+
+```terra
+resource "nsx_dhcp_relay" "dhcp_relay" {
+    edgeid = "edge-50"
+    vnicindex = "18"
+    giaddress = "10.152.163.1"
+}
+```
+
+### Argument Reference
+
+The following arguments are supported:
+
+* `edgeid` - (Required) The NSX Edge ID for the Distributed Logical Router (DLR) we wish to use.
+* `vnicindex` - (Required) The VNIC Index.
+* `giaddress` - (Required) The GIAddress is the IP address of the gateway on the edge interface (nsx_edge_interface gateway value above).
