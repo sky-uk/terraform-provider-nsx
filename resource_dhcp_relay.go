@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
         "github.com/sky-uk/gonsx"
         "github.com/sky-uk/gonsx/api/dhcprelay"
@@ -21,7 +20,7 @@ func getAllDhcpRelays(edgeId string, nsxclient *gonsx.NSXClient) (*dhcprelay.Dhc
                 fmt.Println("Error:", err)
                 return nil, err
         } else {
-                fmt.Println("Get All Response: ", api.GetResponse())
+                log.Println("Get All Response: ", api.GetResponse())
                 return api.GetResponse(), nil
         }
 }
@@ -33,6 +32,12 @@ func resourceDHCPRelay() *schema.Resource {
 		Delete: resourceDHCPRelayDelete,
 
 		Schema: map[string]*schema.Schema{
+			"name": {
+				  Type:     schema.TypeString,
+				  Required: true,
+				  ForceNew: true,
+			},
+
 			"edgeid": {
 				  Type:     schema.TypeString,
 				  Required: true,
@@ -50,15 +55,27 @@ func resourceDHCPRelay() *schema.Resource {
 				     Required: true,
 				     ForceNew: true,
 			},
+
+			"dhcpserverip": {
+				        Type:     schema.TypeString,
+				        Required: true,
+				        ForceNew: true,
+			},
 		},
 	}
 }
 
 func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
         nsxclient := m.(*gonsx.NSXClient)
-        var edgeid, vnicindex, giaddress string
+        var name, edgeid, vnicindex, giaddress, dhcpserverip string
 
         // Gather the attributes for the resource.
+        if v, ok := d.GetOk("name"); ok {
+                name = v.(string)
+        } else {
+                return fmt.Errorf("name argument is required")
+        }
+
         if v, ok := d.GetOk("edgeid"); ok {
                 edgeid = v.(string)
         } else {
@@ -77,6 +94,12 @@ func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
                 return fmt.Errorf("giaddress argument is required")
         }
 
+        if v, ok := d.GetOk("dhcpserverip"); ok {
+                giaddress = v.(string)
+        } else {
+                return fmt.Errorf("dhcpserverip argument is required")
+        }
+
         // Create the API, use it and check for errors.
         currentDHCPRelay, err := getAllDhcpRelays(edgeid, nsxclient)
 
@@ -85,103 +108,24 @@ func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
         }
 
         newRelayAgent := dhcprelay.RelayAgent{VnicIndex: vnicindex, GiAddress: giaddress}
+        newRelayAgentsList := append(currentDHCPRelay.RelayAgents, newRelayAgent)
+        update_api := dhcprelay.NewUpdate(dhcpserverip, edgeid, newRelayAgentsList)
+        err = nsxclient.Do(update_api)
 
-        // If we go here, everything is OK.  Set the ID for the Terraform state
+	if err != nil {
+                return err
+        }
+
+        // If we get here, everything is OK.  Set the ID for the Terraform state
         // and return the response from the READ method.
-        d.SetId(createAPI.GetResponse())
+        d.SetId(name)
         return resourceDHCPRelayRead(d, m)
 }
 
 func resourceDHCPRelayRead(d *schema.ResourceData, m interface{}) error {
-	nsxclient := m.(*gonsx.NSXClient)
-	var name, scopeid string
-
-	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("name"); ok {
-		name = v.(string)
-	} else {
-		return fmt.Errorf("name argument is required")
-	}
-
-	if v, ok := d.GetOk("scopeid"); ok {
-		scopeid = v.(string)
-	} else {
-		return fmt.Errorf("scopeid argument is required")
-	}
-
-	// Gather all the resources that are associated with the specified
-	// scopeid.
-	log.Printf(fmt.Sprintf("[DEBUG] virtualwire.NewGetAll(%s)", scopeid))
-	api := virtualwire.NewGetAll(scopeid)
-	err := nsxclient.Do(api)
-
-	if err != nil {
-		return err
-	}
-
-	// See if we can find our specifically named resource within the list of
-	// resources associated with the scopeid.
-	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", name))
-	id := (api.GetResponse().FilterByName(name).ObjectID)
-	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
-
-	// If the resource has been removed manually, notify Terraform of this fact.
-	if id == "" {
-		d.SetId("")
-	}
-
 	return nil
 }
 
 func resourceDHCPRelayDelete(d *schema.ResourceData, m interface{}) error {
-	nsxclient := m.(*gonsx.NSXClient)
-	var name, scopeid string
-
-	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("name"); ok {
-		name = v.(string)
-	} else {
-		return fmt.Errorf("name argument is required")
-	}
-
-	if v, ok := d.GetOk("scopeid"); ok {
-		scopeid = v.(string)
-	} else {
-		return fmt.Errorf("scopeid argument is required")
-	}
-
-	// Gather all the resources that are associated with the specified
-	// scopeid.
-	log.Printf(fmt.Sprintf("[DEBUG] virtualwire.NewGetAll(%s)", scopeid))
-	api := virtualwire.NewGetAll(scopeid)
-	err := nsxclient.Do(api)
-
-	if err != nil {
-		return err
-	}
-
-	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", name))
-	id := (api.GetResponse().FilterByName(name).ObjectID)
-	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
-
-	// If the resource has been removed manually, notify Terraform of this fact.
-	if id == "" {
-		d.SetId("")
-		return nil
-	}
-
-	// If we got here, the resource exists, so we attempt to delete it.
-	deleteAPI := virtualwire.NewDelete(id)
-	err = nsxclient.Do(deleteAPI)
-
-	if err != nil {
-		return err
-	}
-
-	// If we got here, the resource had existed, we deleted it and there was
-	// no error.  Notify Terraform of this fact and return successful
-	// completion.
-	d.SetId("")
-	log.Printf(fmt.Sprintf("[DEBUG] id %s deleted.", id))
 	return nil
 }

@@ -195,6 +195,7 @@ relay for an edge interface on the Distributed Logical Router (DLR).
 
 ```terra
 resource "nsx_dhcp_relay" "dhcp_relay" {
+    name = "tf_dhcp_relay"
     edgeid = "edge-50"
     vnicindex = "18"
     giaddress = "10.152.163.1"
@@ -206,6 +207,7 @@ resource "nsx_dhcp_relay" "dhcp_relay" {
 
 The following arguments are supported:
 
+* `name` - (Required) A user supplied name for the DHCP relay.
 * `edgeid` - (Required) The NSX Edge ID for the Distributed Logical Router (DLR) we wish to use.
 * `vnicindex` - (Required) The VNIC Index.
 * `giaddress` - (Required) The GIAddress is the IP address of the gateway on the edge interface (nsx_edge_interface gateway value above).

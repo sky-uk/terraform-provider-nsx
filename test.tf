@@ -20,3 +20,12 @@ resource "nsx_edge_interface" "edge_interface" {
         interfacetype = "internal"
         mtu = "1500"
 }
+
+resource "nsx_dhcp_relay" "dhcp_relay" {
+    name = "tf_dhcp_relay"
+    edgeid = "edge-50"
+    vnicindex = "${nsx_edge_interface.edge_interface.id}"
+    giaddress = "${nsx_edge_interface.edge_interface.gateway}"
+    dhcpserverip = "10.152.160.10"
+}
+
