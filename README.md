@@ -12,6 +12,7 @@ with the proper credentials before it can be used.
 * [NSX_LOGICAL_SWITCH Resource](#nsx_logical_switch-resource)
 * [NSX_EDGE_INTERFACE Resource](#nsx_edge_interface-resource)
 * [NSX_DHCP_RELAY Resource](#nsx_dhcp_relay-resource)
+* [Limitations](#limitations)
 
 ## Installation
 
@@ -213,3 +214,12 @@ The following arguments are supported:
 * `giaddress` - (Required) The GIAddress is the IP address of the gateway on the edge interface (nsx_edge_interface gateway value above).
 * `dhcpserverip` (Required) The IP address of the DHCP server to have requests
 relayed to.
+
+### Limitations
+
+This is currently a proof of concept and only has a very limited number of
+supported resources.  These resources also have a very limited number
+of attributes.
+
+We have only implemented the ability to Create, Read and Delete resources.
+Currently there is no implementation of Update.
