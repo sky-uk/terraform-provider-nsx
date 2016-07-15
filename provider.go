@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+        "github.com/hashicorp/terraform/helper/mutexkv"
 	"github.com/hashicorp/terraform/terraform"
 	"os"
 )
@@ -81,3 +82,6 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 
 	return config.Client()
 }
+
+// This is a global MutexKV for use within this plugin.
+var nsxMutexKV = mutexkv.NewMutexKV()
