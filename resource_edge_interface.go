@@ -106,8 +106,8 @@ func resourceEdgeInterfaceCreate(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("mtu argument is required")
 	}
 
-        nsxMutexKV.Lock(edgeid)
-        defer nsxMutexKV.Unlock(edgeid)
+	nsxMutexKV.Lock(edgeid)
+	defer nsxMutexKV.Unlock(edgeid)
 
 	// Create the API, use it and check for errors.
 	log.Printf(fmt.Sprintf("[DEBUG] edgeinterface.NewCreate(%s, %s, %s, %s, %s, %s, %d)", edgeid, name, virtualwireid, gateway, subnetmask, interfacetype, mtu))
@@ -189,8 +189,8 @@ func resourceEdgeInterfaceDelete(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("name argument is required")
 	}
 
-        nsxMutexKV.Lock(edgeid)
-        defer nsxMutexKV.Unlock(edgeid)
+	nsxMutexKV.Lock(edgeid)
+	defer nsxMutexKV.Unlock(edgeid)
 
 	// Gather all the resources that are associated with the specified
 	// edgeid.
