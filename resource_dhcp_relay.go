@@ -99,8 +99,8 @@ func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("dhcpserverip argument is required")
 	}
 
-        nsxMutexKV.Lock(name)
-	defer nsxMutexKV.Unlock(name)
+        nsxMutexKV.Lock(edgeid)
+	defer nsxMutexKV.Unlock(edgeid)
 
 	// Create the API, use it and check for errors.
 	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.getAllDhcpRelays(%s, %s)", edgeid, nsxclient))
@@ -167,15 +167,9 @@ func resourceDHCPRelayRead(d *schema.ResourceData, m interface{}) error {
 
 func resourceDHCPRelayDelete(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var name, edgeid, vnicindex string
+	var edgeid, vnicindex string
 
 	// Gather the attributes for the resource.
-        if v, ok := d.GetOk("name"); ok {
-                name = v.(string)
-        } else {
-                return fmt.Errorf("name argument is required")
-        }
-
 	if v, ok := d.GetOk("edgeid"); ok {
 		edgeid = v.(string)
 	} else {
@@ -188,8 +182,8 @@ func resourceDHCPRelayDelete(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("vnicindex argument is required")
 	}
 
-        nsxMutexKV.Lock(name)
-        defer nsxMutexKV.Unlock(name)
+        nsxMutexKV.Lock(edgeid)
+        defer nsxMutexKV.Unlock(edgeid)
 
 	// Create the API, use it and check for errors.
 	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.getAllDhcpRelays(%s, %s)", edgeid, nsxclient))
