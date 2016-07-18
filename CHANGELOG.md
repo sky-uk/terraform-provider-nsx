@@ -1,5 +1,11 @@
 # Terraform-Provider-NSX
 
+##2016-07-18 - Release 0.1.1
+
+###
+
+Fix for 'DHCP relays being updated in parallel causing unexpected results'. All DHCP relays are pushed on delete or create due to the design of the API. Fix permits one change at a time to avoid unexpected results.
+
 ##2016-07-14 - Release 0.1.0
 
 ### Summary
