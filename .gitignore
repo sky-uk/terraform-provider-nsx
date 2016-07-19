@@ -5,3 +5,4 @@ terraform.log
 *.swp
 .idea/
 crash.log
+vendor/
