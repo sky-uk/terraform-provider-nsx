@@ -22,35 +22,13 @@ version 0.6.16.
 Assuming that you have already got GOPATH setup
 (see https://golang.org/doc/code.html for details). Do the following:
 
-Install the Terraform library from HashiCorp and workaround the new
-Terraform API version introduced after 0.7.0:
-
 ```bash
-$ go get -u github.com/hashicorp/terraform
-$ cd $GOPATH/src/github.com/hashicorp/terraform
-$ git checkout v0.6.16
-Note: checking out 'v0.6.16'.
-
-You are in 'detached HEAD' state. You can look around, make experimental
-changes and commit them, and you can discard any commits you make in this
-state without impacting any branches by performing another checkout.
-
-If you want to create a new branch to retain commits you create, you may
-do so (now or later) by using -b with the checkout command again. Example:
-
-  git checkout -b <new-branch-name>
-
-HEAD is now at 6e586c8... v0.6.16
+go get github.com/sky-uk/terraform-provider-nsx
 ```
 
-As this project is hosted on GitLab and this does not yet support `go get ...`
-manually checkout this project to the correct location:
+This will also build the binary and add the `terraform-provider-nsx`
+plugin into the `$GOPATH/bin`.
 
-```bash
-mkdir -p $GOPATH/src/git.devops.int.ovp.bskyb.com/paas
-cd $GOPATH/src/git.devops.int.ovp.bskyb.com/paas
-git clone git@git.devops.int.ovp.bskyb.com:paas/terraform-provider-nsx.git
-```
 
 ## Getting Started
 
