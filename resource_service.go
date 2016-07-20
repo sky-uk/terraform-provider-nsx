@@ -8,16 +8,20 @@ import (
 	"log"
 )
 
-func getAllServices(scopeID string, nsxclient *gonsx.NSXClient) (*service.Service, error) {
-	getAllAPI := service.NewGetAll(scopeid)
-	err := nsxclient.Do(getAllAPI)
+// func getAllApplications(scopeID string, nsxclient *gonsx.NSXClient) (error) {
+	// getAllAPI := service.NewGetAll(scopeid)
+	// err := nsxclient.Do(getAllAPI)
 
-	if err != nil {
-		return nil, err
-	}
+	// if err != nil {
+		// return err
+	// }
 
-	return getAllAPI, nil
-}
+	// if getAllAPI.StatusCode() != 200 {
+                // return Error("Status code: %d, Response: %s", getAllAPI.StatusCode(), getAllAPI.ResponseObject())
+        // }
+
+	// return nil
+// }
 
 func resourceService() *schema.Resource {
 	return &schema.Resource{
@@ -95,121 +99,30 @@ func resourceServiceCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	// Create the API, use it and check for errors.
-	log.Printf(fmt.Sprintf("[DEBUG] service.NewGetAll(%s)", scopeid))
-	getAllAPI := service.NewGetAll(scopeid)
-        err := nsxclient.Do(getAllAPI)
+	log.Printf(fmt.Sprintf("[DEBUG] service.NewCreate(%s, %s, %s, %s, %s)", scopeid, name, desc, proto, ports))
+	createAPI := service.NewCreate(scopeid, name, desc, proto, ports)
+	err := nsxclient.Do(createAPI)
 
-	if err != nil {
+        if err != nil {
 		return fmt.Errorf("Error:", err)
-	}
-
-        // check the status code and proceed accordingly.
-        if getAllAPI.StatusCode() != 200 {
-                fmt.Println("Status code:", getAllAPI.StatusCode())
-                fmt.Println("Response: ", getAllAPI.ResponseObject())
         }
 
-        
+	if createAPI.StatusCode() != 201 {
+		return fmt.Errorf("%s", createAPI.ResponseObject())
+	}
 
 	// If we get here, everything is OK.  Set the ID for the Terraform state
 	// and return the response from the READ method.
-	d.SetId(name)
+	d.SetId(createAPI.GetResponse())
 	return resourceServiceRead(d, m)
 }
 
 func resourceServiceRead(d *schema.ResourceData, m interface{}) error {
-	nsxclient := m.(*gonsx.NSXClient)
-	var edgeid, vnicindex string
-
-	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("edgeid"); ok {
-		edgeid = v.(string)
-	} else {
-		return fmt.Errorf("edgeid argument is required")
-	}
-
-	if v, ok := d.GetOk("vnicindex"); ok {
-		vnicindex = v.(string)
-	} else {
-		return fmt.Errorf("vnicindex argument is required")
-	}
-
-	// Create the API, use it and check for errors.
-	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.getAllDhcpRelays(%s, %s)", edgeid, nsxclient))
-	currentService, err := getAllDhcpRelays(edgeid, nsxclient)
-
-	if err != nil {
-		return fmt.Errorf("Error:", err)
-	}
-
-	if !currentService.CheckByVnicIndex(vnicindex) {
-		d.SetId("")
-	}
-
+	// nsxclient := m.(*gonsx.NSXClient)
 	return nil
 }
 
 func resourceServiceDelete(d *schema.ResourceData, m interface{}) error {
-	nsxclient := m.(*gonsx.NSXClient)
-	var edgeid, vnicindex string
-
-	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("edgeid"); ok {
-		edgeid = v.(string)
-	} else {
-		return fmt.Errorf("edgeid argument is required")
-	}
-
-	if v, ok := d.GetOk("vnicindex"); ok {
-		vnicindex = v.(string)
-	} else {
-		return fmt.Errorf("vnicindex argument is required")
-	}
-
-	nsxMutexKV.Lock(edgeid)
-	defer nsxMutexKV.Unlock(edgeid)
-
-	// Create the API, use it and check for errors.
-	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.getAllDhcpRelays(%s, %s)", edgeid, nsxclient))
-	currentService, err := getAllDhcpRelays(edgeid, nsxclient)
-
-	if err != nil {
-		return fmt.Errorf("Error:", err)
-	}
-
-	// Check to see if an entry with the vnicindex exists at all.  If
-	// not, assume it has been deleted manually and notify Terraform
-	// and exit gracefully.
-	if !currentService.CheckByVnicIndex(vnicindex) {
-		d.SetId("")
-		return nil
-	}
-
-	if currentService.CheckByVnicIndex(vnicindex) && (len(currentService.RelayAgents) == 1) {
-		deleteAPI := dhcprelay.NewDelete(edgeid)
-		err = nsxclient.Do(deleteAPI)
-		if err != nil {
-			return fmt.Errorf("Error:", err)
-		}
-
-		log.Println("DHCP Relay agent deleted.")
-	} else {
-		// if we got more than one relay agents, then we have to call update after removing
-		// the entry we want to remove.
-		log.Println("There are other DHCP Relay agents, only removing single entry with update.")
-		newRelayAgentsList := currentService.RemoveByVnicIndex(vnicindex).RelayAgents
-
-		updateAPI := dhcprelay.NewUpdate(currentService.RelayServer.IPAddress, edgeid, newRelayAgentsList)
-		err = nsxclient.Do(updateAPI)
-
-		if err != nil {
-			return fmt.Errorf("Error:", err)
-		} else if updateAPI.StatusCode() != 204 {
-			return fmt.Errorf(updateAPI.GetResponse())
-		} else {
-			log.Printf("Updated DHCP Relay - %s", updateAPI.GetResponse())
-		}
-	}
-
+	// nsxclient := m.(*gonsx.NSXClient)
 	return nil
 }
