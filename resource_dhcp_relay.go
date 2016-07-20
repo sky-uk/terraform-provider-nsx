@@ -215,7 +215,7 @@ func resourceDHCPRelayDelete(d *schema.ResourceData, m interface{}) error {
 		log.Println("There are other DHCP Relay agents, only removing single entry with update.")
 		newRelayAgentsList := currentDHCPRelay.RemoveByVnicIndex(vnicindex).RelayAgents
 
-		updateAPI := dhcprelay.NewUpdate(currentDHCPRelay.RelayServer.IpAddress, edgeid, newRelayAgentsList)
+		updateAPI := dhcprelay.NewUpdate(currentDHCPRelay.RelayServer.IPAddress, edgeid, newRelayAgentsList)
 		err = nsxclient.Do(updateAPI)
 
 		if err != nil {
