@@ -12,6 +12,7 @@ with the proper credentials before it can be used.
 * [NSX_LOGICAL_SWITCH Resource](#nsx_logical_switch-resource)
 * [NSX_EDGE_INTERFACE Resource](#nsx_edge_interface-resource)
 * [NSX_DHCP_RELAY Resource](#nsx_dhcp_relay-resource)
+* [NSX_SERVICE Resource](#nsx_service-resource)
 * [Limitations](#limitations)
 
 ## Installation
@@ -192,6 +193,18 @@ The following arguments are supported:
 * `giaddress` - (Required) The GIAddress is the IP address of the gateway on the edge interface (nsx_edge_interface gateway value above).
 * `dhcpserverip` (Required) The IP address of the DHCP server to have requests
 relayed to.
+
+## NSX_SERVICE Resource
+
+The SERVICE resource allows the creation of Services/Applications for use by
+service groups and service policies.
+
+### Example Usage
+
+```terra
+resource "nsx_service" "http" {
+}
+```
 
 ### Limitations
 
