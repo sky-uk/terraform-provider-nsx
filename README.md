@@ -203,8 +203,23 @@ service groups and service policies.
 
 ```terra
 resource "nsx_service" "http" {
+    name = "tf_service_http_80"
+    scopeid = "globalroot-0"
+    desc = "TCP port 80 - http"
+    proto = "TCP"
+    ports = "80"
 }
 ```
+
+### Argument Reference
+
+The following arguments are supported:
+
+* `name` - (Required) The name you want to call this service by.
+* `scopeid` - (Required) The scopeid.
+* `desc` - (Required) Description of the service.
+* `proto` - (Required) The chosen protocol. E.g. TCP.
+* `ports` - (Required) The ports assigned to this service. 
 
 ### Limitations
 
