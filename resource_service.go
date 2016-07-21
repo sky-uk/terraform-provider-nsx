@@ -125,10 +125,97 @@ func resourceServiceCreate(d *schema.ResourceData, m interface{}) error {
 
 func resourceServiceRead(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
+	var scopeid, name string
+
+	// Gather the attributes for the resource.
+	if v, ok := d.GetOk("scopeid"); ok{
+		scopeid = v.(string)
+	} else {
+		return fmt.Errorf("scopeid argument is required")
+	}
+
+	if v, ok := d.GetOk("name"); ok{
+		name = v.(string)
+	} else {
+		return fmt.Errorf("name argument is required")
+	}
+
+	// Gather all the resources that are associated with the specified
+	// scopeid.
+	log.Printf(fmt.Sprintf("[DEBUG] service.NewGetAll(%s)", scopeid))
+	api := service.NewGetAll(scopeid)
+	err := nsxclient.Do(api)
+
+	if err != nil {
+		return err
+	}
+
+	// See if we can find our specifically named resource within the list of
+	// resources associated with the scopeid.
+	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", name))
+	id := (api.GetResponse().FilterByName(name).ObjectID)
+	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
+
+	// If the resource has been removed manually, notify Terraform of this fact.
+	if id == "" {
+		d.SetId("")
+	}
+
 	return nil
 }
 
 func resourceServiceDelete(d *schema.ResourceData, m interface{}) error {
-	// nsxclient := m.(*gonsx.NSXClient)
+	nsxclient := m.(*gonsx.NSXClient)
+	var name, scopeid string
+
+	// Gather the attributes for the resource.
+	if v, ok := d.GetOk("scopeid"); ok{
+		scopeid = v.(string)
+	} else {
+		return fmt.Errorf("scopeid argument is required")
+	}
+
+	if v, ok := d.GetOk("name"); ok{
+		name = v.(string)
+	} else {
+		return fmt.Errorf("name argument is required")
+	}
+
+	// Gather all the resources that are associated with the specified
+	// scopeid.
+	log.Printf(fmt.Sprintf("[DEBUG] service.NewGetAll(%s)", scopeid))
+	api := service.NewGetAll(scopeid)
+	err := nsxclient.Do(api)
+
+	if err != nil {
+		return err
+	}
+
+	// See if we can find our specifically named resource within the list of
+	// resources associated with the scopeid.
+	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", name))
+	id := (api.GetResponse().FilterByName(name).ObjectID)
+	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
+
+	// If the resource has been removed manually, notify Terraform of this fact.
+	if id == "" {
+		d.SetId("")
+		return nil
+	}
+
+	// If we got here, the resource exists, so we attempt to delete it.
+	deleteAPI := service.NewDelete(id)
+	err = nsxclient.Do(deleteAPI)
+
+	if err != nil {
+		return err
+	}
+
+	// If we got here, the resource had existed, we deleted it and there was
+	// no error.  Notify Terraform of this fact and return successful
+	// completion.
+	d.SetId("")
+	log.Printf(fmt.Sprintf("[DEBUG] id %s deleted.", id))
+
 	return nil
 }
