@@ -153,7 +153,8 @@ func resourceServiceRead(d *schema.ResourceData, m interface{}) error {
 	// See if we can find our specifically named resource within the list of
 	// resources associated with the scopeid.
 	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", name))
-	id := (api.GetResponse().FilterByName(name).ObjectID)
+	serviceObject, err := getSingleService(scopeid, name, nsxclient)
+	id := serviceObject.ObjectID
 	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
 
 	// If the resource has been removed manually, notify Terraform of this fact.
@@ -194,7 +195,8 @@ func resourceServiceDelete(d *schema.ResourceData, m interface{}) error {
 	// See if we can find our specifically named resource within the list of
 	// resources associated with the scopeid.
 	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", name))
-	id := (api.GetResponse().FilterByName(name).ObjectID)
+	serviceObject, err := getSingleService(scopeid, name, nsxclient)
+	id := serviceObject.ObjectID
 	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
 
 	// If the resource has been removed manually, notify Terraform of this fact.
