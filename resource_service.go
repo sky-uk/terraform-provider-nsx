@@ -8,20 +8,26 @@ import (
 	"log"
 )
 
-// func getAllApplications(scopeID string, nsxclient *gonsx.NSXClient) (error) {
-	// getAllAPI := service.NewGetAll(scopeid)
-	// err := nsxclient.Do(getAllAPI)
+func getSingleService(scopeid, name string, nsxclient *gonsx.NSXClient) (*service.ApplicationService, error) {
+	getAllAPI := service.NewGetAll(scopeid)
+	err := nsxclient.Do(getAllAPI)
 
-	// if err != nil {
-		// return err
-	// }
+	if err != nil {
+		return nil, err
+	}
 
-	// if getAllAPI.StatusCode() != 200 {
-                // return Error("Status code: %d, Response: %s", getAllAPI.StatusCode(), getAllAPI.ResponseObject())
-        // }
+	if getAllAPI.StatusCode() != 200 {
+                return nil, fmt.Errorf("Status code: %d, Response: %s", getAllAPI.StatusCode(), getAllAPI.ResponseObject())
+        }
 
-	// return nil
-// }
+	service := getAllAPI.GetResponse().FilterByName(name)
+
+	if service.ObjectID == "" {
+		return nil, fmt.Errorf("Not found %s", name)
+	}
+
+	return service, nil
+}
 
 func resourceService() *schema.Resource {
 	return &schema.Resource{
@@ -118,7 +124,7 @@ func resourceServiceCreate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceServiceRead(d *schema.ResourceData, m interface{}) error {
-	// nsxclient := m.(*gonsx.NSXClient)
+	nsxclient := m.(*gonsx.NSXClient)
 	return nil
 }
 
