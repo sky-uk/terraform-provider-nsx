@@ -5,32 +5,35 @@ import (
 	"net/http"
 )
 
-type CreateEdgeInterfaceApi struct {
-	*api.BaseApi
+// CreateEdgeInterfaceAPI struct
+type CreateEdgeInterfaceAPI struct {
+	*api.BaseAPI
 }
 
-func NewCreate(edgeId, interfaceName, virtualWireId, gateway,
-		subnetMask, interfaceType string, mtu int) *CreateEdgeInterfaceApi {
-	this := new(CreateEdgeInterfaceApi)
+// NewCreate returns a new object of CreateEdgeInterfaceAPI
+func NewCreate(edgeID, interfaceName, virtualWireID, gateway,
+	subnetMask, interfaceType string, mtu int) *CreateEdgeInterfaceAPI {
+	this := new(CreateEdgeInterfaceAPI)
 
-	address_group := AddressGroup{PrimaryAddress: gateway, SubnetMask: subnetMask}
-	address_group_list := []AddressGroup{address_group}
+	addressGroup := AddressGroup{PrimaryAddress: gateway, SubnetMask: subnetMask}
+	addressGroupList := []AddressGroup{addressGroup}
 
-	edge_interface := EdgeInterface{
-		Name: interfaceName,
-		ConnectedToId: virtualWireId,
-		Type: interfaceType,
-		Mtu: mtu,
-		IsConnected: true,
-		AddressGroups:	AddressGroups{address_group_list},
+	edgeInterface := EdgeInterface{
+		Name:          interfaceName,
+		ConnectedToID: virtualWireID,
+		Type:          interfaceType,
+		Mtu:           mtu,
+		IsConnected:   true,
+		AddressGroups: AddressGroups{addressGroupList},
 	}
 	requestPayload := &EdgeInterfaces{}
-	requestPayload.Interfaces = []EdgeInterface{edge_interface}
+	requestPayload.Interfaces = []EdgeInterface{edgeInterface}
 
-	this.BaseApi = api.NewBaseApi(http.MethodPost, "/api/4.0/edges/" + edgeId + "/interfaces/?action=patch", requestPayload, new(EdgeInterfaces))
+	this.BaseAPI = api.NewBaseAPI(http.MethodPost, "/api/4.0/edges/"+edgeID+"/interfaces/?action=patch", requestPayload, new(EdgeInterfaces))
 	return this
 }
 
-func (this CreateEdgeInterfaceApi) GetResponse() *EdgeInterfaces {
-	return this.ResponseObject().(*EdgeInterfaces)
+// GetResponse returns the ResponseObject.
+func (createAPI CreateEdgeInterfaceAPI) GetResponse() *EdgeInterfaces {
+	return createAPI.ResponseObject().(*EdgeInterfaces)
 }

@@ -109,7 +109,7 @@ nsxclient.Do(delete_api)
 
 ### Dhcp Relay
 
-Interface resource. This resource will call the interface api within NSX.
+DHCP resource. This resource will call the DHCP relay api within NSX.
 Import the following class:
 ```
 github.com/sky-uk/gonsx/api/dhcprelay
@@ -134,4 +134,48 @@ nsxclient.Do(api)
 Delete:
 ```
 api := dhcprelay.NewDelete(edgeId)
+nsxclient.Do(api)
+```
+
+### Security Tags
+
+Interface resource. This resource will call the interface api within NSX.
+Import the following class:
+```
+github.com/sky-uk/gonsx/api/securitytags
+```
+
+Create:
+```
+api := securitytags.NewCreate(name, desc)
+nsxclient.Do(api)
+```
+
+Read:
+```
+api := securitytags.NewGetAll()
+nsxclient.Do(api)
+```
+
+Update:
+```
+Not yet implemented
+```
+
+Delete:
+```
+api := securitytags.NewDelete(securitytagID)
+nsxclient.Do(api)
+```
+
+Detach:
+```
+api := securitytags.NewDetach(securityTagID, vmID)
+nsxclient.Do(api)
+```
+
+Attach: 
+```
+api := securitytags.NewAttach(securityTagID, vmID)
+nsxclient.Do(api)
 ```

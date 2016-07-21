@@ -5,16 +5,19 @@ import (
 	"net/http"
 )
 
-type GetAllDhcpRelaysApi struct {
-	*api.BaseApi
+// GetAllDhcpRelaysAPI - struct
+type GetAllDhcpRelaysAPI struct {
+	*api.BaseAPI
 }
 
-func NewGetAll(edgeId string) *GetAllDhcpRelaysApi {
-	this := new(GetAllDhcpRelaysApi)
-	this.BaseApi = api.NewBaseApi(http.MethodGet, "/api/4.0/edges/"+edgeId+"/dhcp/config/relay", nil, new(DhcpRelay))
+// NewGetAll  - returns GetAll api object of GetAllDhcpRelaysAPI type.
+func NewGetAll(edgeID string) *GetAllDhcpRelaysAPI {
+	this := new(GetAllDhcpRelaysAPI)
+	this.BaseAPI = api.NewBaseAPI(http.MethodGet, "/api/4.0/edges/"+edgeID+"/dhcp/config/relay", nil, new(DhcpRelay))
 	return this
 }
 
-func (this GetAllDhcpRelaysApi) GetResponse() *DhcpRelay {
-	return this.ResponseObject().(*DhcpRelay)
+// GetResponse - Returns ResponseObject from GetAllDhcpRelaysAPI of DhcpRelay type.
+func (getAllAPI GetAllDhcpRelaysAPI) GetResponse() *DhcpRelay {
+	return getAllAPI.ResponseObject().(*DhcpRelay)
 }

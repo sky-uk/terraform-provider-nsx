@@ -1,21 +1,23 @@
 package edgeinterface
 
-
 import (
 	"github.com/sky-uk/gonsx/api"
 	"net/http"
 )
 
-type GetAllEdgeInterfacesApi struct {
-	*api.BaseApi
+// GetAllEdgeInterfacesAPI base object.
+type GetAllEdgeInterfacesAPI struct {
+	*api.BaseAPI
 }
 
-func NewGetAll(edgeId string) *GetAllEdgeInterfacesApi {
-	this := new(GetAllEdgeInterfacesApi)
-	this.BaseApi = api.NewBaseApi(http.MethodGet, "/api/4.0/edges/" + edgeId + "/interfaces", nil, new(EdgeInterfaces))
+// NewGetAll returns the api object of GetAllEdgeInterfacesAPI
+func NewGetAll(edgeID string) *GetAllEdgeInterfacesAPI {
+	this := new(GetAllEdgeInterfacesAPI)
+	this.BaseAPI = api.NewBaseAPI(http.MethodGet, "/api/4.0/edges/"+edgeID+"/interfaces", nil, new(EdgeInterfaces))
 	return this
 }
 
-func (this GetAllEdgeInterfacesApi) GetResponse() *EdgeInterfaces {
-	return this.ResponseObject().(*EdgeInterfaces)
+// GetResponse returns ResponseObject of GetAllEdgeInterfacesAPI
+func (getAllAPI GetAllEdgeInterfacesAPI) GetResponse() *EdgeInterfaces {
+	return getAllAPI.ResponseObject().(*EdgeInterfaces)
 }

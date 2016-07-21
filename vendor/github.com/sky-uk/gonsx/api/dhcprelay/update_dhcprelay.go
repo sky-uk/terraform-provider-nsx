@@ -1,27 +1,27 @@
 package dhcprelay
 
-
 import (
 	"github.com/sky-uk/gonsx/api"
 	"net/http"
 )
 
-type UpdateDhcpRelayApi struct {
-	*api.BaseApi
+// UpdateDhcpRelayAPI ...
+type UpdateDhcpRelayAPI struct {
+	*api.BaseAPI
 }
 
-func NewUpdate(dhcpIpAddress, edgeId string, relayAgentslist []RelayAgent) *UpdateDhcpRelayApi {
-	this := new(UpdateDhcpRelayApi)
+// NewUpdate creates a new object of UpdateDhcpRelayAPI
+func NewUpdate(dhcpIPAddress, edgeID string, relayAgentslist []RelayAgent) *UpdateDhcpRelayAPI {
+	this := new(UpdateDhcpRelayAPI)
 	requestPayload := new(DhcpRelay)
-	requestPayload.RelayServer.IpAddress = dhcpIpAddress
+	requestPayload.RelayServer.IPAddress = dhcpIPAddress
 	requestPayload.RelayAgents = relayAgentslist
 
-	this.BaseApi = api.NewBaseApi(http.MethodPut, "/api/4.0/edges/" + edgeId +"/dhcp/config/relay", requestPayload, new(string))
+	this.BaseAPI = api.NewBaseAPI(http.MethodPut, "/api/4.0/edges/"+edgeID+"/dhcp/config/relay", requestPayload, new(string))
 	return this
 }
 
-
-func (this UpdateDhcpRelayApi) GetResponse() string{
-	return this.ResponseObject().(string)
+// GetResponse returns the ResponseObject from UpdateDhcpRelayAPI
+func (updateAPI UpdateDhcpRelayAPI) GetResponse() string {
+	return updateAPI.ResponseObject().(string)
 }
-

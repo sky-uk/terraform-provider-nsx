@@ -5,12 +5,14 @@ import (
 	"net/http"
 )
 
-type DeleteDhcpRelayApi struct {
-	*api.BaseApi
+// DeleteDhcpRelayAPI - struct
+type DeleteDhcpRelayAPI struct {
+	*api.BaseAPI
 }
 
-func NewDelete(edgeId string) *DeleteDhcpRelayApi {
-	this := new(DeleteDhcpRelayApi)
-	this.BaseApi = api.NewBaseApi(http.MethodDelete, "/api/4.0/edges/"+ edgeId + "/dhcp/config/relay", nil, nil)
+// NewDelete - Generates a new DeleteDhcpRelayAPI object.
+func NewDelete(edgeID string) *DeleteDhcpRelayAPI {
+	this := new(DeleteDhcpRelayAPI)
+	this.BaseAPI = api.NewBaseAPI(http.MethodDelete, "/api/4.0/edges/"+edgeID+"/dhcp/config/relay", nil, nil)
 	return this
 }

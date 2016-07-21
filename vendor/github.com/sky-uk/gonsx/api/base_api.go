@@ -1,60 +1,73 @@
 package api
 
-type BaseApi struct {
-	method	 	string
-	endpoint 	string
-	requestObject 	interface{}
-	responseObject 	interface{}
+// BaseAPI  - Base API struct.
+type BaseAPI struct {
+	method         string
+	endpoint       string
+	requestObject  interface{}
+	responseObject interface{}
 
-	statusCode	int
-	rawResponse	[]byte
-	err 		error
+	statusCode  int
+	rawResponse []byte
+	err         error
 }
 
-func NewBaseApi(method string, endpoint string, requestObject interface{}, responseObject interface{}) *BaseApi {
-	return &BaseApi{method, endpoint, requestObject, responseObject, 0, nil, nil}
+// NewBaseAPI - Returns a new object of the BaseAPI.
+func NewBaseAPI(method string, endpoint string, requestObject interface{}, responseObject interface{}) *BaseAPI {
+	return &BaseAPI{method, endpoint, requestObject, responseObject, 0, nil, nil}
 }
 
-func (this *BaseApi) RequestObject() interface{} {
-	return this.requestObject
+// RequestObject - Returns the request object of the BaseAPI
+func (b *BaseAPI) RequestObject() interface{} {
+	return b.requestObject
 }
 
-func (this *BaseApi) ResponseObject() interface{} {
-	return this.responseObject
+// ResponseObject - Returns the ResponseObject interface.
+func (b *BaseAPI) ResponseObject() interface{} {
+	return b.responseObject
 }
 
-func (this *BaseApi) Method() string {
-	return this.method
+// Method - Returns the Method string, i.e. GET, PUT, POST.
+func (b *BaseAPI) Method() string {
+	return b.method
 }
 
-func (this *BaseApi) Endpoint() string {
-	return this.endpoint
+// Endpoint - Returns the Endpoint url string.
+func (b *BaseAPI) Endpoint() string {
+	return b.endpoint
 }
 
-func (this *BaseApi) StatusCode() int {
-	return this.statusCode
+// StatusCode - Returns the status code of the api.
+func (b *BaseAPI) StatusCode() int {
+	return b.statusCode
 }
 
-func (this *BaseApi) RawResponse() []byte {
-	return this.rawResponse
+// RawResponse - Returns the rawResponse object as byte type.
+func (b *BaseAPI) RawResponse() []byte {
+	return b.rawResponse
 }
 
-func (this *BaseApi) Error() error {
-	return this.err
+// Error - Returns the err the api.
+func (b *BaseAPI) Error() error {
+	return b.err
 }
 
-func (this *BaseApi) SetStatusCode(statusCode int) {
-	this.statusCode = statusCode
+// SetStatusCode - Sets the statusCode from api object.
+func (b *BaseAPI) SetStatusCode(statusCode int) {
+	b.statusCode = statusCode
 }
 
-func (this *BaseApi) SetRawResponse(rawResponse []byte) {
-	this.rawResponse = rawResponse
+// SetRawResponse - Sets the rawResponse on api object.
+func (b *BaseAPI) SetRawResponse(rawResponse []byte) {
+	b.rawResponse = rawResponse
 }
 
-func (this *BaseApi) SetError(err error) {
-	this.err = err
+// SetError - Sets the err on api object.
+func (b *BaseAPI) SetError(err error) {
+	b.err = err
 }
 
-func (this *BaseApi) SetResponseObject(res interface{}) {
-	this.responseObject = res
+// SetResponseObject - Sets the responseObject on api.
+func (b *BaseAPI) SetResponseObject(res interface{}) {
+	b.responseObject = res
 }

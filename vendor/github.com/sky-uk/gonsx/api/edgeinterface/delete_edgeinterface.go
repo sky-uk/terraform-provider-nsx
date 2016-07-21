@@ -5,12 +5,14 @@ import (
 	"net/http"
 )
 
-type DeleteEdgeInterfaceApi struct {
-	*api.BaseApi
+// DeleteEdgeInterfaceAPI struct
+type DeleteEdgeInterfaceAPI struct {
+	*api.BaseAPI
 }
 
-func NewDelete(interfaceIndex, edgeId string) *DeleteEdgeInterfaceApi {
-	this := new(DeleteEdgeInterfaceApi)
-	this.BaseApi = api.NewBaseApi(http.MethodDelete, "/api/4.0/edges/"+ edgeId + "/interfaces/?index=" + interfaceIndex, nil, nil)
+// NewDelete returns a new delete method object of DeleteEdgeInterfaceAPI
+func NewDelete(interfaceIndex, edgeID string) *DeleteEdgeInterfaceAPI {
+	this := new(DeleteEdgeInterfaceAPI)
+	this.BaseAPI = api.NewBaseAPI(http.MethodDelete, "/api/4.0/edges/"+edgeID+"/interfaces/?index="+interfaceIndex, nil, nil)
 	return this
 }

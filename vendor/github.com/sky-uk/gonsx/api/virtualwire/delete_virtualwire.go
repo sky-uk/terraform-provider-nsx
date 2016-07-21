@@ -5,12 +5,14 @@ import (
 	"net/http"
 )
 
-type DeleteVirtualWiresApi struct {
-	*api.BaseApi
+// DeleteVirtualWiresAPI base object.
+type DeleteVirtualWiresAPI struct {
+	*api.BaseAPI
 }
 
-func NewDelete(virtualWireId string) *DeleteVirtualWiresApi {
-	this := new(DeleteVirtualWiresApi)
-	this.BaseApi = api.NewBaseApi(http.MethodDelete, "/api/2.0/vdn/virtualwires/" + virtualWireId, nil, nil)
+// NewDelete returns a new object of DeleteVirtualWiresAPI.
+func NewDelete(virtualWireID string) *DeleteVirtualWiresAPI {
+	this := new(DeleteVirtualWiresAPI)
+	this.BaseAPI = api.NewBaseAPI(http.MethodDelete, "/api/2.0/vdn/virtualwires/"+virtualWireID, nil, nil)
 	return this
 }

@@ -5,16 +5,19 @@ import (
 	"net/http"
 )
 
-type GetAllVirtualWiresApi struct {
-	*api.BaseApi
+// GetAllVirtualWiresAPI base object.
+type GetAllVirtualWiresAPI struct {
+	*api.BaseAPI
 }
 
-func NewGetAll(scopeId string) *GetAllVirtualWiresApi {
-	this := new(GetAllVirtualWiresApi)
-	this.BaseApi = api.NewBaseApi(http.MethodGet, "/api/2.0/vdn/scopes/" + scopeId + "/virtualwires", nil, new(VirtualWires))
+// NewGetAll returns a new object of GetAllVirtualWiresAPI.
+func NewGetAll(scopeID string) *GetAllVirtualWiresAPI {
+	this := new(GetAllVirtualWiresAPI)
+	this.BaseAPI = api.NewBaseAPI(http.MethodGet, "/api/2.0/vdn/scopes/"+scopeID+"/virtualwires", nil, new(VirtualWires))
 	return this
 }
 
-func (this GetAllVirtualWiresApi) GetResponse() *VirtualWires {
-	return this.ResponseObject().(*VirtualWires)
+// GetResponse returns ResponseObject of GetAllVirtualWiresAPI.
+func (ga GetAllVirtualWiresAPI) GetResponse() *VirtualWires {
+	return ga.ResponseObject().(*VirtualWires)
 }

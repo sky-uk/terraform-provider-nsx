@@ -5,23 +5,26 @@ import (
 	"net/http"
 )
 
-type CreateVirtualWireApi struct {
-	*api.BaseApi
+// CreateVirtualWireAPI base api object.
+type CreateVirtualWireAPI struct {
+	*api.BaseAPI
 }
 
-func NewCreate(name, desc, tenantID, scopeId string) *CreateVirtualWireApi {
-	this := new(CreateVirtualWireApi)
-	requestPayload := new(VirtualWireCreateSpec)
+// NewCreate returns a new object of CreateVirtualWireAPI.
+func NewCreate(name, desc, tenantID, scopeID string) *CreateVirtualWireAPI {
+	this := new(CreateVirtualWireAPI)
+	requestPayload := new(CreateSpec)
 	requestPayload.Name = name
 	requestPayload.TenantID = tenantID
 	requestPayload.Description = desc
 	// TODO: need to make it argument
 	requestPayload.ControlPlaneMode = "UNICAST_MODE"
 
-	this.BaseApi = api.NewBaseApi(http.MethodPost, "/api/2.0/vdn/scopes/" + scopeId +"/virtualwires", requestPayload, new(string))
+	this.BaseAPI = api.NewBaseAPI(http.MethodPost, "/api/2.0/vdn/scopes/"+scopeID+"/virtualwires", requestPayload, new(string))
 	return this
 }
 
-func (this CreateVirtualWireApi) GetResponse() string{
-	return this.ResponseObject().(string)
+// GetResponse returns ResponseObject of CreateVirtualWireAPI.
+func (ca CreateVirtualWireAPI) GetResponse() string {
+	return ca.ResponseObject().(string)
 }
