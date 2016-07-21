@@ -13,6 +13,7 @@ with the proper credentials before it can be used.
 * [NSX_EDGE_INTERFACE Resource](#nsx_edge_interface-resource)
 * [NSX_DHCP_RELAY Resource](#nsx_dhcp_relay-resource)
 * [NSX_SERVICE Resource](#nsx_service-resource)
+* [NSX_SECURITY_GROUP Resource](#nsx_security_group-resource)
 * [Limitations](#limitations)
 
 ## Installation
@@ -194,6 +195,8 @@ The following arguments are supported:
 * `dhcpserverip` (Required) The IP address of the DHCP server to have requests
 relayed to.
 
+ 
+
 ## NSX_SERVICE Resource
 
 The SERVICE resource allows the creation of Services/Applications for use by
@@ -220,6 +223,40 @@ The following arguments are supported:
 * `desc` - (Required) Description of the service.
 * `proto` - (Required) The chosen protocol. E.g. TCP.
 * `ports` - (Required) The ports assigned to this service. 
+
+
+
+## NSX_SECURITY_GROUP Resource
+
+The SECURITY_GROUP resource allows the creation of Security Groups for use by
+service policies. Currently this will only have the one security tag to compare 
+on within the group.
+
+### Example Usage
+
+```terra
+resource "nsx_security_group" "web" {
+    name = "tf_security_group_web"
+    scopeid = "globalroot-0"
+    setoperator = "OR"
+    criteriaoperator = "OR"
+    criteriakey = "VM.SECURITY_TAG"
+    criteriavalue = "tag_name"
+    criteria = "contains"
+}
+```
+
+### Argument Reference
+
+The following arguments are supported:
+
+* `name` - (Required) The name you want to call this security group by.
+* `scopeid` - (Required) The scopeid.
+* `setoperator` - (Required) Set is used to combine the result of the dynamic set(s) evaluated previously with the result of this dynamic set. The possible values for this field are "AND" and "OR".
+* `criteriaoperator` - (Required) The operator for the criteria. 
+* `criteriakey` - (Required) The key in which the criteria should use to match.
+* `criteriavalue` - (Required) The value in which the criteria should match.
+* `criteria` - (Required) How the criteria should match.
 
 ### Limitations
 
