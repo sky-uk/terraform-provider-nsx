@@ -8,6 +8,27 @@ import (
 	"log"
 )
 
+func getSingleSecurityGroup(scopeid, name string, nsxclient *gonsx.NSXClient) (*securitygroup.SecurityGroup, error) {
+	getAllAPI := securitygroup.NewGetAll(scopeid)
+	err := nsxclient.Do(getAllAPI)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if getAllAPI.StatusCode() != 200 {
+		return nil, fmt.Errorf("Status code: %d, Response: %s", getAllAPI.StatusCode(), getAllAPI.ResponseObject())
+	}
+
+	securityGroup := getAllAPI.GetResponse().FilterByName(name)
+
+	if securityGroup.ObjectID == "" {
+		return nil, fmt.Errorf("Not found %s", name)
+	}
+
+	return securityGroup, nil
+}
+
 func resourceSecurityGroup() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceSecurityGroupCreate,
@@ -154,7 +175,8 @@ func resourceSecurityGroupRead(d *schema.ResourceData, m interface{}) error {
 	// See if we can find our specifically named resource within the list of
 	// resources associated with the scopeid.
 	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", name))
-	id := (api.GetResponse().FilterByName(name).ObjectID)
+	securityGroupObject, err := getSingleSecurityGroup(scopeid, name, nsxclient)
+	id := securityGroupObject.ObjectID
 	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
 
 	// If the resource has been removed manually, notify Terraform of this fact.
@@ -195,7 +217,8 @@ func resourceSecurityGroupDelete(d *schema.ResourceData, m interface{}) error {
 	// See if we can find our specifically named resource within the list of
 	// resources associated with the scopeid.
 	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", name))
-	id := (api.GetResponse().FilterByName(name).ObjectID)
+	securityGroupObject, err := getSingleSecurityGroup(scopeid, name, nsxclient)
+	id := securityGroupObject.ObjectID
 	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
 
 	// If the resource has been removed manually, notify Terraform of this fact.
