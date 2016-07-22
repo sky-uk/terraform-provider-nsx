@@ -9,6 +9,27 @@ import (
 	"log"
 )
 
+func getSingleEdgeInterface(edgeid, name string, nsxclient *gonsx.NSXClient) (*edgeinterface.EdgeInterface, error) {
+	getAllAPI := edgeinterface.NewGetAll(edgeid)
+	err := nsxclient.Do(getAllAPI)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if getAllAPI.StatusCode() != 200 {
+		return nil, fmt.Errorf("Status code: %d, Response: %s", getAllAPI.StatusCode(), getAllAPI.ResponseObject())
+	}
+
+	edgeinterface := getAllAPI.GetResponse().FilterByName(name)
+
+	if edgeinterface.Index == "" {
+		return nil, fmt.Errorf("Not found %s", name)
+	}
+
+	return edgeinterface, nil
+}
+
 func resourceEdgeInterface() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceEdgeInterfaceCreate,
@@ -161,7 +182,8 @@ func resourceEdgeInterfaceRead(d *schema.ResourceData, m interface{}) error {
 	// See if we can find our specifically named resource within the list of
 	// resources associated with the edgeid.
 	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").Index", name))
-	id := (api.GetResponse().FilterByName(name).Index)
+	edgeInterfaceObject, err := getSingleEdgeInterface(edgeid, name, nsxclient)
+	id := edgeInterfaceObject.Index
 	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
 
 	// If the resource has been removed manually, notify Terraform of this fact.
@@ -205,7 +227,9 @@ func resourceEdgeInterfaceDelete(d *schema.ResourceData, m interface{}) error {
 	// See if we can find our specifically named resource within the list of
 	// resources associated with the edgeid.
 	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").Index", name))
-	id := (api.GetResponse().FilterByName(name).Index)
+	edgeInterfaceObject, err := getSingleEdgeInterface(edgeid, name, nsxclient)
+	id := edgeInterfaceObject.Index
+	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
 
 	// If we got here, the resource exists, so we attempt to delete it.
 	deleteAPI := edgeinterface.NewDelete(id, edgeid)

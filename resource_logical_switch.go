@@ -9,6 +9,27 @@ import (
 	"log"
 )
 
+func getSingleLogicalSwitch(scopeid, name string, nsxclient *gonsx.NSXClient) (*virtualwire.VirtualWire, error) {
+	getAllAPI := virtualwire.NewGetAll(scopeid)
+	err := nsxclient.Do(getAllAPI)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if getAllAPI.StatusCode() != 200 {
+		return nil, fmt.Errorf("Status code: %d, Response: %s", getAllAPI.StatusCode(), getAllAPI.ResponseObject())
+	}
+
+	service := getAllAPI.GetResponse().FilterByName(name)
+
+	if service.ObjectID == "" {
+		return nil, fmt.Errorf("Not found %s", name)
+	}
+
+	return service, nil
+}
+
 func resourceLogicalSwitch() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceLogicalSwitchCreate,
@@ -117,7 +138,8 @@ func resourceLogicalSwitchRead(d *schema.ResourceData, m interface{}) error {
 	// See if we can find our specifically named resource within the list of
 	// resources associated with the scopeid.
 	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", name))
-	id := (api.GetResponse().FilterByName(name).ObjectID)
+	logicalSwitchObject, err := getSingleLogicalSwitch(scopeid, name, nsxclient)
+	id := logicalSwitchObject.ObjectID
 	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
 
 	// If the resource has been removed manually, notify Terraform of this fact.
@@ -156,7 +178,8 @@ func resourceLogicalSwitchDelete(d *schema.ResourceData, m interface{}) error {
 	}
 
 	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", name))
-	id := (api.GetResponse().FilterByName(name).ObjectID)
+	logicalSwitchObject, err := getSingleLogicalSwitch(scopeid, name, nsxclient)
+	id := logicalSwitchObject.ObjectID
 	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
 
 	// If the resource has been removed manually, notify Terraform of this fact.
