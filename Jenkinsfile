@@ -75,19 +75,28 @@ node {
 // we only release from master
 if (git_branch == 'master' && !gitHelper.isLastCommitFromUser('paas-jenkins')) {
     stage 'release'
-    timeout(time:3, unit:'HOURS') {
-        input message:"Release ${project_name} ${version()} ?"
+    def approved = true
+    timeout(time:2, unit:'HOURS') {
+        try {
+            input message: "Release ${project_name} ${version()} ?"
+        } catch (InterruptedException _x) {
+            echo "Releasing not approved in time!"
+            approved = false
+        }
     }
 
-    node() {
-        gitHelper.tag(version(), "Jenkins ${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}")
-        gitHelper.push(git_credentials_id, git_branch)
+    if(approved) {
+        echo "Release has been approved!"
+        node() {
+            gitHelper.tag(version(), "Jenkins ${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}")
+            gitHelper.push(git_credentials_id, git_branch)
 
-        echo "Creating GitHub Release v${version()}"
-        github_release_response = gitHelper.createGitHubRelease(project_github_token, project_owner, project_name, version(), git_branch)
-//      FIXME: this is not working yet
-//        echo "Attaching artifacts to GitHub Release v${version()}"
-//        gitHelper.uploadToGitHubRelease(project_github_token, project_owner, project_name, github_release_response.id, "${pwd()}/coverage.html", 'application/html')
+            echo "Creating GitHub Release v${version()}"
+            github_release_response = gitHelper.createGitHubRelease(project_github_token, project_owner, project_name, version(), git_branch)
+//          FIXME: this is not working yet
+//          echo "Attaching artifacts to GitHub Release v${version()}"
+//          gitHelper.uploadToGitHubRelease(project_github_token, project_owner, project_name, github_release_response.id, "${pwd()}/coverage.html", 'application/html')
+        }
     }
 }
 
