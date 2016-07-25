@@ -14,6 +14,7 @@ with the proper credentials before it can be used.
 * [NSX_DHCP_RELAY Resource](#nsx_dhcp_relay-resource)
 * [NSX_SERVICE Resource](#nsx_service-resource)
 * [NSX_SECURITY_GROUP Resource](#nsx_security_group-resource)
+* [NSX_SECURITY_TAG Resource](#nsx_security_tag-resource)
 * [Limitations](#limitations)
 
 ## Installation
@@ -258,6 +259,29 @@ The following arguments are supported:
 * `criteriavalue` - (Required) The value in which the criteria should match.
 * `criteria` - (Required) How the criteria should match.
 
+## NSX_SECURITY_TAG Resource
+
+The SECURITY_TAG resource allows the creation of Security Tags for use by
+security groups and virtual machines. 
+
+### Example Usage
+
+```terra
+resource "nsx_security_tag "web" {
+    name = "tf_security_tag"
+    desc = "TF Security Tag for web hosts"
+}
+```
+
+### Argument Reference
+
+The following arguments are supported:
+
+* `name` - (Required) The name you want to call this security tag by.
+* `desc` - (Required) A friendly description of the security tag.
+
+
+
 ### Limitations
 
 This is currently a proof of concept and only has a very limited number of
@@ -266,3 +290,4 @@ of attributes.
 
 We have only implemented the ability to Create, Read and Delete resources.
 Currently there is no implementation of Update.
+

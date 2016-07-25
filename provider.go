@@ -47,6 +47,7 @@ func Provider() terraform.ResourceProvider {
 			"nsx_dhcp_relay":     resourceDHCPRelay(),
 			"nsx_service":        resourceService(),
 			"nsx_security_group": resourceSecurityGroup(),
+			"nsx_security_tag":   resourceSecurityTag(),
 		},
 
 		ConfigureFunc: providerConfigure,
