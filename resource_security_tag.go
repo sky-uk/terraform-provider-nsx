@@ -9,7 +9,7 @@ import (
 	"log"
 )
 
-func getSingleSecurityTag(name string, nsxclient *gonsx.NSXClient) (*securitytag.SecurityTag, error){
+func getSingleSecurityTag(name string, nsxclient *gonsx.NSXClient) (*securitytag.SecurityTag, error) {
 	getAllAPI := securitytag.NewGetAll()
 	err := nsxclient.Do(getAllAPI)
 
@@ -43,9 +43,9 @@ func resourceSecurityTag() *schema.Resource {
 				ForceNew: true,
 			},
 			"desc": {
-				Type:      schema.TypeString,
-				Required:  true,
-				ForceNew:  true,
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
 			},
 		},
 	}
@@ -67,7 +67,6 @@ func resourceSecurityTagCreate(d *schema.ResourceData, m interface{}) error {
 	} else {
 		return fmt.Errorf("desc argument is required")
 	}
-
 
 	log.Printf(fmt.Sprintf("[DEBUG] securitytag.NewCreate(%s, %s)", name, desc))
 	createAPI := securitytag.NewCreate(name, desc)
@@ -115,7 +114,7 @@ func resourceSecurityTagRead(d *schema.ResourceData, m interface{}) error {
 	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", name))
 	securityTagObject, err := getSingleSecurityTag(name, nsxclient)
 
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
@@ -132,7 +131,7 @@ func resourceSecurityTagRead(d *schema.ResourceData, m interface{}) error {
 
 func resourceSecurityTagDelete(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var name string//, singleoperation string
+	var name string //, singleoperation string
 
 	// Gather the attributes for the resource.
 	if v, ok := d.GetOk("name"); ok {
@@ -156,7 +155,7 @@ func resourceSecurityTagDelete(d *schema.ResourceData, m interface{}) error {
 	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", name))
 	securityTagObject, err := getSingleSecurityTag(name, nsxclient)
 
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
@@ -171,7 +170,7 @@ func resourceSecurityTagDelete(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	if  deleteAPI.StatusCode() != 200 {
+	if deleteAPI.StatusCode() != 200 {
 		//log.Printf(fmt.Sprintf("[DEBUG] id %s deleted.", id))
 		return fmt.Errorf("[DEBUG] response object: %s", deleteAPI.ResponseObject())
 	}

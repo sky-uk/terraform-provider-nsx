@@ -22,26 +22,26 @@ func resourceSecurityTagAttachment() *schema.Resource {
 				ForceNew: true,
 			},
 			"moid": {
-				Type:      schema.TypeString,
-				Required:  true,
-				ForceNew:  true,
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
 			},
 		},
 	}
 }
 
-func resourceSecurityTagAttachmentCreate (d *schema.ResourceData, m interface{}) error {
+func resourceSecurityTagAttachmentCreate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
 	var name, moid string
 
 	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("name"); ok{
+	if v, ok := d.GetOk("name"); ok {
 		name = v.(string)
 	} else {
 		return fmt.Errorf("name argument is required")
 	}
 
-	if v, ok := d.GetOk("moid"); ok{
+	if v, ok := d.GetOk("moid"); ok {
 		moid = v.(string)
 	} else {
 		return fmt.Errorf("moid argument is required")
@@ -49,7 +49,7 @@ func resourceSecurityTagAttachmentCreate (d *schema.ResourceData, m interface{})
 
 	log.Printf(fmt.Sprintf("[DEBUG] getSingleSecurityTag(%s)", name))
 	securityTagObject, err := getSingleSecurityTag(name, nsxclient)
-	tagID := securityTagObject .ObjectID
+	tagID := securityTagObject.ObjectID
 
 	if err != nil {
 		return err
@@ -79,10 +79,10 @@ func resourceSecurityTagAttachmentCreate (d *schema.ResourceData, m interface{})
 	return resourceSecurityTagAttachmentRead(d, m)
 }
 
-func resourceSecurityTagAttachmentRead (d *schema.ResourceData, m interface{}) error {
+func resourceSecurityTagAttachmentRead(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func resourceSecurityTagAttachmentDelete (d *schema.ResourceData, m interface{}) error {
+func resourceSecurityTagAttachmentDelete(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
