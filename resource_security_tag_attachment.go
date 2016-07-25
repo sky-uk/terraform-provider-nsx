@@ -47,16 +47,36 @@ func resourceSecurityTagAttachmentCreate (d *schema.ResourceData, m interface{})
 		return fmt.Errorf("moid argument is required")
 	}
 
-	log.Printf(fmt.Sprintf("[DEBUG] securitytag.NewAssign(%s, %s)", name, moid))
-	createAPI := securitytag.NewAssign(name, moid)
-	err := nsxclient.Do(createAPI)
+	log.Printf(fmt.Sprintf("[DEBUG] getSingleSecurityTag(%s)", name))
+	securityTagObject, err := getSingleSecurityTag(name, nsxclient)
+	tagID := securityTagObject .ObjectID
 
 	if err != nil {
 		return err
 	}
 
+	log.Printf(fmt.Sprintf("[DEBUG] securitytag.NewAssign(%s, %s)", tagID, moid))
+	createAPI := securitytag.NewAssign(name, moid)
+	err = nsxclient.Do(createAPI)
 
-	return nil
+	if err != nil {
+		return err
+	}
+
+	if createAPI.StatusCode() != 200 {
+		return fmt.Errorf("Failed to attach security tag %s", name)
+	}
+
+	id := tagID + "/" + moid
+	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
+
+	if tagID != "" || moid != "" {
+		d.SetId(id)
+	} else {
+		return errors.New("Can not establish the id of the created resource")
+	}
+
+	return resourceSecurityTagAttachmentRead(d, m)
 }
 
 func resourceSecurityTagAttachmentRead (d *schema.ResourceData, m interface{}) error {
