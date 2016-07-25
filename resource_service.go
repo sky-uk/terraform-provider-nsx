@@ -17,8 +17,8 @@ func getSingleService(scopeid, name string, nsxclient *gonsx.NSXClient) (*servic
 	}
 
 	if getAllAPI.StatusCode() != 200 {
-                return nil, fmt.Errorf("Status code: %d, Response: %s", getAllAPI.StatusCode(), getAllAPI.ResponseObject())
-        }
+		return nil, fmt.Errorf("Status code: %d, Response: %s", getAllAPI.StatusCode(), getAllAPI.ResponseObject())
+	}
 
 	service := getAllAPI.GetResponse().FilterByName(name)
 
@@ -109,9 +109,9 @@ func resourceServiceCreate(d *schema.ResourceData, m interface{}) error {
 	createAPI := service.NewCreate(scopeid, name, desc, proto, ports)
 	err := nsxclient.Do(createAPI)
 
-        if err != nil {
+	if err != nil {
 		return fmt.Errorf("Error:", err)
-        }
+	}
 
 	if createAPI.StatusCode() != 201 {
 		return fmt.Errorf("%s", createAPI.ResponseObject())
@@ -128,13 +128,13 @@ func resourceServiceRead(d *schema.ResourceData, m interface{}) error {
 	var scopeid, name string
 
 	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("scopeid"); ok{
+	if v, ok := d.GetOk("scopeid"); ok {
 		scopeid = v.(string)
 	} else {
 		return fmt.Errorf("scopeid argument is required")
 	}
 
-	if v, ok := d.GetOk("name"); ok{
+	if v, ok := d.GetOk("name"); ok {
 		name = v.(string)
 	} else {
 		return fmt.Errorf("name argument is required")
@@ -170,13 +170,13 @@ func resourceServiceDelete(d *schema.ResourceData, m interface{}) error {
 	var name, scopeid string
 
 	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("scopeid"); ok{
+	if v, ok := d.GetOk("scopeid"); ok {
 		scopeid = v.(string)
 	} else {
 		return fmt.Errorf("scopeid argument is required")
 	}
 
-	if v, ok := d.GetOk("name"); ok{
+	if v, ok := d.GetOk("name"); ok {
 		name = v.(string)
 	} else {
 		return fmt.Errorf("name argument is required")

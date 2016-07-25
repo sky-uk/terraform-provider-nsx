@@ -192,13 +192,13 @@ func resourceSecurityGroupDelete(d *schema.ResourceData, m interface{}) error {
 	var name, scopeid string
 
 	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("scopeid"); ok{
+	if v, ok := d.GetOk("scopeid"); ok {
 		scopeid = v.(string)
 	} else {
 		return fmt.Errorf("scopeid argument is required")
 	}
 
-	if v, ok := d.GetOk("name"); ok{
+	if v, ok := d.GetOk("name"); ok {
 		name = v.(string)
 	} else {
 		return fmt.Errorf("name argument is required")
@@ -234,7 +234,7 @@ func resourceSecurityGroupDelete(d *schema.ResourceData, m interface{}) error {
 	if err != nil {
 		return err
 	}
-	
+
 	// If we got here, the resource had existed, we deleted it and there was
 	// no error.  Notify Terraform of this fact and return successful
 	// completion.
