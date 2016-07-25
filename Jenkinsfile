@@ -39,7 +39,8 @@ node {
             echo "Running Go lint"
             inContainer {
                 sh "go get github.com/golang/lint/golint"
-                sh "\$GOPATH/bin/golint -set_exit_status ${project_src_path}/..."
+                // TODO: enforcement has been removed, as per golint readme
+                sh "\$GOPATH/bin/golint ${project_src_path}/..."
             }
 
             stage 'format'
