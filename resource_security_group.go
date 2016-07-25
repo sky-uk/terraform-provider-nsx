@@ -135,7 +135,7 @@ func resourceSecurityGroupCreate(d *schema.ResourceData, m interface{}) error {
 	err := nsxclient.Do(createAPI)
 
 	if err != nil {
-		return fmt.Errorf("Error creating security group: ", err)
+		return fmt.Errorf("Error creating security group: %v", err)
 	}
 
 	if createAPI.StatusCode() != 201 {

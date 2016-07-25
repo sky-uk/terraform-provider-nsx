@@ -110,7 +110,7 @@ func resourceServiceCreate(d *schema.ResourceData, m interface{}) error {
 	err := nsxclient.Do(createAPI)
 
 	if err != nil {
-		return fmt.Errorf("Error:", err)
+		return fmt.Errorf("Error: %v", err)
 	}
 
 	if createAPI.StatusCode() != 201 {

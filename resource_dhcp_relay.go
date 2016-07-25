@@ -103,11 +103,11 @@ func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
 	defer nsxMutexKV.Unlock(edgeid)
 
 	// Create the API, use it and check for errors.
-	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.getAllDhcpRelays(%s, %s)", edgeid, nsxclient))
+	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.getAllDhcpRelays(%s, %v)", edgeid, nsxclient))
 	currentDHCPRelay, err := getAllDhcpRelays(edgeid, nsxclient)
 
 	if err != nil {
-		return fmt.Errorf("Error:", err)
+		return fmt.Errorf("Error: %v", err)
 	}
 
 	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.RelayAgent(%s, %s)", vnicindex, giaddress))
@@ -122,7 +122,7 @@ func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
 	err = nsxclient.Do(updateAPI)
 
 	if err != nil {
-		return fmt.Errorf("Error:", err)
+		return fmt.Errorf("Error: %v", err)
 	} else if updateAPI.StatusCode() != 204 {
 		return fmt.Errorf("Failed to update the DHCP relay %s", updateAPI.GetResponse())
 	}
@@ -151,11 +151,11 @@ func resourceDHCPRelayRead(d *schema.ResourceData, m interface{}) error {
 	}
 
 	// Create the API, use it and check for errors.
-	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.getAllDhcpRelays(%s, %s)", edgeid, nsxclient))
+	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.getAllDhcpRelays(%s, %v)", edgeid, nsxclient))
 	currentDHCPRelay, err := getAllDhcpRelays(edgeid, nsxclient)
 
 	if err != nil {
-		return fmt.Errorf("Error:", err)
+		return fmt.Errorf("Error: %v", err)
 	}
 
 	if !currentDHCPRelay.CheckByVnicIndex(vnicindex) {
@@ -186,11 +186,11 @@ func resourceDHCPRelayDelete(d *schema.ResourceData, m interface{}) error {
 	defer nsxMutexKV.Unlock(edgeid)
 
 	// Create the API, use it and check for errors.
-	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.getAllDhcpRelays(%s, %s)", edgeid, nsxclient))
+	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.getAllDhcpRelays(%s, %v)", edgeid, nsxclient))
 	currentDHCPRelay, err := getAllDhcpRelays(edgeid, nsxclient)
 
 	if err != nil {
-		return fmt.Errorf("Error:", err)
+		return fmt.Errorf("Error: %v", err)
 	}
 
 	// Check to see if an entry with the vnicindex exists at all.  If
@@ -205,7 +205,7 @@ func resourceDHCPRelayDelete(d *schema.ResourceData, m interface{}) error {
 		deleteAPI := dhcprelay.NewDelete(edgeid)
 		err = nsxclient.Do(deleteAPI)
 		if err != nil {
-			return fmt.Errorf("Error:", err)
+			return fmt.Errorf("Error: %v", err)
 		}
 
 		log.Println("DHCP Relay agent deleted.")
@@ -219,7 +219,7 @@ func resourceDHCPRelayDelete(d *schema.ResourceData, m interface{}) error {
 		err = nsxclient.Do(updateAPI)
 
 		if err != nil {
-			return fmt.Errorf("Error:", err)
+			return fmt.Errorf("Error: %v", err)
 		} else if updateAPI.StatusCode() != 204 {
 			return fmt.Errorf(updateAPI.GetResponse())
 		} else {
