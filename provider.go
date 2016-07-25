@@ -48,6 +48,7 @@ func Provider() terraform.ResourceProvider {
 			"nsx_service":        resourceService(),
 			"nsx_security_group": resourceSecurityGroup(),
 			"nsx_security_tag":   resourceSecurityTag(),
+			"nsx_security_tag_attachment":   resourceSecurityTagAttachment(),
 		},
 
 		ConfigureFunc: providerConfigure,
