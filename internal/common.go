@@ -5,8 +5,8 @@ import (
 	"github.com/sky-uk/gonsx"
 	"io"
 	"log"
-	"os/exec"
 	"os"
+	"os/exec"
 )
 
 var nsxClient *gonsx.NSXClient
@@ -16,7 +16,7 @@ func GetNSXClient() *gonsx.NSXClient {
 		nsxUrl := os.Getenv("NSX_URL")
 		nsxUser := os.Getenv("NSX_USER")
 		nsxPassword := os.Getenv("NSX_PASSWORD")
-		if (nsxUrl == "" || nsxUser == "" || nsxPassword == "") {
+		if nsxUrl == "" || nsxUser == "" || nsxPassword == "" {
 			panic("either NSX_URL, NSX_USER or NSX_PASSWORD environment variables are empty!")
 		}
 		nsxClient = gonsx.NewNSXClient(nsxUrl, nsxUser, nsxPassword, true, false)
