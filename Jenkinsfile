@@ -19,83 +19,87 @@ docker_image = "paas/golang-img:0.0.1"
 gitHelper = null
 shellHelper = null
 goHelper = null
+slackHelper = null
 
-node {
-    wrap([$class: 'TimestamperBuildWrapper']) {
-        wrap([$class: 'AnsiColorBuildWrapper']) {
-            loadHelpers()
+slackChannel = '#ott-paas'
 
-            stage 'checkout'
-            deleteDir()
-            git_branch = env.BRANCH_NAME
-            checkout scm
-            gitHelper.prepareGit('paas-jenkins', 'paas-jenkins@jenkins.paas.int.ovp.bskyb.com')
+loadHelpers()
 
-            stage 'version'
-            if (autoincVersion()) {
-                writeFile file: version_file, text: version()
-                gitHelper.commit(version_file, "bumping to: ${version()}")
-            }
+slackHelper.notificationWrapper(slackChannel, currentBuild, env, true) {
+    node {
+        wrap([$class: 'TimestamperBuildWrapper']) {
+            wrap([$class: 'AnsiColorBuildWrapper']) {
+                stage 'checkout'
+                deleteDir()
+                git_branch = env.BRANCH_NAME
+                checkout scm
+                gitHelper.prepareGit('paas-jenkins', 'paas-jenkins@jenkins.paas.int.ovp.bskyb.com')
 
-            echo "Starting pipeline for project: [${project_name}], branch: [${git_branch}], version: [${version()}]"
+                stage 'version'
+                if (autoincVersion()) {
+                    writeFile file: version_file, text: version()
+                    gitHelper.commit(version_file, "bumping to: ${version()}")
+                }
 
-            stage 'lint'
-            inContainer {
-                goHelper.goLint(project_src_path)
-            }
+                echo "Starting pipeline for project: [${project_name}], branch: [${git_branch}], version: [${version()}]"
 
-            stage 'format'
-            inContainer {
-                goHelper.goFmt(project_src_path)
-            }
+                stage 'lint'
+                inContainer {
+                    goHelper.goLint(project_src_path)
+                }
 
-            stage 'vet'
-            inContainer {
-                goHelper.goVet(project_src_path)
-            }
+                stage 'format'
+                inContainer {
+                    goHelper.goFmt(project_src_path)
+                }
 
-            stage 'build'
-            inContainer {
-                goHelper.goBuild(project_src_path)
-            }
+                stage 'vet'
+                inContainer {
+                    goHelper.goVet(project_src_path)
+                }
 
-            stage 'test'
-            inContainer {
-                goHelper.goTest(project_src_path)
-            }
+                stage 'build'
+                inContainer {
+                    goHelper.goBuild(project_src_path)
+                }
 
-            stage 'coverage'
-            inContainer {
-                goHelper.goCoverage(project_src_path)
+                stage 'test'
+                inContainer {
+                    goHelper.goTest(project_src_path)
+                }
+
+                stage 'coverage'
+                inContainer {
+                    goHelper.goCoverage(project_src_path)
+                }
             }
         }
     }
-}
-
-// we only release from master
-if (git_branch == 'master' && !gitHelper.isLastCommitFromUser('paas-jenkins')) {
-    stage 'release'
-    def approved = true
-    timeout(time:2, unit:'HOURS') {
-        try {
-            input message: "Release ${project_name} ${version()} ?"
-        } catch (InterruptedException _x) {
-            echo "Releasing not approved in time!"
-            approved = false
+    // we only release from master
+    if (git_branch == 'master' && !gitHelper.isLastCommitFromUser('paas-jenkins')) {
+        stage 'release'
+        def approved = true
+        timeout(time: 2, unit: 'HOURS') {
+            try {
+                input message: "Release ${project_name} ${version()} ?"
+            } catch (InterruptedException _x) {
+                echo "Releasing not approved in time!"
+                approved = false
+            }
         }
-    }
 
-    if(approved) {
-        echo "Release has been approved!"
-        node() {
-            gitHelper.tag(version(), "Jenkins ${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}")
-            gitHelper.push(git_credentials_id, git_branch)
+        if (approved) {
+            echo "Release has been approved!"
+            node() {
+                gitHelper.tag(version(), "Jenkins ${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}")
+                gitHelper.push(git_credentials_id, git_branch)
 
-            echo "Creating GitHub Release v${version()}"
-            github_release_response = gitHelper.createGitHubRelease(project_github_token, project_owner, project_name, version(), git_branch)
-//          FIXME: this is not working yet
-//          echo "Attaching artifacts to GitHub Release v${version()}"
-//          gitHelper.uploadToGitHubRelease(project_github_token, project_owner, project_name, github_release_response.id, "${pwd()}/coverage.html", 'application/html')
+                echo "Creating GitHub Release v${version()}"
+                github_release_response = gitHelper.createGitHubRelease(project_github_token, project_owner, project_name, version(), git_branch)
+//              FIXME: this is not working yet
+//              echo "Attaching artifacts to GitHub Release v${version()}"
+//              gitHelper.uploadToGitHubRelease(project_github_token, project_owner, project_name, github_release_response.id, "${pwd()}/coverage.html", 'application/html')
+            }
         }
     }
 }
@@ -105,6 +109,7 @@ def loadHelpers() {
         this.gitHelper = fileLoader.load('lib/helpers/git')
         this.shellHelper = fileLoader.load('lib/helpers/shell')
         this.goHelper = fileLoader.load('lib/helpers/go')
+        this.slackHelper = fileLoader.load('lib/helpers/slack')
     }
 }
 
