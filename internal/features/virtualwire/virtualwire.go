@@ -7,28 +7,28 @@ import (
 
 func deleteAllVirtualWiresWithNameInScope(name string, scope string) {
 	for {
-		getApi := virtualwire.NewGetAll(scope)
-		err := Client.Do(getApi)
+		getAPI := virtualwire.NewGetAll(scope)
+		err := Client.Do(getAPI)
 		internal.CheckError(err)
-		objectId := getApi.GetResponse().FilterByName(name).ObjectID
-		if objectId == "" {
+		objectID := getAPI.GetResponse().FilterByName(name).ObjectID
+		if objectID == "" {
 			break
 		}
-		deleteApi := virtualwire.NewDelete(objectId)
-		err = Client.Do(deleteApi)
+		deleteAPI := virtualwire.NewDelete(objectID)
+		err = Client.Do(deleteAPI)
 		internal.CheckError(err)
 	}
 }
 
 func getVirtualWire(name string, scope string) *virtualwire.VirtualWire {
-	getApi := virtualwire.NewGetAll(scope)
-	err := Client.Do(getApi)
+	getAPI := virtualwire.NewGetAll(scope)
+	err := Client.Do(getAPI)
 	internal.CheckError(err)
-	return getApi.GetResponse().FilterByName(name)
+	return getAPI.GetResponse().FilterByName(name)
 }
 
 func createVirtualWire(name string, description string, tenant string, scope string) {
-	createApi := virtualwire.NewCreate(name, description, tenant, scope)
-	err := Client.Do(createApi)
+	createAPI := virtualwire.NewCreate(name, description, tenant, scope)
+	err := Client.Do(createAPI)
 	internal.CheckError(err)
 }
