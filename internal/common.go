@@ -11,25 +11,28 @@ import (
 
 var nsxClient *gonsx.NSXClient
 
+// GetNSXClient : method to retrieve the nsxclient singleton
 func GetNSXClient() *gonsx.NSXClient {
 	if nsxClient == nil {
-		nsxUrl := os.Getenv("NSX_URL")
+		nsxURL := os.Getenv("NSX_URL")
 		nsxUser := os.Getenv("NSX_USER")
 		nsxPassword := os.Getenv("NSX_PASSWORD")
-		if nsxUrl == "" || nsxUser == "" || nsxPassword == "" {
+		if nsxURL == "" || nsxUser == "" || nsxPassword == "" {
 			panic("either NSX_URL, NSX_USER or NSX_PASSWORD environment variables are empty!")
 		}
-		nsxClient = gonsx.NewNSXClient(nsxUrl, nsxUser, nsxPassword, true, false)
+		nsxClient = gonsx.NewNSXClient(nsxURL, nsxUser, nsxPassword, true, false)
 	}
 	return nsxClient
 }
 
+// CheckError : Print a FATAL log if error is != null
 func CheckError(err error) {
 	if err != nil {
 		log.Fatalf("Error: %s", err)
 	}
 }
 
+// ExecuteCommand : Executes a shell command and returns stdOut and stdErr as byte[] and exitError
 func ExecuteCommand(command string, arg ...string) ([]byte, []byte, *exec.ExitError) {
 	cmd := exec.Command(command, arg...)
 	stdout, err := cmd.StdoutPipe()
@@ -51,8 +54,9 @@ func ExecuteCommand(command string, arg ...string) ([]byte, []byte, *exec.ExitEr
 	return stdOutBytes, stdErrBytes, exitError
 }
 
+// ReadAll : Reads all data from a Reader and returns a byte[]
 func ReadAll(r *bufio.Reader) []byte {
-	var content []byte = []byte{}
+	content := []byte{}
 	nBytes, nChunks := int64(0), int64(0)
 	buf := make([]byte, 0, 4*1024)
 	for {
