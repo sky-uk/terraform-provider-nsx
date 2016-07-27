@@ -45,22 +45,18 @@ func resourceSecurityPolicy() *schema.Resource {
 			"precedence": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: false,
+				ForceNew: true,
 			},
 			"description": {
 				Type:     schema.TypeString,
-				Required: false,
-				ForceNew: false,
+				Optional: true,
+				ForceNew: true,
 			},
 			"securitygroups": {
 				Type:     schema.TypeList,
-				Required: true,
+				Optional: true,
 				ForceNew: true,
-			},
-			"actions": {
-				Type:     schema.TypeList,
-				Required: true,
-				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 		},
 	}
