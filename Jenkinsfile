@@ -5,7 +5,7 @@ project_owner = 'sky-uk'
 project_github_token = '7eec88ceb08431126182c7ce85631cb45bd0f98a'
 
 project_src_path = "github.com/${project_owner}/${project_name}"
-git_credentials_id = '9be96924-ccbc-4f9e-a07c-18818fff868c'
+git_credentials_id = '51e7ba41-d78c-4e30-802d-9b424fa0ab63'
 git_helper_credentials_id = 'paas-jenkins-pipelines-deploy-key'
 
 version_file = 'VERSION'
