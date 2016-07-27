@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sky-uk/gonsx/api/securitypolicy"
 	"github.com/sky-uk/gonsx"
+	"github.com/sky-uk/gonsx/api/securitypolicy"
+	"log"
 )
 
 func getSingleSecurityPolicy(name string, nsxclient *gonsx.NSXClient) (*securitypolicy.SecurityPolicy, error) {
