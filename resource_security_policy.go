@@ -131,6 +131,9 @@ func resourceSecurityPolicyRead(d *schema.ResourceData, m interface{}) error {
 	}
 
 	securityPolicyObject, err := getSingleSecurityPolicy(name, nsxclient)
+	if err != nil {
+		return err
+	}
 	id := securityPolicyObject.ObjectID
 	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
 
@@ -152,6 +155,9 @@ func resourceSecurityPolicyDelete(d *schema.ResourceData, m interface{}) error {
 	}
 
 	securityPolicyObject, err := getSingleSecurityPolicy(name, nsxclient)
+	if err != nil {
+		return err
+	}
 	id := securityPolicyObject.ObjectID
 	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
 
