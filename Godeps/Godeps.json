@@ -3,7 +3,7 @@
 	"GoVersion": "go1.6",
 	"GodepVersion": "v74",
 	"Packages": [
-		"github.com/sky-uk/terraform-provider-nsx/..."
+		"./..."
 	],
 	"Deps": [
 		{
@@ -311,6 +311,11 @@
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx/api/securitygroup",
+			"Comment": "0.2.2",
+			"Rev": "bcf6026d51e6a2d7e4aedd6aa98b584036df4ff1"
+		},
+		{
+			"ImportPath": "github.com/sky-uk/gonsx/api/securitypolicy",
 			"Comment": "0.2.2",
 			"Rev": "bcf6026d51e6a2d7e4aedd6aa98b584036df4ff1"
 		},
