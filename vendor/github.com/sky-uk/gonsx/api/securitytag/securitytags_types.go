@@ -15,3 +15,14 @@ type SecurityTag struct {
 	Description string   `xml:"description"`
 	TypeName    string   `xml:"type>typeName"`
 }
+
+// BasicInfoList struct to get info of vms attached to tags
+type BasicInfoList struct {
+	BasicInfoList []BasicInfo `xml:"basicinfo"`
+}
+
+// BasicInfo gives info of list
+type BasicInfo struct {
+	ObjectID string `xml:"objectId"`
+	Name     string `xml:"name"`
+}

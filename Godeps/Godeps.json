@@ -291,43 +291,43 @@
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx",
-			"Comment": "0.2.0",
-			"Rev": "367ec741eb86f78e77ae37ecba1abebda9266bd2"
+			"Comment": "0.2.2",
+			"Rev": "bcf6026d51e6a2d7e4aedd6aa98b584036df4ff1"
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx/api",
-			"Comment": "0.2.0",
-			"Rev": "367ec741eb86f78e77ae37ecba1abebda9266bd2"
+			"Comment": "0.2.2",
+			"Rev": "bcf6026d51e6a2d7e4aedd6aa98b584036df4ff1"
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx/api/dhcprelay",
-			"Comment": "0.2.0",
-			"Rev": "367ec741eb86f78e77ae37ecba1abebda9266bd2"
+			"Comment": "0.2.2",
+			"Rev": "bcf6026d51e6a2d7e4aedd6aa98b584036df4ff1"
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx/api/edgeinterface",
-			"Comment": "0.2.0",
-			"Rev": "367ec741eb86f78e77ae37ecba1abebda9266bd2"
+			"Comment": "0.2.2",
+			"Rev": "bcf6026d51e6a2d7e4aedd6aa98b584036df4ff1"
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx/api/securitygroup",
-			"Comment": "0.2.0",
-			"Rev": "367ec741eb86f78e77ae37ecba1abebda9266bd2"
+			"Comment": "0.2.2",
+			"Rev": "bcf6026d51e6a2d7e4aedd6aa98b584036df4ff1"
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx/api/securitytag",
-			"Comment": "0.2.0",
-			"Rev": "367ec741eb86f78e77ae37ecba1abebda9266bd2"
+			"Comment": "0.2.2",
+			"Rev": "bcf6026d51e6a2d7e4aedd6aa98b584036df4ff1"
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx/api/service",
-			"Comment": "0.2.0",
-			"Rev": "367ec741eb86f78e77ae37ecba1abebda9266bd2"
+			"Comment": "0.2.2",
+			"Rev": "bcf6026d51e6a2d7e4aedd6aa98b584036df4ff1"
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx/api/virtualwire",
-			"Comment": "0.2.0",
-			"Rev": "367ec741eb86f78e77ae37ecba1abebda9266bd2"
+			"Comment": "0.2.2",
+			"Rev": "bcf6026d51e6a2d7e4aedd6aa98b584036df4ff1"
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",

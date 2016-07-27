@@ -27,3 +27,15 @@ func (s SecurityTags) CheckByName(name string) bool {
 	}
 	return false
 }
+
+// FilterByIDAttached - Filters BasicInfoList->BasicInfo with provided name
+func (b BasicInfoList) FilterByIDAttached(id string) *BasicInfo {
+	var basicInfoFound BasicInfo
+	for _, basicInfo := range b.BasicInfoList {
+		if basicInfo.ObjectID == id {
+			basicInfoFound = basicInfo
+			break
+		}
+	}
+	return &basicInfoFound
+}
