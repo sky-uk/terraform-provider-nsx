@@ -39,6 +39,40 @@ func (sp *SecurityPolicy) RemoveSecurityGroupBinding(objectID string) {
 	return
 }
 
+// CheckFirewallRuleByUUID - Checks if the rule with UUID exists in the firewall rules of security policy.
+func (sp *SecurityPolicy) CheckFirewallRuleByUUID(uuid string) bool {
+	for _, action := range sp.ActionsByCategory.Actions {
+		if action.VsmUUID == uuid {
+			return true
+		}
+	}
+	return false
+}
+
+// GetFirewallRuleByName - Checks if the rule with given name exists in the firewall rules of security policy.
+func (sp *SecurityPolicy) GetFirewallRuleByName(name string) *Action {
+	var actionFound Action
+	for _, action := range sp.ActionsByCategory.Actions {
+		if action.Name == name {
+			actionFound = action
+			break
+		}
+	}
+	return &actionFound
+}
+
+// GetFirewallRuleByUUID - Checks if the rule with given name exists in the firewall rules of security policy.
+func (sp *SecurityPolicy) GetFirewallRuleByUUID(uuid string) *Action {
+	var actionFound Action
+	for _, action := range sp.ActionsByCategory.Actions {
+		if action.VsmUUID == uuid {
+			actionFound = action
+			break
+		}
+	}
+	return &actionFound
+}
+
 // RemoveFirewallActionByName - Removes the firewalla ction from security policy object if it exists.
 func (sp *SecurityPolicy) RemoveFirewallActionByName(actionName string) {
 	for idx, action := range sp.ActionsByCategory.Actions {
@@ -49,10 +83,20 @@ func (sp *SecurityPolicy) RemoveFirewallActionByName(actionName string) {
 	}
 }
 
+// RemoveFirewallActionByUUID - Removes the firewall action from security policy object if it exists by it's UUID.
+func (sp *SecurityPolicy) RemoveFirewallActionByUUID(uuid string) {
+	for idx, action := range sp.ActionsByCategory.Actions {
+		if action.VsmUUID == uuid {
+			sp.ActionsByCategory.Actions = append(sp.ActionsByCategory.Actions[:idx], sp.ActionsByCategory.Actions[idx+1:]...)
+			return
+		}
+	}
+}
+
 // AddOutboundFirewallAction adds outbound firewall action rule into security policy.
 func (sp *SecurityPolicy) AddOutboundFirewallAction(name, action, direction string, secGroupObjectIDs []string) error {
-	if action != "allow" && action != "disallow" {
-		return errors.New("Action can be only 'allow' or 'disallow'")
+	if action != "allow" && action != "block" {
+		return errors.New("Action can be only 'allow' or 'block'")
 	}
 	if direction != "outbound" && direction != "inbound" {
 		return errors.New("Direction can be only 'inbound' or 'outbound'")
