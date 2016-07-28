@@ -139,6 +139,11 @@ func resourceLogicalSwitchRead(d *schema.ResourceData, m interface{}) error {
 	// resources associated with the scopeid.
 	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", name))
 	logicalSwitchObject, err := getSingleLogicalSwitch(scopeid, name, nsxclient)
+
+	if err != nil {
+		return err
+	}
+
 	id := logicalSwitchObject.ObjectID
 	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
 
