@@ -21,11 +21,6 @@ func getSingleSecurityGroup(scopeid, name string, nsxclient *gonsx.NSXClient) (*
 	}
 
 	securityGroup := getAllAPI.GetResponse().FilterByName(name)
-
-	if securityGroup.ObjectID == "" {
-		return nil, fmt.Errorf("Not found %s", name)
-	}
-
 	return securityGroup, nil
 }
 
@@ -162,20 +157,14 @@ func resourceSecurityGroupRead(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("name argument is required")
 	}
 
-	// Gather all the resources that are associated with the specified
-	// scopeid.
-	log.Printf(fmt.Sprintf("[DEBUG] securitygroup.NewGetAll(%s)", scopeid))
-	api := securitygroup.NewGetAll(scopeid)
-	err := nsxclient.Do(api)
-
-	if err != nil {
-		return err
-	}
-
 	// See if we can find our specifically named resource within the list of
 	// resources associated with the scopeid.
 	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", name))
 	securityGroupObject, err := getSingleSecurityGroup(scopeid, name, nsxclient)
+	if err != nil {
+		return err
+	}
+
 	id := securityGroupObject.ObjectID
 	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
 

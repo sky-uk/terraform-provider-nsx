@@ -133,10 +133,14 @@ func resourceEdgeInterfaceCreate(d *schema.ResourceData, m interface{}) error {
 	// Create the API, use it and check for errors.
 	log.Printf(fmt.Sprintf("[DEBUG] edgeinterface.NewCreate(%s, %s, %s, %s, %s, %s, %d)", edgeid, name, virtualwireid, gateway, subnetmask, interfacetype, mtu))
 	createAPI := edgeinterface.NewCreate(edgeid, name, virtualwireid, gateway, subnetmask, interfacetype, mtu)
-	nsxclient.Do(createAPI)
+	err := nsxclient.Do(createAPI)
+
+	if err != nil {
+		return err
+	}
 
 	if createAPI.StatusCode() != 200 {
-		return errors.New("Failed to create edge interface")
+		return fmt.Errorf("Failed to create edge interface:%s StatusCode:%s Response:%s", err, createAPI.StatusCode(), createAPI.RawResponse())
 	}
 
 	// If we go here, everything is OK.  Set the ID for the Terraform state

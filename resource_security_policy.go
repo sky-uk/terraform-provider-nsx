@@ -89,15 +89,18 @@ func resourceSecurityPolicyCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if v, ok := d.GetOk("securitygroups"); ok {
-		securitygroups = v.([]string)
+		list := v.([]interface{})
+
+		securitygroups = make([]string, len(list))
+		for i, value := range list {
+			groupID, ok := value.(string)
+			if !ok {
+				return fmt.Errorf("empty element found in securitygroups")
+			}
+			securitygroups[i] = groupID
+		}
 	} else {
 		return fmt.Errorf("security groups argument is required")
-	}
-
-	if v, ok := d.GetOk("actions"); ok {
-		actions = v.([]securitypolicy.Action)
-	} else {
-		return fmt.Errorf("actions argument is required")
 	}
 
 	log.Printf(fmt.Sprintf("[DEBUG] securitypolicy.NewCreate(%s, %s, %s, %s, %s)", name, precedence, description, securitygroups, actions))
