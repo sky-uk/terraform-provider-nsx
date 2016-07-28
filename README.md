@@ -15,6 +15,7 @@ with the proper credentials before it can be used.
 * [NSX_SERVICE Resource](#nsx_service-resource)
 * [NSX_SECURITY_GROUP Resource](#nsx_security_group-resource)
 * [NSX_SECURITY_TAG Resource](#nsx_security_tag-resource)
+* [NSX_SECURITY_TAG_ATTACHMENT Resource](#nsx_security_tag_attachment-resource)
 * [Limitations](#limitations)
 
 ## Installation
@@ -281,6 +282,26 @@ The following arguments are supported:
 * `desc` - (Required) A friendly description of the security tag.
 
 
+## NSX_SECURITY_TAG_ATTACHMENT Resource
+
+The SECURITY_TAG resource allows the attachment of Security Tags to 
+virtual machines. 
+
+### Example Usage
+
+```terra
+resource "nsx_security_tag_attachment "web" {
+    tagid = "securitytag-1"
+    moid = "vm-1"
+}
+```
+
+### Argument Reference
+
+The following arguments are supported:
+
+* `tagid` - (Required) ID of security tag.
+* `moid` - (Required) ID of vm.
 
 ### Limitations
 
