@@ -24,6 +24,7 @@ func resourceSecurityPolicyRule() *schema.Resource {
 
 			"securitypolicyname": {
 				Type:     schema.TypeString,
+				Required: true,
 				ForceNew: true,
 			},
 
