@@ -114,6 +114,7 @@ func (sp *SecurityPolicy) AddOutboundFirewallAction(name, action, direction stri
 		Action:                 action,
 		Category:               "firewall",
 		Direction:              direction,
+		IsEnabled:              true,
 		SecondarySecurityGroup: secondarySecurityGroupList,
 	}
 

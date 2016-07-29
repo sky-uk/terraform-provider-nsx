@@ -291,48 +291,48 @@
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx",
-			"Comment": "0.2.4",
-			"Rev": "fdb4a1babf85838fdabb6dfe98dca09c27dbffad"
+			"Comment": "0.2.5",
+			"Rev": "701cf7a9de2ef6d038a2ee145f7d75642af6f4a6"
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx/api",
-			"Comment": "0.2.4",
-			"Rev": "fdb4a1babf85838fdabb6dfe98dca09c27dbffad"
+			"Comment": "0.2.5",
+			"Rev": "701cf7a9de2ef6d038a2ee145f7d75642af6f4a6"
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx/api/dhcprelay",
-			"Comment": "0.2.4",
-			"Rev": "fdb4a1babf85838fdabb6dfe98dca09c27dbffad"
+			"Comment": "0.2.5",
+			"Rev": "701cf7a9de2ef6d038a2ee145f7d75642af6f4a6"
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx/api/edgeinterface",
-			"Comment": "0.2.4",
-			"Rev": "fdb4a1babf85838fdabb6dfe98dca09c27dbffad"
+			"Comment": "0.2.5",
+			"Rev": "701cf7a9de2ef6d038a2ee145f7d75642af6f4a6"
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx/api/securitygroup",
-			"Comment": "0.2.4",
-			"Rev": "fdb4a1babf85838fdabb6dfe98dca09c27dbffad"
+			"Comment": "0.2.5",
+			"Rev": "701cf7a9de2ef6d038a2ee145f7d75642af6f4a6"
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx/api/securitypolicy",
-			"Comment": "0.2.4",
-			"Rev": "fdb4a1babf85838fdabb6dfe98dca09c27dbffad"
+			"Comment": "0.2.5",
+			"Rev": "701cf7a9de2ef6d038a2ee145f7d75642af6f4a6"
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx/api/securitytag",
-			"Comment": "0.2.4",
-			"Rev": "fdb4a1babf85838fdabb6dfe98dca09c27dbffad"
+			"Comment": "0.2.5",
+			"Rev": "701cf7a9de2ef6d038a2ee145f7d75642af6f4a6"
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx/api/service",
-			"Comment": "0.2.4",
-			"Rev": "fdb4a1babf85838fdabb6dfe98dca09c27dbffad"
+			"Comment": "0.2.5",
+			"Rev": "701cf7a9de2ef6d038a2ee145f7d75642af6f4a6"
 		},
 		{
 			"ImportPath": "github.com/sky-uk/gonsx/api/virtualwire",
-			"Comment": "0.2.4",
-			"Rev": "fdb4a1babf85838fdabb6dfe98dca09c27dbffad"
+			"Comment": "0.2.5",
+			"Rev": "701cf7a9de2ef6d038a2ee145f7d75642af6f4a6"
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",

@@ -24,7 +24,6 @@ func resourceSecurityPolicyRule() *schema.Resource {
 
 			"securitypolicyname": {
 				Type:     schema.TypeString,
-				Required: true,
 				ForceNew: true,
 			},
 
@@ -127,9 +126,7 @@ func resourceSecurityPolicyRuleCreate(d *schema.ResourceData, m interface{}) err
 		return fmt.Errorf("%s", updateAPI.ResponseObject())
 	}
 
-	newAction := policyToModify.GetFirewallRuleByName(name)
-	d.SetId(newAction.VsmUUID)
-	d.Set("VsmUUID", newAction.VsmUUID)
+	d.SetId(name)
 	return resourceSecurityPolicyRuleRead(d, m)
 }
 
