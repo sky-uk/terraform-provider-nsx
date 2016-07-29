@@ -23,7 +23,6 @@ func getSingleSecurityPolicy(name string, nsxclient *gonsx.NSXClient) (*security
 	log.Printf(fmt.Sprintf("[DEBUG] getAllAPI.GetResponse().FilterByName(\"%s\").ObjectID", name))
 	securityPolicy := getAllAPI.GetResponse().FilterByName(name)
 
-
 	return securityPolicy, nil
 }
 

@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sky-uk/gonsx"
 	"github.com/sky-uk/gonsx/api/securitypolicy"
+	"log"
 )
 
 func resourceSecurityPolicyRule() *schema.Resource {
@@ -23,7 +23,7 @@ func resourceSecurityPolicyRule() *schema.Resource {
 			},
 
 			"securitypolicyname": {
-				Type: 	  schema.TypeString,
+				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
@@ -109,7 +109,7 @@ func resourceSecurityPolicyRuleCreate(d *schema.ResourceData, m interface{}) err
 		return fmt.Errorf("Firewall rule with same name already exists in this security policy.")
 	}
 
-	log.Printf(fmt.Sprintf("[DEBUG] policyToModify.AddOutboundFirewallAction(%s, %s, %s, %s)",name, action, direction, securitygroupids))
+	log.Printf(fmt.Sprintf("[DEBUG] policyToModify.AddOutboundFirewallAction(%s, %s, %s, %s)", name, action, direction, securitygroupids))
 	modifyErr := policyToModify.AddOutboundFirewallAction(name, action, direction, securitygroupids)
 	if err != nil {
 		return fmt.Errorf("Error in adding the rule to policy object: %s", modifyErr)
