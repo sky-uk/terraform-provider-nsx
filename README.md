@@ -303,6 +303,96 @@ The following arguments are supported:
 * `tagid` - (Required) ID of security tag.
 * `moid` - (Required) ID of vm.
 
+## NSX_SECURITY_GROUPS Resource
+
+The SECURITY_GROUPS resource allows the creation of Security Groups. 
+
+### Example Usage
+
+```terra
+resource "nsx_security_group" "web" {
+       name = "tf_web_security_group"
+       scopeid = "globalroot-0"
+       setoperator = "OR"
+       criteriaoperator = "OR"
+       criteriakey = "VM.SECURITY_TAG"
+       criteriavalue = "tf_web_security_tag"
+       criteria = "contains"
+}
+```
+
+### Argument Reference
+
+The following arguments are supported:
+
+* `name` - (Required) Name of security group.
+* `scopeid` - (Required) ID of scope.
+* `setoperator` - (Required) "AND" or "OR" operator to match the 
+criterias with the list of criterias.
+* `criteriaoperator` - (Required) "AND" or "OR" operator to match within
+ the criterias.
+* `criteriakey` - (Required) The key to match the criterias on e.g. 
+security tags.
+* `criteriavalue` - (Required) Value to match criteria.
+* `criteria` - (Required) What the criteria is.
+
+
+## NSX_SECURITY_POLICY Resource
+
+The SECURITY_POLICY resource allows the creation of Security Policies 
+for use by security groups. 
+
+### Example Usage
+
+```terra
+resource "nsx_security_policy" "web" {
+       name = "tf_web_security_policy"
+       description = "security policy for web role"
+       precedence  = "55002"
+       securitygroups = ["${nsx_security_group.web.id}"]
+}
+```
+
+### Argument Reference
+
+The following arguments are supported:
+
+* `name` - (Required) Name of security policy.
+* `description` - (Required) Description of policy.
+* `precedence` - (Required) Importance of the rule.
+* `securitygroups` - (Required) List of security groups to attach policy
+ to.
+
+
+## NSX_SECURITY_POLICY_RULE resource
+
+The SECURITY_POLICY_RULE creates rules on security policies.
+
+
+### Example Usage
+
+```terra
+resource "nsx_security_policy_rule" "web" {
+      name = "tf_web_security_policy_rule"
+      securitypolicyname = "${nsx_security_policy.security_policy_web.name}"
+      action = "allow"
+      direction = "outbound"
+      securitygroupids = ["${nsx_security_group.web.id}"]
+}
+```
+
+### Argument Reference
+
+The following arguments are supported:
+
+* `name` - (Required) Name of security policy rule.
+* `securitypolicyname` - (Required) Name of policy to attach to.
+* `action` - (Required) "ALLOW" or "BLOCK".
+* `direction` - (Required) "OUTBOUND" or "INBOUND".
+* `securitygroupids` - (Required) "List of groups to add rule to"
+ 
+ 
+
 ### Limitations
 
 This is currently a proof of concept and only has a very limited number of
