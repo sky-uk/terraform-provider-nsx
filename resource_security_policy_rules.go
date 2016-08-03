@@ -48,10 +48,10 @@ func resourceSecurityPolicyRule() *schema.Resource {
 			},
 
 			"serviceids": {
-				Type: schema.TypeList,
+				Type:     schema.TypeList,
 				Required: true,
 				ForceNew: true,
-				Elem: &schema.Schema{Type: schema.TypeString},
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 		},
 	}
