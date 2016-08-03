@@ -46,6 +46,13 @@ func resourceSecurityPolicyRule() *schema.Resource {
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+
+			"serviceids": {
+				Type: schema.TypeList,
+				Required: true,
+				ForceNew: true,
+				Elem: &schema.Schema{Type: schema.TypeString},
+			},
 		},
 	}
 }
@@ -53,7 +60,7 @@ func resourceSecurityPolicyRule() *schema.Resource {
 func resourceSecurityPolicyRuleCreate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
 	var name, securitypolicyname, action, direction string
-	var securitygroupids []string
+	var securitygroupids, serviceids []string
 
 	// Gather the attributes for the resource.
 
@@ -96,6 +103,21 @@ func resourceSecurityPolicyRuleCreate(d *schema.ResourceData, m interface{}) err
 		return fmt.Errorf("securitygroupids argument is required")
 	}
 
+	if v, ok := d.GetOk("serviceids"); ok {
+		list := v.([]interface{})
+
+		serviceids = make([]string, len(list))
+		for i, value := range list {
+			serviceID, ok := value.(string)
+			if !ok {
+				return fmt.Errorf("empty element found in services")
+			}
+			serviceids[i] = serviceID
+		}
+	} else {
+		return fmt.Errorf("serviceids argument is required")
+	}
+
 	log.Print("Getting policy object to modify")
 	policyToModify, err := getSingleSecurityPolicy(securitypolicyname, nsxclient)
 	log.Printf("[DEBUG] - policyTOModify :%s", policyToModify)
@@ -109,8 +131,8 @@ func resourceSecurityPolicyRuleCreate(d *schema.ResourceData, m interface{}) err
 		return fmt.Errorf("Firewall rule with same name already exists in this security policy.")
 	}
 
-	log.Printf(fmt.Sprintf("[DEBUG] policyToModify.AddOutboundFirewallAction(%s, %s, %s, %s)", name, action, direction, securitygroupids))
-	modifyErr := policyToModify.AddOutboundFirewallAction(name, action, direction, securitygroupids)
+	log.Printf(fmt.Sprintf("[DEBUG] policyToModify.AddOutboundFirewallAction(%s, %s, %s, %s, %s)", name, action, direction, securitygroupids, serviceids))
+	modifyErr := policyToModify.AddOutboundFirewallAction(name, action, direction, securitygroupids, serviceids)
 	if err != nil {
 		return fmt.Errorf("Error in adding the rule to policy object: %s", modifyErr)
 	}

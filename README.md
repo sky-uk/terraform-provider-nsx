@@ -378,6 +378,7 @@ resource "nsx_security_policy_rule" "web" {
       action = "allow"
       direction = "outbound"
       securitygroupids = ["${nsx_security_group.web.id}"]
+      serviceids = ["${nsx_service.web.id}"]
 }
 ```
 
@@ -389,7 +390,9 @@ The following arguments are supported:
 * `securitypolicyname` - (Required) Name of policy to attach to.
 * `action` - (Required) "ALLOW" or "BLOCK".
 * `direction` - (Required) "OUTBOUND" or "INBOUND".
-* `securitygroupids` - (Required) "List of groups to add rule to"
+* `securitygroupids` - (Required) List of groups to add rule to.
+* `serviceids` - (Required) List of services to apply.
+
  
  
 
