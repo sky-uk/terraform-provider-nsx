@@ -53,4 +53,17 @@ type Action struct {
 	Direction              string          `xml:"direction"`
 	IsEnabled              bool            `xml:"isEnabled,omitempty"`
 	SecondarySecurityGroup []SecurityGroup `xml:"secondarySecurityGroup,omitempty"`
+	Applications           *Applications   `xml:"applications,omitempty"`
+}
+
+//Applications object struct
+type Applications struct {
+	Applications []Application `xml:"application,omitempty"`
+}
+
+// Application element of Applications List
+type Application struct {
+	//XMLName  xml.Name `xml:"application,omitempty"`
+	ObjectID string `xml:"objectId,omitempty"`
+	Name     string `xml:"name,omitempty"`
 }

@@ -10,25 +10,25 @@ type List struct {
 
 // SecurityGroup - <securitygroup> element of <list>
 type SecurityGroup struct {
-	XMLName                 xml.Name                `xml:"securitygroup"`
-	ObjectID                string                  `xml:"objectId,omitempty"`
-	ObjectTypeName          string                  `xml:"objectTypeName,omitempty"`
-	Revision                string                  `xml:"revision,omitempty"`
-	Type                    string                  `xml:"type,omitempty>typeName,omitempty"`
-	Name                    string                  `xml:"name"`
-	InheritanceAllowed      bool                    `xml:"inheritanceAllowed,omitempty"`
-	DynamicMemberDefinition DynamicMemberDefinition `xml:"dynamicMemberDefinition"`
+	XMLName                 xml.Name                 `xml:"securitygroup"`
+	ObjectID                string                   `xml:"objectId,omitempty"`
+	ObjectTypeName          string                   `xml:"objectTypeName,omitempty"`
+	Revision                string                   `xml:"revision,omitempty"`
+	Type                    string                   `xml:"type,omitempty>typeName,omitempty"`
+	Name                    string                   `xml:"name"`
+	InheritanceAllowed      bool                     `xml:"inheritanceAllowed,omitempty"`
+	DynamicMemberDefinition *DynamicMemberDefinition `xml:"dynamicMemberDefinition,omitempty"`
 }
 
 // DynamicMemberDefinition - <dynamicMemberDefinition> element of <securitygroup>
 type DynamicMemberDefinition struct {
-	DynamicSet []DynamicSet `xml:"dynamicSet"`
+	DynamicSet []DynamicSet `xml:"dynamicSet,omitempty"`
 }
 
 // DynamicSet - <dynamicSet> element of <dynamicMemberDefinition>
 type DynamicSet struct {
-	Operator        string            `xml:"operator"`
-	DynamicCriteria []DynamicCriteria `xml:"dynamicCriteria"`
+	Operator        string            `xml:"operator,omitempty"`
+	DynamicCriteria []DynamicCriteria `xml:"dynamicCriteria,omitempty"`
 }
 
 // DynamicCriteria - <dynamicCriteria> element of <dynamicSet>

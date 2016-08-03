@@ -11,26 +11,14 @@ type CreateSecurityGroupAPI struct {
 }
 
 // NewCreate returns a new object of CreateServiceAPI.
-func NewCreate(scopeID, tagName, setOperator, criteriaOperator, criteriaKey, criteriaValue, criteria string) *CreateSecurityGroupAPI {
+func NewCreate(scopeID, securityGroupName string) *CreateSecurityGroupAPI {
 	this := new(CreateSecurityGroupAPI)
+
+	// Generate payload with the name.
 	requestPayload := new(SecurityGroup)
-	requestPayload.Name = tagName
+	requestPayload.Name = securityGroupName
 
-	dynamicCriteria := DynamicCriteria{
-		Operator: criteriaOperator,
-		Key:      criteriaKey,
-		Value:    criteriaValue,
-		Criteria: criteria,
-	}
-	dynamicCriteriaList := []DynamicCriteria{dynamicCriteria}
-
-	dynamicSet := DynamicSet{
-		Operator:        setOperator,
-		DynamicCriteria: dynamicCriteriaList,
-	}
-	dynamicSetList := []DynamicSet{dynamicSet}
-
-	requestPayload.DynamicMemberDefinition = DynamicMemberDefinition{dynamicSetList}
+	// Build API object and return it
 	this.BaseAPI = api.NewBaseAPI(http.MethodPost, "/api/2.0/services/securitygroup/bulk/"+scopeID, requestPayload, new(string))
 	return this
 }

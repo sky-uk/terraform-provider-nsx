@@ -63,7 +63,8 @@ resp := api.GetResponse().FilterByName(virtualWireName)
 
 Update:
 ```
-Not yet implemented
+api := virtualwire.NewUpdate(name, desc, virtualwireID)
+nsxclient.Do(api)
 ```
 
 Delete:
@@ -137,23 +138,23 @@ api := dhcprelay.NewDelete(edgeId)
 nsxclient.Do(api)
 ```
 
-### Security Tags
+### Security Tag
 
-Interface resource. This resource will call the interface api within NSX.
+Security tag resource. This resource will call the security tag api within NSX.
 Import the following class:
 ```
-github.com/sky-uk/gonsx/api/securitytags
+github.com/sky-uk/gonsx/api/securitytag
 ```
 
 Create:
 ```
-api := securitytags.NewCreate(name, desc)
+api := securitytag.NewCreate(name, desc)
 nsxclient.Do(api)
 ```
 
 Read:
 ```
-api := securitytags.NewGetAll()
+api := securitytag.NewGetAll()
 nsxclient.Do(api)
 ```
 
@@ -164,18 +165,140 @@ Not yet implemented
 
 Delete:
 ```
-api := securitytags.NewDelete(securitytagID)
+api := securitytag.NewDelete(securitytagID)
 nsxclient.Do(api)
 ```
 
 Detach:
 ```
-api := securitytags.NewDetach(securityTagID, vmID)
+api := securitytag.NewDetach(securityTagID, vmID)
 nsxclient.Do(api)
 ```
 
 Attach: 
 ```
-api := securitytags.NewAttach(securityTagID, vmID)
+api := securitytag.NewAttach(securityTagID, vmID)
 nsxclient.Do(api)
+```
+
+
+### Service
+
+Service resource. This resource will call the service api with NSX.
+Import the following class:
+```
+github.com/sky-uk/gonsx/api/service
+```
+
+Create:
+```
+api := service.NewCreate(scopeID, name, desc, proto, ports)
+nsxclient.Do(api)
+```
+
+Read:
+```
+api := service.NewGetAll(scopeID)
+nsxclient.Do(api)
+```
+
+Update:
+```
+Not yet implemented
+```
+
+Delete:
+```
+api := service.NewDelete(serviceID)
+nsxclient.Do(api)
+```
+
+
+### Security Group
+
+Security Group resource. This resource will call the security group api with NSX.
+Import the following class:
+```
+github.com/sky-uk/gonsx/api/securitygroup
+```
+
+Create:
+```
+api := securitygroup.NewCreate(scopeID, name, setOperator, criteriaOperator, criteriaKey, criteriaValue, criteria)
+nsxclient.Do(api)
+```
+
+Read:
+```
+api := securitygroup.NewGetAll(scopeID)
+nsxclient.Do(api)
+```
+
+Update:
+```
+Not yet implemented
+```
+
+Delete:
+```
+api := securitygroup.NewDelete(serviceID)
+nsxclient.Do(api)
+```
+
+
+### Security Policy
+Security Policy resource. This resource will call the security policy with NSX.
+Import the following class:
+```
+github.com/sky-uk/gonsx/api/securitypolicy
+```
+
+Create:
+```
+api := securitypolicy.NewCreate(name, precendence, desc, securityGroupsIDs, actions)
+nsxclient.Do(api)
+```
+
+Read:
+```
+api := securitypolicy.NewGetAll()
+nsxclient.Do(api)
+```
+
+Update:
+```
+Not yet implemented
+```
+
+Delete:
+```
+api := securitypolicy.NewDelete(securityPolicyID, force)
+nsxclient.Do(api)
+```
+
+AddOutboundFirewall:
+```
+securityPolicyToModify := getAllAPI.GetResponse().FilterByName(securityPolicyName)
+
+// we will use a help function to add a firewall rule.
+securityPolicyToModify.AddOutboundFirewallAction(
+	firewallName,
+	action,
+	direction,
+	secGroupObjectIDs,
+	serviceIDs,
+)
+
+updateAPI := securitypolicy.NewUpdate(securityPolicyToModify.ObjectID, securityPolicyToModify)
+nsxclient.Do(updateAPI)
+```
+
+RemoveFirewall:
+```
+securityPolicyToModify := getAllAPI.GetResponse().FilterByName(securityPolicyName)
+
+securityPolicyToModify.RemoveFirewallActionByName(firewallName)
+
+updateAPI := securitypolicy.NewUpdate(securityPolicyToModify.ObjectID, securityPolicyToModify)
+nsxclient.Do(updateAPI)
 ```
