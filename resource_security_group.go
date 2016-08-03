@@ -8,8 +8,8 @@ import (
 	"log"
 )
 
-func getSingleSecurityGroup(scopeid, name string, nsxclient *gonsx.NSXClient) (*securitygroup.SecurityGroup, error) {
-	getAllAPI := securitygroup.NewGetAll(scopeid)
+func getSingleSecurityGroup(scopeID, name string, nsxclient *gonsx.NSXClient) (*securitygroup.SecurityGroup, error) {
+	getAllAPI := securitygroup.NewGetAll(scopeID)
 	err := nsxclient.Do(getAllAPI)
 
 	if err != nil {
@@ -43,43 +43,13 @@ func resourceSecurityGroup() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
-
-			"setoperator": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
-			"criteriaoperator": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
-			"criteriakey": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
-			"criteriavalue": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
-			"criteria": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
 		},
 	}
 }
 
 func resourceSecurityGroupCreate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var scopeid, name, setoperator, criteriaoperator, criteriakey, criteriavalue, criteria string
+	var scopeid, name string
 
 	// Gather the attributes for the resource.
 
@@ -95,38 +65,8 @@ func resourceSecurityGroupCreate(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("name argument is required")
 	}
 
-	if v, ok := d.GetOk("setoperator"); ok {
-		setoperator = v.(string)
-	} else {
-		return fmt.Errorf("setoperator argument is required")
-	}
-
-	if v, ok := d.GetOk("criteriaoperator"); ok {
-		criteriaoperator = v.(string)
-	} else {
-		return fmt.Errorf("criteriaoperator argument is required")
-	}
-
-	if v, ok := d.GetOk("criteriakey"); ok {
-		criteriakey = v.(string)
-	} else {
-		return fmt.Errorf("criteriakey argument is required")
-	}
-
-	if v, ok := d.GetOk("criteriavalue"); ok {
-		criteriavalue = v.(string)
-	} else {
-		return fmt.Errorf("criteriavalue argument is required")
-	}
-
-	if v, ok := d.GetOk("criteria"); ok {
-		criteria = v.(string)
-	} else {
-		return fmt.Errorf("criteria argument is required")
-	}
-
-	log.Printf(fmt.Sprintf("[DEBUG] securitygroup.NewCreate(%s, %s, %s, %s, %s, %s, %s)", scopeid, name, setoperator, criteriaoperator, criteriakey, criteriavalue, criteria))
-	createAPI := securitygroup.NewCreate(scopeid, name, setoperator, criteriaoperator, criteriakey, criteriavalue, criteria)
+	log.Printf(fmt.Sprintf("[DEBUG] securitygroup.NewCreate(%s, %s)", scopeid, name))
+	createAPI := securitygroup.NewCreate(scopeid, name)
 	err := nsxclient.Do(createAPI)
 
 	if err != nil {
