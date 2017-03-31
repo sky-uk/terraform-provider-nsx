@@ -7,7 +7,7 @@ with the proper credentials before it can be used.
 ## Contents
 
 * [Installation](#installation)
-* [Features] (#features)
+* [Features](#features)
 * [Getting Started](#getting-started)
 * [Authentication](#authentication)
 * [NSX_LOGICAL_SWITCH Resource](#nsx_logical_switch-resource)
