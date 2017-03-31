@@ -7,6 +7,7 @@ with the proper credentials before it can be used.
 ## Contents
 
 * [Installation](#installation)
+* [Features] (#features)
 * [Getting Started](#getting-started)
 * [Authentication](#authentication)
 * [NSX_LOGICAL_SWITCH Resource](#nsx_logical_switch-resource)
@@ -32,6 +33,19 @@ go get github.com/sky-uk/terraform-provider-nsx
 
 This will also build the binary and add the `terraform-provider-nsx`
 plugin into the `$GOPATH/bin`.
+
+## Features
+| Feature                 | Create | Read  | Update  | Delete |
+|-------------------------|--------|-------|---------|--------|
+| DHCP Relay              |   Y    |   Y   |    N    |   Y    |
+| Edge Interface          |   Y    |   Y   |    N    |   Y    |
+| Logical Switch          |   Y    |   Y   |    N    |   Y    |
+| Security Group          |   Y    |   Y   |    N    |   Y    |
+| Security Policy         |   Y    |   Y   |    N    |   Y    |
+| Security Policy Rules   |   Y    |   Y   |    N    |   Y    |
+| Security Tag            |   Y    |   Y   |    N    |   Y    |
+| Security Tag Attachment |   Y    |   Y   |    N    |   Y    |
+| Service                 |   Y    |   Y   |    N    |   Y    |
 
 
 ## Getting Started
