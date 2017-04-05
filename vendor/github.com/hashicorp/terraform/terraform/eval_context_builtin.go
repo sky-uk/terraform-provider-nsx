@@ -23,17 +23,16 @@ type BuiltinEvalContext struct {
 	// as the Interpolater itself, it is protected by InterpolaterVarLock
 	// which must be locked during any access to the map.
 	Interpolater        *Interpolater
-	InterpolaterVars    map[string]map[string]string
+	InterpolaterVars    map[string]map[string]interface{}
 	InterpolaterVarLock *sync.Mutex
 
+	Components          contextComponentFactory
 	Hooks               []Hook
 	InputValue          UIInput
-	Providers           map[string]ResourceProviderFactory
 	ProviderCache       map[string]ResourceProvider
 	ProviderConfigCache map[string]*ResourceConfig
 	ProviderInputConfig map[string]map[string]interface{}
 	ProviderLock        *sync.Mutex
-	Provisioners        map[string]ResourceProvisionerFactory
 	ProvisionerCache    map[string]ResourceProvisioner
 	ProvisionerLock     *sync.Mutex
 	DiffValue           *Diff
@@ -81,23 +80,18 @@ func (ctx *BuiltinEvalContext) InitProvider(n string) (ResourceProvider, error) 
 	ctx.ProviderLock.Lock()
 	defer ctx.ProviderLock.Unlock()
 
+	providerPath := make([]string, len(ctx.Path())+1)
+	copy(providerPath, ctx.Path())
+	providerPath[len(providerPath)-1] = n
+	key := PathCacheKey(providerPath)
+
 	typeName := strings.SplitN(n, ".", 2)[0]
-
-	f, ok := ctx.Providers[typeName]
-	if !ok {
-		return nil, fmt.Errorf("Provider '%s' not found", typeName)
-	}
-
-	p, err := f()
+	p, err := ctx.Components.ResourceProvider(typeName, key)
 	if err != nil {
 		return nil, err
 	}
 
-	providerPath := make([]string, len(ctx.Path())+1)
-	copy(providerPath, ctx.Path())
-	providerPath[len(providerPath)-1] = n
-
-	ctx.ProviderCache[PathCacheKey(providerPath)] = p
+	ctx.ProviderCache[key] = p
 	return p, nil
 }
 
@@ -231,21 +225,17 @@ func (ctx *BuiltinEvalContext) InitProvisioner(
 	ctx.ProvisionerLock.Lock()
 	defer ctx.ProvisionerLock.Unlock()
 
-	f, ok := ctx.Provisioners[n]
-	if !ok {
-		return nil, fmt.Errorf("Provisioner '%s' not found", n)
-	}
+	provPath := make([]string, len(ctx.Path())+1)
+	copy(provPath, ctx.Path())
+	provPath[len(provPath)-1] = n
+	key := PathCacheKey(provPath)
 
-	p, err := f()
+	p, err := ctx.Components.ResourceProvisioner(n, key)
 	if err != nil {
 		return nil, err
 	}
 
-	provPath := make([]string, len(ctx.Path())+1)
-	copy(provPath, ctx.Path())
-	provPath[len(provPath)-1] = n
-
-	ctx.ProvisionerCache[PathCacheKey(provPath)] = p
+	ctx.ProvisionerCache[key] = p
 	return p, nil
 }
 
@@ -291,6 +281,7 @@ func (ctx *BuiltinEvalContext) Interpolate(
 			Path:     ctx.Path(),
 			Resource: r,
 		}
+
 		vs, err := ctx.Interpolater.Values(scope, cfg.Variables)
 		if err != nil {
 			return nil, err
@@ -311,7 +302,7 @@ func (ctx *BuiltinEvalContext) Path() []string {
 	return ctx.PathValue
 }
 
-func (ctx *BuiltinEvalContext) SetVariables(n string, vs map[string]string) {
+func (ctx *BuiltinEvalContext) SetVariables(n string, vs map[string]interface{}) {
 	ctx.InterpolaterVarLock.Lock()
 	defer ctx.InterpolaterVarLock.Unlock()
 
@@ -322,7 +313,7 @@ func (ctx *BuiltinEvalContext) SetVariables(n string, vs map[string]string) {
 
 	vars := ctx.InterpolaterVars[key]
 	if vars == nil {
-		vars = make(map[string]string)
+		vars = make(map[string]interface{})
 		ctx.InterpolaterVars[key] = vars
 	}
 
@@ -340,9 +331,4 @@ func (ctx *BuiltinEvalContext) State() (*State, *sync.RWMutex) {
 }
 
 func (ctx *BuiltinEvalContext) init() {
-	// We nil-check the things below because they're meant to be configured,
-	// and we just default them to non-nil.
-	if ctx.Providers == nil {
-		ctx.Providers = make(map[string]ResourceProviderFactory)
-	}
 }

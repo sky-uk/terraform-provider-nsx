@@ -100,6 +100,13 @@ func outputsStr(os []*Output) string {
 
 		result += fmt.Sprintf("%s\n", n)
 
+		if len(o.DependsOn) > 0 {
+			result += fmt.Sprintf("  dependsOn\n")
+			for _, d := range o.DependsOn {
+				result += fmt.Sprintf("    %s\n", d)
+			}
+		}
+
 		if len(o.RawConfig.Variables) > 0 {
 			result += fmt.Sprintf("  vars\n")
 			for _, rawV := range o.RawConfig.Variables {
@@ -178,7 +185,7 @@ func resourcesStr(rs []*Resource) string {
 	ks := make([]string, 0, len(rs))
 	mapping := make(map[string]int)
 	for i, r := range rs {
-		k := fmt.Sprintf("%s[%s]", r.Type, r.Name)
+		k := r.Id()
 		ks = append(ks, k)
 		mapping[k] = i
 	}
@@ -190,9 +197,8 @@ func resourcesStr(rs []*Resource) string {
 	for _, i := range order {
 		r := rs[i]
 		result += fmt.Sprintf(
-			"%s[%s] (x%s)\n",
-			r.Type,
-			r.Name,
+			"%s (x%s)\n",
+			r.Id(),
 			r.RawCount.Value())
 
 		ks := make([]string, 0, len(r.RawConfig.Raw))

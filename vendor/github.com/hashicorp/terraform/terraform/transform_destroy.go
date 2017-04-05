@@ -1,15 +1,8 @@
 package terraform
 
 import (
+	"github.com/hashicorp/terraform/config"
 	"github.com/hashicorp/terraform/dag"
-)
-
-type GraphNodeDestroyMode byte
-
-const (
-	DestroyNone    GraphNodeDestroyMode = 0
-	DestroyPrimary GraphNodeDestroyMode = 1 << iota
-	DestroyTainted
 )
 
 // GraphNodeDestroyable is the interface that nodes that can be destroyed
@@ -19,7 +12,7 @@ type GraphNodeDestroyable interface {
 	// DestroyNode returns the node used for the destroy with the given
 	// mode. If this returns nil, then a destroy node for that mode
 	// will not be added.
-	DestroyNode(GraphNodeDestroyMode) GraphNodeDestroy
+	DestroyNode() GraphNodeDestroy
 }
 
 // GraphNodeDestroy is the interface that must implemented by
@@ -60,32 +53,6 @@ type DestroyTransformer struct {
 
 func (t *DestroyTransformer) Transform(g *Graph) error {
 	var connect, remove []dag.Edge
-
-	modes := []GraphNodeDestroyMode{DestroyPrimary, DestroyTainted}
-	for _, m := range modes {
-		connectMode, removeMode, err := t.transform(g, m)
-		if err != nil {
-			return err
-		}
-
-		connect = append(connect, connectMode...)
-		remove = append(remove, removeMode...)
-	}
-
-	// Atomatically add/remove the edges
-	for _, e := range connect {
-		g.Connect(e)
-	}
-	for _, e := range remove {
-		g.RemoveEdge(e)
-	}
-
-	return nil
-}
-
-func (t *DestroyTransformer) transform(
-	g *Graph, mode GraphNodeDestroyMode) ([]dag.Edge, []dag.Edge, error) {
-	var connect, remove []dag.Edge
 	nodeToCn := make(map[dag.Vertex]dag.Vertex, len(g.Vertices()))
 	nodeToDn := make(map[dag.Vertex]dag.Vertex, len(g.Vertices()))
 	for _, v := range g.Vertices() {
@@ -96,7 +63,7 @@ func (t *DestroyTransformer) transform(
 		}
 
 		// Grab the destroy side of the node and connect it through
-		n := cn.DestroyNode(mode)
+		n := cn.DestroyNode()
 		if n == nil {
 			continue
 		}
@@ -155,7 +122,15 @@ func (t *DestroyTransformer) transform(
 		}
 	}
 
-	return connect, remove, nil
+	// Atomatically add/remove the edges
+	for _, e := range connect {
+		g.Connect(e)
+	}
+	for _, e := range remove {
+		g.RemoveEdge(e)
+	}
+
+	return nil
 }
 
 // CreateBeforeDestroyTransformer is a GraphTransformer that modifies
@@ -180,7 +155,27 @@ func (t *CreateBeforeDestroyTransformer) Transform(g *Graph) error {
 
 		// If the node doesn't need to create before destroy, then continue
 		if !dn.CreateBeforeDestroy() {
-			continue
+			if noCreateBeforeDestroyAncestors(g, dn) {
+				continue
+			}
+
+			// PURPOSELY HACKY FIX SINCE THIS TRANSFORM IS DEPRECATED.
+			// This is a hacky way to fix GH-10439. For a detailed description
+			// of the fix, see CBDEdgeTransformer, which is the equivalent
+			// transform used by the new graphs.
+			//
+			// This transform is deprecated because it is only used by the
+			// old graphs which are going to be removed.
+			var update *config.Resource
+			if dn, ok := v.(*graphNodeResourceDestroy); ok {
+				update = dn.Original.Resource
+			}
+			if dn, ok := v.(*graphNodeResourceDestroyFlat); ok {
+				update = dn.Original.Resource
+			}
+			if update != nil {
+				update.Lifecycle.CreateBeforeDestroy = true
+			}
 		}
 
 		// Get the creation side of this node
@@ -224,6 +219,30 @@ func (t *CreateBeforeDestroyTransformer) Transform(g *Graph) error {
 	}
 
 	return nil
+}
+
+// noCreateBeforeDestroyAncestors verifies that a vertex has no ancestors that
+// are CreateBeforeDestroy.
+// If this vertex has an ancestor with CreateBeforeDestroy, we will need to
+// inherit that behavior and re-order the edges even if this node type doesn't
+// directly implement CreateBeforeDestroy.
+func noCreateBeforeDestroyAncestors(g *Graph, v dag.Vertex) bool {
+	s, _ := g.Ancestors(v)
+	if s == nil {
+		return true
+	}
+	for _, v := range s.List() {
+		dn, ok := v.(GraphNodeDestroy)
+		if !ok {
+			continue
+		}
+
+		if dn.CreateBeforeDestroy() {
+			// some ancestor is CreateBeforeDestroy, so we need to follow suit
+			return false
+		}
+	}
+	return true
 }
 
 // PruneDestroyTransformer is a GraphTransformer that removes the destroy

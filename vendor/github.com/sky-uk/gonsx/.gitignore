@@ -1,7 +1,0 @@
-.DS_Store
-.idea/
-*.iml
-*.coverprofile
-coverage.html
-coverage-gocov.xml
-coverage-gocov.html

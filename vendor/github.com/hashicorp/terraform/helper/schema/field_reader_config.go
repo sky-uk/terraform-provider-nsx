@@ -85,7 +85,7 @@ func (r *ConfigFieldReader) readField(
 	case TypeList:
 		return readListField(&nestedConfigFieldReader{r}, address, schema)
 	case TypeMap:
-		return r.readMap(k)
+		return r.readMap(k, schema)
 	case TypeSet:
 		return r.readSet(address, schema)
 	case typeObject:
@@ -97,18 +97,49 @@ func (r *ConfigFieldReader) readField(
 	}
 }
 
-func (r *ConfigFieldReader) readMap(k string) (FieldReadResult, error) {
+func (r *ConfigFieldReader) readMap(k string, schema *Schema) (FieldReadResult, error) {
 	// We want both the raw value and the interpolated. We use the interpolated
 	// to store actual values and we use the raw one to check for
-	// computed keys.
+	// computed keys. Actual values are obtained in the switch, depending on
+	// the type of the raw value.
 	mraw, ok := r.Config.GetRaw(k)
 	if !ok {
-		return FieldReadResult{}, nil
+		// check if this is from an interpolated field by seeing if it exists
+		// in the config
+		_, ok := r.Config.Get(k)
+		if !ok {
+			// this really doesn't exist
+			return FieldReadResult{}, nil
+		}
+
+		// We couldn't fetch the value from a nested data structure, so treat the
+		// raw value as an interpolation string. The mraw value is only used
+		// for the type switch below.
+		mraw = "${INTERPOLATED}"
 	}
 
 	result := make(map[string]interface{})
 	computed := false
 	switch m := mraw.(type) {
+	case string:
+		// This is a map which has come out of an interpolated variable, so we
+		// can just get the value directly from config. Values cannot be computed
+		// currently.
+		v, _ := r.Config.Get(k)
+
+		// If this isn't a map[string]interface, it must be computed.
+		mapV, ok := v.(map[string]interface{})
+		if !ok {
+			return FieldReadResult{
+				Exists:   true,
+				Computed: true,
+			}, nil
+		}
+
+		// Otherwise we can proceed as usual.
+		for i, iv := range mapV {
+			result[i] = iv
+		}
 	case []interface{}:
 		for i, innerRaw := range m {
 			for ik := range innerRaw.(map[string]interface{}) {
@@ -148,6 +179,11 @@ func (r *ConfigFieldReader) readMap(k string) (FieldReadResult, error) {
 		}
 	default:
 		panic(fmt.Sprintf("unknown type: %#v", mraw))
+	}
+
+	err := mapValuesToPrimitive(result, schema)
+	if err != nil {
+		return FieldReadResult{}, nil
 	}
 
 	var value interface{}

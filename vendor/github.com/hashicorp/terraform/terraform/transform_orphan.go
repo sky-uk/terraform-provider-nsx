@@ -17,6 +17,11 @@ type GraphNodeStateRepresentative interface {
 // OrphanTransformer is a GraphTransformer that adds orphans to the
 // graph. This transformer adds both resource and module orphans.
 type OrphanTransformer struct {
+	// Resource is resource configuration. This is only non-nil when
+	// expanding a resource that is in the configuration. It can't be
+	// dependend on.
+	Resource *config.Resource
+
 	// State is the global state. We require the global state to
 	// properly find module orphans at our path.
 	State *State
@@ -80,6 +85,7 @@ func (t *OrphanTransformer) Transform(g *Graph) error {
 			resourceVertexes[i] = g.Add(&graphNodeOrphanResource{
 				Path:        g.Path,
 				ResourceKey: rsk,
+				Resource:    t.Resource,
 				Provider:    rs.Provider,
 				dependentOn: rs.Dependencies,
 			})
@@ -159,6 +165,7 @@ func (n *graphNodeOrphanModule) Expand(b GraphBuilder) (GraphNodeSubgraph, error
 type graphNodeOrphanResource struct {
 	Path        []string
 	ResourceKey *ResourceStateKey
+	Resource    *config.Resource
 	Provider    string
 
 	dependentOn []string
@@ -175,6 +182,7 @@ func (n *graphNodeOrphanResource) ResourceAddress() *ResourceAddress {
 		Name:         n.ResourceKey.Name,
 		Path:         n.Path[1:],
 		Type:         n.ResourceKey.Type,
+		Mode:         n.ResourceKey.Mode,
 	}
 }
 
@@ -203,17 +211,42 @@ func (n *graphNodeOrphanResource) ProvidedBy() []string {
 
 // GraphNodeEvalable impl.
 func (n *graphNodeOrphanResource) EvalTree() EvalNode {
-	var provider ResourceProvider
-	var state *InstanceState
 
 	seq := &EvalSequence{Nodes: make([]EvalNode, 0, 5)}
 
 	// Build instance info
 	info := &InstanceInfo{Id: n.ResourceKey.String(), Type: n.ResourceKey.Type}
+	info.uniqueExtra = "destroy"
+
 	seq.Nodes = append(seq.Nodes, &EvalInstanceInfo{Info: info})
 
+	// Each resource mode has its own lifecycle
+	switch n.ResourceKey.Mode {
+	case config.ManagedResourceMode:
+		seq.Nodes = append(
+			seq.Nodes,
+			n.managedResourceEvalNodes(info)...,
+		)
+	case config.DataResourceMode:
+		seq.Nodes = append(
+			seq.Nodes,
+			n.dataResourceEvalNodes(info)...,
+		)
+	default:
+		panic(fmt.Errorf("unsupported resource mode %s", n.ResourceKey.Mode))
+	}
+
+	return seq
+}
+
+func (n *graphNodeOrphanResource) managedResourceEvalNodes(info *InstanceInfo) []EvalNode {
+	var provider ResourceProvider
+	var state *InstanceState
+
+	nodes := make([]EvalNode, 0, 3)
+
 	// Refresh the resource
-	seq.Nodes = append(seq.Nodes, &EvalOpFilter{
+	nodes = append(nodes, &EvalOpFilter{
 		Ops: []walkOperation{walkRefresh},
 		Node: &EvalSequence{
 			Nodes: []EvalNode{
@@ -244,7 +277,7 @@ func (n *graphNodeOrphanResource) EvalTree() EvalNode {
 
 	// Diff the resource
 	var diff *InstanceDiff
-	seq.Nodes = append(seq.Nodes, &EvalOpFilter{
+	nodes = append(nodes, &EvalOpFilter{
 		Ops: []walkOperation{walkPlan, walkPlanDestroy},
 		Node: &EvalSequence{
 			Nodes: []EvalNode{
@@ -257,6 +290,11 @@ func (n *graphNodeOrphanResource) EvalTree() EvalNode {
 					State:  &state,
 					Output: &diff,
 				},
+				&EvalCheckPreventDestroy{
+					Resource:   n.Resource,
+					ResourceId: n.ResourceKey.String(),
+					Diff:       &diff,
+				},
 				&EvalWriteDiff{
 					Name: n.ResourceKey.String(),
 					Diff: &diff,
@@ -267,7 +305,7 @@ func (n *graphNodeOrphanResource) EvalTree() EvalNode {
 
 	// Apply
 	var err error
-	seq.Nodes = append(seq.Nodes, &EvalOpFilter{
+	nodes = append(nodes, &EvalOpFilter{
 		Ops: []walkOperation{walkApply, walkDestroy},
 		Node: &EvalSequence{
 			Nodes: []EvalNode{
@@ -308,7 +346,35 @@ func (n *graphNodeOrphanResource) EvalTree() EvalNode {
 		},
 	})
 
-	return seq
+	return nodes
+}
+
+func (n *graphNodeOrphanResource) dataResourceEvalNodes(info *InstanceInfo) []EvalNode {
+	nodes := make([]EvalNode, 0, 3)
+
+	// This will remain nil, since we don't retain states for orphaned
+	// data resources.
+	var state *InstanceState
+
+	// On both refresh and apply we just drop our state altogether,
+	// since the config resource validation pass will have proven that the
+	// resources remaining in the configuration don't need it.
+	nodes = append(nodes, &EvalOpFilter{
+		Ops: []walkOperation{walkRefresh, walkApply},
+		Node: &EvalSequence{
+			Nodes: []EvalNode{
+				&EvalWriteState{
+					Name:         n.ResourceKey.String(),
+					ResourceType: n.ResourceKey.Type,
+					Provider:     n.Provider,
+					Dependencies: n.DependentOn(),
+					State:        &state, // state is nil
+				},
+			},
+		},
+	})
+
+	return nodes
 }
 
 func (n *graphNodeOrphanResource) dependableName() string {
@@ -316,11 +382,7 @@ func (n *graphNodeOrphanResource) dependableName() string {
 }
 
 // GraphNodeDestroyable impl.
-func (n *graphNodeOrphanResource) DestroyNode(mode GraphNodeDestroyMode) GraphNodeDestroy {
-	if mode != DestroyPrimary {
-		return nil
-	}
-
+func (n *graphNodeOrphanResource) DestroyNode() GraphNodeDestroy {
 	return n
 }
 
@@ -350,11 +412,7 @@ func (n *graphNodeOrphanResourceFlat) Path() []string {
 }
 
 // GraphNodeDestroyable impl.
-func (n *graphNodeOrphanResourceFlat) DestroyNode(mode GraphNodeDestroyMode) GraphNodeDestroy {
-	if mode != DestroyPrimary {
-		return nil
-	}
-
+func (n *graphNodeOrphanResourceFlat) DestroyNode() GraphNodeDestroy {
 	return n
 }
 

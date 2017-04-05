@@ -7,7 +7,6 @@ import (
 	"github.com/hashicorp/terraform/config"
 	"github.com/hashicorp/terraform/config/module"
 	"github.com/hashicorp/terraform/dag"
-	"github.com/hashicorp/terraform/dot"
 )
 
 // GraphNodeConfigModule represents a module within the configuration graph.
@@ -59,7 +58,7 @@ func (n *GraphNodeConfigModule) Expand(b GraphBuilder) (GraphNodeSubgraph, error
 
 	{
 		// Add the destroy marker to the graph
-		t := &ModuleDestroyTransformer{}
+		t := &ModuleDestroyTransformerOld{}
 		if err := t.Transform(graph); err != nil {
 			return nil, err
 		}
@@ -69,7 +68,7 @@ func (n *GraphNodeConfigModule) Expand(b GraphBuilder) (GraphNodeSubgraph, error
 	return &graphNodeModuleExpanded{
 		Original:  n,
 		Graph:     graph,
-		Variables: make(map[string]string),
+		Variables: make(map[string]interface{}),
 	}, nil
 }
 
@@ -107,7 +106,7 @@ type graphNodeModuleExpanded struct {
 	// Variables is a map of the input variables. This reference should
 	// be shared with ModuleInputTransformer in order to create a connection
 	// where the variables are set properly.
-	Variables map[string]string
+	Variables map[string]interface{}
 }
 
 func (n *graphNodeModuleExpanded) Name() string {
@@ -129,11 +128,14 @@ func (n *graphNodeModuleExpanded) DependentOn() []string {
 }
 
 // GraphNodeDotter impl.
-func (n *graphNodeModuleExpanded) DotNode(name string, opts *GraphDotOpts) *dot.Node {
-	return dot.NewNode(name, map[string]string{
-		"label": dag.VertexName(n.Original),
-		"shape": "component",
-	})
+func (n *graphNodeModuleExpanded) DotNode(name string, opts *dag.DotOpts) *dag.DotNode {
+	return &dag.DotNode{
+		Name: name,
+		Attrs: map[string]string{
+			"label": dag.VertexName(n.Original),
+			"shape": "component",
+		},
+	}
 }
 
 // GraphNodeEvalable impl.
@@ -147,8 +149,8 @@ func (n *graphNodeModuleExpanded) EvalTree() EvalNode {
 			},
 
 			&EvalVariableBlock{
-				Config:    &resourceConfig,
-				Variables: n.Variables,
+				Config:         &resourceConfig,
+				VariableValues: n.Variables,
 			},
 		},
 	}
@@ -156,7 +158,7 @@ func (n *graphNodeModuleExpanded) EvalTree() EvalNode {
 
 // GraphNodeFlattenable impl.
 func (n *graphNodeModuleExpanded) FlattenGraph() *Graph {
-	graph := n.Subgraph()
+	graph := n.Subgraph().(*Graph)
 	input := n.Original.Module.RawConfig
 
 	// Go over each vertex and do some modifications to the graph for
@@ -189,7 +191,7 @@ func (n *graphNodeModuleExpanded) FlattenGraph() *Graph {
 }
 
 // GraphNodeSubgraph impl.
-func (n *graphNodeModuleExpanded) Subgraph() *Graph {
+func (n *graphNodeModuleExpanded) Subgraph() dag.Grapher {
 	return n.Graph
 }
 
