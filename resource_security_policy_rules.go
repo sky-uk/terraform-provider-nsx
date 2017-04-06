@@ -128,7 +128,7 @@ func resourceSecurityPolicyRuleCreate(d *schema.ResourceData, m interface{}) err
 
 	existingAction := policyToModify.GetFirewallRuleByName(name)
 	if existingAction.Name != "" {
-		return fmt.Errorf("Firewall rule with same name already exists in this security policy.")
+		return fmt.Errorf("Firewall rule with same name already exists in this security policy")
 	}
 
 	log.Printf(fmt.Sprintf("[DEBUG] policyToModify.AddOutboundFirewallAction(%s, %s, %s, %s, %s)", name, action, direction, securitygroupids, serviceids))
