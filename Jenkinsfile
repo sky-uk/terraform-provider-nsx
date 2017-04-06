@@ -13,7 +13,7 @@ major_version = null
 minor_version = null
 patch_version = null
 
-docker_image = "paas/golang-img:0.0.1"
+docker_image = "paas/golang-img:0.8.8"
 
 // helpers
 gitHelper = null
