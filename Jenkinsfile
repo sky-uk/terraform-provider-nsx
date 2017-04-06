@@ -2,7 +2,6 @@
 
 project_name = 'terraform-provider-nsx'
 project_owner = 'sky-uk'
-project_github_token = '7eec88ceb08431126182c7ce85631cb45bd0f98a'
 
 project_src_path = "github.com/${project_owner}/${project_name}"
 git_credentials_id = '51e7ba41-d78c-4e30-802d-9b424fa0ab63'
@@ -95,10 +94,14 @@ slackHelper.notificationWrapper(slackChannel, currentBuild, env, true) {
                 gitHelper.push(git_credentials_id, git_branch)
 
                 echo "Creating GitHub Release v${version()}"
-                github_release_response = gitHelper.createGitHubRelease(project_github_token, project_owner, project_name, version(), git_branch)
-//              FIXME: this is not working yet
-//              echo "Attaching artifacts to GitHub Release v${version()}"
-//              gitHelper.uploadToGitHubRelease(project_github_token, project_owner, project_name, github_release_response.id, "${pwd()}/coverage.html", 'application/html')
+
+                withCredentials([string(credentialsId: 'c7203be2-2bd2-407a-9876-86be3496e5e8', variable: 'GITHUB_TOKEN')]) {
+                    def github_release_response = gitHelper.createGitHubRelease(GITHUB_TOKEN, project_owner, project_name, version(), git_branch)
+                    // FIXME: this is not working yet
+                    // echo "Attaching artifacts to GitHub Release v${version()}"
+                    // gitHelper.uploadToGitHubRelease(project_github_token, project_owner, project_name, github_release_response.id, "${pwd()}/coverage.html", 'application/html')
+                }
+
             }
             currentBuild.description = "Released ${version()}"
         }
