@@ -404,73 +404,84 @@
 			"revision": "a422bbe96644373c5753384a59d678f7d261ff10"
 		},
 		{
-			"checksumSHA1": "ulYK69ZDWz8mRGH25M90nYGwiQI=",
-			"comment": "0.3.2",
+			"checksumSHA1": "RTMekwLpUJhBRfGrgH6jg3zj+EQ=",
 			"path": "github.com/sky-uk/gonsx",
-			"revision": "509d8ee63c075dbff568f3ccb94daa0460d4debd",
-			"revisionTime": "2016-08-03T09:47:21Z"
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
+			"revisionTime": "2017-04-07T10:17:16Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
 			"checksumSHA1": "1KwQ4O1Kk2aUgnPlCpt5E7iOhuk=",
-			"comment": "0.3.2",
 			"path": "github.com/sky-uk/gonsx/api",
-			"revision": "509d8ee63c075dbff568f3ccb94daa0460d4debd",
-			"revisionTime": "2016-08-03T09:47:21Z"
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
+			"revisionTime": "2017-04-07T10:17:16Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
 			"checksumSHA1": "mKHPeRXdfRPjoWqgxx6u98rbPqA=",
-			"comment": "0.3.2",
 			"path": "github.com/sky-uk/gonsx/api/dhcprelay",
-			"revision": "509d8ee63c075dbff568f3ccb94daa0460d4debd",
-			"revisionTime": "2016-08-03T09:47:21Z"
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
+			"revisionTime": "2017-04-07T10:17:16Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
 			"checksumSHA1": "HOAJv0BVJy4Q8v5K8qWJ+G8ace4=",
-			"comment": "0.3.2",
 			"path": "github.com/sky-uk/gonsx/api/edgeinterface",
-			"revision": "509d8ee63c075dbff568f3ccb94daa0460d4debd",
-			"revisionTime": "2016-08-03T09:47:21Z"
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
+			"revisionTime": "2017-04-07T10:17:16Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
-			"checksumSHA1": "Y0G3rZu8u4yjVh24/66w7riu3qM=",
-			"comment": "0.3.2",
+			"checksumSHA1": "dsDimgTzQGJ7NMgvH+78VdW2JfI=",
 			"path": "github.com/sky-uk/gonsx/api/securitygroup",
-			"revision": "509d8ee63c075dbff568f3ccb94daa0460d4debd",
-			"revisionTime": "2016-08-03T09:47:21Z"
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
+			"revisionTime": "2017-04-07T10:17:16Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
 			"checksumSHA1": "dZ2Lhb6nI5/mlA1ZBLM4ZMY7uBw=",
-			"comment": "0.3.2",
 			"path": "github.com/sky-uk/gonsx/api/securitypolicy",
-			"revision": "509d8ee63c075dbff568f3ccb94daa0460d4debd",
-			"revisionTime": "2016-08-03T09:47:21Z"
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
+			"revisionTime": "2017-04-07T10:17:16Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
 			"checksumSHA1": "sWX5ui8JcfUYXKvpUIT5Z/SYwKM=",
-			"comment": "0.3.2",
 			"path": "github.com/sky-uk/gonsx/api/securitytag",
-			"revision": "509d8ee63c075dbff568f3ccb94daa0460d4debd",
-			"revisionTime": "2016-08-03T09:47:21Z"
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
+			"revisionTime": "2017-04-07T10:17:16Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
 			"checksumSHA1": "UpbA43PSGyAOp3WfQlMvKitZTKI=",
-			"comment": "0.3.2",
 			"path": "github.com/sky-uk/gonsx/api/service",
-			"revision": "509d8ee63c075dbff568f3ccb94daa0460d4debd",
-			"revisionTime": "2016-08-03T09:47:21Z"
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
+			"revisionTime": "2017-04-07T10:17:16Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
 			"checksumSHA1": "K1PMAqhEoFwvMc4aZbJEEyssovo=",
-			"comment": "0.3.2",
 			"path": "github.com/sky-uk/gonsx/api/tzone",
-			"revision": "509d8ee63c075dbff568f3ccb94daa0460d4debd"
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
+			"revisionTime": "2017-04-07T10:17:16Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
 			"checksumSHA1": "14Q7FjC0yj57cT4bAZSIQvlCqWU=",
-			"comment": "0.3.2",
 			"path": "github.com/sky-uk/gonsx/api/virtualwire",
-			"revision": "509d8ee63c075dbff568f3ccb94daa0460d4debd",
-			"revisionTime": "2016-08-03T09:47:21Z"
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
+			"revisionTime": "2017-04-07T10:17:16Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
 			"checksumSHA1": "cZ2c6CJ5uvKiKvoZHk7F8Ypdo8g=",
