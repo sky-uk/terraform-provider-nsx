@@ -5,6 +5,22 @@
 
 This project is a NSXClient library for talking to NSX API.
 
+### Features
+
+| Feature                 | Create | Read  | Update  | Delete |
+|-------------------------|--------|-------|---------|--------|
+| DHCP Relay              |   N    |   Y   |    Y    |   Y    |
+| Edge Interface          |   Y    |   Y   |    N    |   Y    |
+| Security Group          |   Y    |   Y   |    Y    |   Y    |
+| Security Policy         |   Y    |   Y   |    Y    |   Y    |
+| Security Tag            |   Y    |   Y   |    N    |   Y    |
+| Security Tag Attachment |   Y    |   Y   |    N    |   Y    |
+| Service                 |   Y    |   Y   |    Y    |   Y    |
+| Transport Zone          |   N    |   Y   |    N    |   N    |
+| Virtual Wire            |   Y    |   Y   |    Y    |   Y    |
+
+Implementation of CRUD in above features is partial in some cases.
+
 ## Usage
 ### NSXClient
 

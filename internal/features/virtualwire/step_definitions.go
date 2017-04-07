@@ -15,19 +15,25 @@ import (
 
 // Client : NSXClient object
 var Client = internal.GetNSXClient()
+
 // StdOut : Command stdout
 var StdOut []byte
+
 // StdErr : Command stderr
 var StdErr []byte
+
 // ExitError : Command exitError
 var ExitError *exec.ExitError
+
 // TempTFDir : Terraform file temporary directory
 var TempTFDir string
+
 // TempTDFile : Temporary Terraform file
 var TempTDFile string
 
 // TerraformPlanChangesRegExp : Regular expression for terraform plan output
 var TerraformPlanChangesRegExp = regexp.MustCompile(`\nPlan: (\d) to add, (\d) to change, (\d) to destroy\.\n`)
+
 // TerraformApplyChangesRegExp : Regular expression for terraform apply output
 var TerraformApplyChangesRegExp = regexp.MustCompile(`\nApply complete! Resources: (\d) added, (\d) changed, (\d) destroyed\.\n`)
 
