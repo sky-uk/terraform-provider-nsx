@@ -36,7 +36,6 @@ func resourceSecurityGroup() *schema.Resource {
 			"scopeid": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 
 			"name": {
@@ -48,31 +47,26 @@ func resourceSecurityGroup() *schema.Resource {
 			"setoperator": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 
 			"criteriaoperator": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 
 			"criteriakey": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 
 			"criteriavalue": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 
 			"criteria": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 		},
 	}
@@ -183,21 +177,22 @@ func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
 	//var scopeid, name, setoperator, criteriaoperator, criteriakey, criteriavalue, criteria string
 	//hasChanges := false
-	securityGroupToUpdate := "TEST"
+
+	// TODO: Remove this line - testing only.
+	//securityGroupToSearch := ""
 
 	getAllAPI := securitygroup.NewGetAll("globalroot-0")
 	err := nsxclient.Do(getAllAPI)
 	if err != nil {
 		return fmt.Errorf("Error: ", err)
 	}
-
+/*
 	if getAllAPI.StatusCode() != 200 {
 		return fmt.Errorf("Status code: %v, Response: %v\n", getAllAPI.StatusCode(), getAllAPI.ResponseObject())
 	}
-
+*/
 	if getAllAPI.StatusCode() == 200 {
-		securityGroupToSearch := d.Get("name").(string)
-		securityGroupToUpdate := getAllAPI.GetResponse().FilterByName(securityGroupToSearch)
+		securityGroupToUpdate := getAllAPI.GetResponse().FilterByName(d.Get("name").(string))
 		if securityGroupToUpdate.ObjectID == "" {
 			return fmt.Errorf("ERROR: Service update - service %s not found", d.Get("name"))
 		}
@@ -205,10 +200,21 @@ func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("ERROR: Service update returned bad http response code for %s.", d.Get("name"))
 	}
 
+	//securityGroupToSearch := d.Get("name").(string)
+	securityGroupToChange := getAllAPI.GetResponse().FilterByName(d.Get("name").(string))
 
-	fmt.Printf("Security Group to update is: %s", securityGroupToUpdate)
+	if d.HasChange("criteriavalue") {
+		hasChanges = true
+		securityGroupToChange. = d.GetChange("criteriavalue")
+	}
 
-	return nil
+
+
+
+
+
+	return fmt.Errorf("Security Group to search for is: %s", securityGroupToChange)
+	//return nil
 	//return resourceSecurityGroupRead(d, m)
 }
 
