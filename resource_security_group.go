@@ -28,6 +28,7 @@ func resourceSecurityGroup() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceSecurityGroupCreate,
 		Read:   resourceSecurityGroupRead,
+		Update: resourceSecurityGroupUpdate,
 		Delete: resourceSecurityGroupDelete,
 
 		Schema: map[string]*schema.Schema{
@@ -175,6 +176,42 @@ func resourceSecurityGroupRead(d *schema.ResourceData, m interface{}) error {
 
 	return nil
 }
+
+
+func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
+
+	nsxclient := m.(*gonsx.NSXClient)
+	//var scopeid, name, setoperator, criteriaoperator, criteriakey, criteriavalue, criteria string
+	//hasChanges := false
+	securityGroupToUpdate := "TEST"
+
+	getAllAPI := securitygroup.NewGetAll("globalroot-0")
+	err := nsxclient.Do(getAllAPI)
+	if err != nil {
+		return fmt.Errorf("Error: ", err)
+	}
+
+	if getAllAPI.StatusCode() != 200 {
+		return fmt.Errorf("Status code: %v, Response: %v\n", getAllAPI.StatusCode(), getAllAPI.ResponseObject())
+	}
+
+	if getAllAPI.StatusCode() == 200 {
+		securityGroupToSearch := d.Get("name").(string)
+		securityGroupToUpdate := getAllAPI.GetResponse().FilterByName(securityGroupToSearch)
+		if securityGroupToUpdate.ObjectID == "" {
+			return fmt.Errorf("ERROR: Service update - service %s not found", d.Get("name"))
+		}
+	} else {
+		return fmt.Errorf("ERROR: Service update returned bad http response code for %s.", d.Get("name"))
+	}
+
+
+	fmt.Printf("Security Group to update is: %s", securityGroupToUpdate)
+
+	return nil
+	//return resourceSecurityGroupRead(d, m)
+}
+
 
 func resourceSecurityGroupDelete(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
