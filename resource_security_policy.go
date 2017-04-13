@@ -31,6 +31,7 @@ func resourceSecurityPolicy() *schema.Resource {
 		Create: resourceSecurityPolicyCreate,
 		Read:   resourceSecurityPolicyRead,
 		Delete: resourceSecurityPolicyDelete,
+		Update: resourceSecurityPolicyUpdate,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -41,12 +42,10 @@ func resourceSecurityPolicy() *schema.Resource {
 			"precedence": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: true,
 			},
 			"securitygroups": {
 				Type:     schema.TypeList,
@@ -58,8 +57,8 @@ func resourceSecurityPolicy() *schema.Resource {
 	}
 }
 
-func resourceSecurityPolicyCreate(d *schema.ResourceData, m interface{}) error {
-	nsxclient := m.(*gonsx.NSXClient)
+func resourceSecurityPolicyCreate(d *schema.ResourceData, meta interface{}) error {
+	nsxclient := meta.(*gonsx.NSXClient)
 	var name, description, precedence string
 	var securitygroups []string
 	var actions []securitypolicy.Action
@@ -112,11 +111,11 @@ func resourceSecurityPolicyCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	d.SetId(createAPI.GetResponse())
-	return resourceSecurityPolicyRead(d, m)
+	return resourceSecurityPolicyRead(d, meta)
 }
 
-func resourceSecurityPolicyRead(d *schema.ResourceData, m interface{}) error {
-	nsxclient := m.(*gonsx.NSXClient)
+func resourceSecurityPolicyRead(d *schema.ResourceData, meta interface{}) error {
+	nsxclient := meta.(*gonsx.NSXClient)
 	var name string
 
 	if v, ok := d.GetOk("name"); ok {
@@ -139,8 +138,8 @@ func resourceSecurityPolicyRead(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func resourceSecurityPolicyDelete(d *schema.ResourceData, m interface{}) error {
-	nsxclient := m.(*gonsx.NSXClient)
+func resourceSecurityPolicyDelete(d *schema.ResourceData, meta interface{}) error {
+	nsxclient := meta.(*gonsx.NSXClient)
 	var name string
 
 	if v, ok := d.GetOk("name"); ok {
@@ -178,4 +177,80 @@ func resourceSecurityPolicyDelete(d *schema.ResourceData, m interface{}) error {
 	log.Printf(fmt.Sprintf("[DEBUG] id %s deleted.", id))
 
 	return nil
+}
+
+
+func resourceSecurityPolicyUpdate(d *schema.ResourceData, meta interface{}) error {
+	// flag if changes have to be applied
+	hasChanges := false
+
+	nsxclient := meta.(*gonsx.NSXClient)
+	var name string
+	var securitygroups []string
+
+	if v, ok := d.GetOk("name"); ok {
+		name = v.(string)
+	} else {
+		return fmt.Errorf("name argument is required")
+	}
+
+	securityPolicyToChange, err := getSingleSecurityPolicy(name, nsxclient)
+	if err != nil {
+		return err
+	}
+
+	id := securityPolicyToChange.ObjectID
+	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
+
+	// If the resource is not found, notify Terraform of this fact.
+	if id == "" {
+		d.SetId("")
+		return nil
+	}
+
+	// Update resource properties.
+	if d.HasChange("description") {
+		hasChanges = true
+		securityPolicyToChange.Description = d.Get("description").(string)
+	}
+
+	if d.HasChange("precedence") {
+		hasChanges = true
+		securityPolicyToChange.Precedence = d.Get("precedence").(string)
+	}
+
+	// TODO: this securitygroup stuff is not yet functional.
+	if v, ok := d.GetOk("securitygroups"); ok {
+		list := v.([]interface{})
+
+		securitygroups = make([]string, len(list))
+		for i, value := range list {
+			groupID, ok := value.(string)
+			if !ok {
+				return fmt.Errorf("empty element found in securitygroups")
+			}
+			securitygroups[i] = groupID
+		}
+	} else {
+		return fmt.Errorf("security groups argument is required")
+	}
+
+	for _, securityGroupID := range securitygroups {
+		securityPolicyToChange.AddSecurityGroupBinding(securityGroupID)
+	}
+
+	// do nothing if there are no changes
+	if !hasChanges {
+		return nil
+	}
+
+	updateAPI := securitypolicy.NewUpdate(id, securityPolicyToChange)
+	err = nsxclient.Do(updateAPI)
+
+	if err != nil {
+		return err
+	}
+
+	return resourceSecurityPolicyRead(d, meta)
+
 }
