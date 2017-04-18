@@ -41,7 +41,6 @@ func resourceSecurityGroup() *schema.Resource {
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 
 			"setoperator": {
@@ -176,46 +175,62 @@ func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
 
 	nsxclient := m.(*gonsx.NSXClient)
 	//var scopeid, name, setoperator, criteriaoperator, criteriakey, criteriavalue, criteria string
-	//hasChanges := false
+	var name, scopeid string
+	hasChanges := false
 
-	// TODO: Remove this line - testing only.
-	//securityGroupToSearch := ""
-
-	getAllAPI := securitygroup.NewGetAll("globalroot-0")
-	err := nsxclient.Do(getAllAPI)
-	if err != nil {
-		return fmt.Errorf("Error: ", err)
-	}
-/*
-	if getAllAPI.StatusCode() != 200 {
-		return fmt.Errorf("Status code: %v, Response: %v\n", getAllAPI.StatusCode(), getAllAPI.ResponseObject())
-	}
-*/
-	if getAllAPI.StatusCode() == 200 {
-		securityGroupToUpdate := getAllAPI.GetResponse().FilterByName(d.Get("name").(string))
-		if securityGroupToUpdate.ObjectID == "" {
-			return fmt.Errorf("ERROR: Service update - service %s not found", d.Get("name"))
-		}
+	if v, ok := d.GetOk("scopeid"); ok {
+		scopeid = v.(string)
 	} else {
-		return fmt.Errorf("ERROR: Service update returned bad http response code for %s.", d.Get("name"))
+		return fmt.Errorf("scopeid argument is required")
 	}
 
-	//securityGroupToSearch := d.Get("name").(string)
-	securityGroupToChange := getAllAPI.GetResponse().FilterByName(d.Get("name").(string))
+	if v, ok := d.GetOk("name"); ok {
+		name = v.(string)
+	} else {
+		return fmt.Errorf("name argument is required")
+	}
 
-	if d.HasChange("criteriavalue") {
+	log.Printf(fmt.Sprintf("[DEBUG] securitygroup.NewGetAll(%s)", scopeid))
+	api := securitygroup.NewGetAll(scopeid)
+	err := nsxclient.Do(api)
+
+	if err != nil {
+		return err
+	}
+
+	oldName, newName := d.GetChange("name")
+	securityGroupObject, err := getSingleSecurityGroup(scopeid, oldName.(string), nsxclient)
+	id := securityGroupObject.ObjectID
+	log.Printf(fmt.Sprintf("[DEBUG] The security group ID to update is: %s", id))
+	log.Printf(fmt.Sprintf("[INFO] The template name is: %s and the new name is %s", name, newName.(string)))
+
+	// attributes we can change are: name, setoperator, criteriaoperator, criteriakey, criteriavalue, criteria
+
+	if d.HasChange("name") {
 		hasChanges = true
-		securityGroupToChange. = d.GetChange("criteriavalue")
+		securityGroupObject.Name = name
 	}
 
 
 
+	if hasChanges {
+		updateAPI := securitygroup.NewUpdate(id, securityGroupObject)
+		err = nsxclient.Do(updateAPI)
+		if err != nil {
+			fmt.Println("Error:", err)
+		}
 
-
-
-	return fmt.Errorf("Security Group to search for is: %s", securityGroupToChange)
-	//return nil
-	//return resourceSecurityGroupRead(d, m)
+		if updateAPI.StatusCode() == 200 {
+			fmt.Println("Security Group object updated successfully.")
+			response := updateAPI.GetResponse()
+			fmt.Println(response)
+		} else {
+			fmt.Println("Failed to update the security group!")
+			fmt.Println("StatusCode:", updateAPI.StatusCode())
+			fmt.Println("ResponseObject:", updateAPI.ResponseObject())
+		}
+	}
+	return nil
 }
 
 
