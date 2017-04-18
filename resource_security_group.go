@@ -201,17 +201,14 @@ func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
 	oldName, newName := d.GetChange("name")
 	securityGroupObject, err := getSingleSecurityGroup(scopeid, oldName.(string), nsxclient)
 	id := securityGroupObject.ObjectID
-	log.Printf(fmt.Sprintf("[DEBUG] The security group ID to update is: %s", id))
-	log.Printf(fmt.Sprintf("[INFO] The template name is: %s and the new name is %s", name, newName.(string)))
 
+	// TODO: change attributes other than name.
 	// attributes we can change are: name, setoperator, criteriaoperator, criteriakey, criteriavalue, criteria
-
 	if d.HasChange("name") {
 		hasChanges = true
 		securityGroupObject.Name = name
+		log.Printf(fmt.Sprintf("[DEBUG] Changing name of security group from %s to %s", oldName.(string), newName.(string)))
 	}
-
-
 
 	if hasChanges {
 		updateAPI := securitygroup.NewUpdate(id, securityGroupObject)
@@ -230,7 +227,7 @@ func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
 			fmt.Println("ResponseObject:", updateAPI.ResponseObject())
 		}
 	}
-	return nil
+	return resourceSecurityGroupRead(d, m)
 }
 
 
