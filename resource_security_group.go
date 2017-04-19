@@ -189,7 +189,7 @@ func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
 	securityGroupObject, err := getSingleSecurityGroup(scopeid, oldName.(string), nsxclient)
 	id := securityGroupObject.ObjectID
 
-	// TODO: change attributes other than name. Requires changes in gonsx.
+	//TODO: change attributes other than name. Requires changes in gonsx.
 	if d.HasChange("name") {
 		hasChanges = true
 		securityGroupObject.Name = newName
