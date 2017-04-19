@@ -170,7 +170,6 @@ func resourceSecurityGroupRead(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-
 func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
 
 	nsxclient := m.(*gonsx.NSXClient)
@@ -229,7 +228,6 @@ func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 	return resourceSecurityGroupRead(d, m)
 }
-
 
 func resourceSecurityGroupDelete(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
