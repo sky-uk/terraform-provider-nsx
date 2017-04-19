@@ -192,7 +192,7 @@ func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
 	//TODO: change attributes other than name. Requires changes in gonsx.
 	if d.HasChange("name") {
 		hasChanges = true
-		securityGroupObject.Name = newName
+		securityGroupObject.Name = newName.(string)
 		log.Printf(fmt.Sprintf("[DEBUG] Changing name of security group from %s to %s", oldName.(string), newName.(string)))
 	}
 
