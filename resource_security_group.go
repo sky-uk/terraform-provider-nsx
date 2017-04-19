@@ -36,6 +36,8 @@ func resourceSecurityGroup() *schema.Resource {
 			"scopeid": {
 				Type:     schema.TypeString,
 				Required: true,
+				// Can't send update on scopeid
+				ForceNew: true,
 			},
 
 			"name": {
@@ -172,9 +174,8 @@ func resourceSecurityGroupRead(d *schema.ResourceData, m interface{}) error {
 
 func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
 
+	var scopeid string
 	nsxclient := m.(*gonsx.NSXClient)
-	//var scopeid, name, setoperator, criteriaoperator, criteriakey, criteriavalue, criteria string
-	var name, scopeid string
 	hasChanges := false
 
 	if v, ok := d.GetOk("scopeid"); ok {
@@ -183,29 +184,15 @@ func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("scopeid argument is required")
 	}
 
-	if v, ok := d.GetOk("name"); ok {
-		name = v.(string)
-	} else {
-		return fmt.Errorf("name argument is required")
-	}
-
 	log.Printf(fmt.Sprintf("[DEBUG] securitygroup.NewGetAll(%s)", scopeid))
-	api := securitygroup.NewGetAll(scopeid)
-	err := nsxclient.Do(api)
-
-	if err != nil {
-		return err
-	}
-
 	oldName, newName := d.GetChange("name")
 	securityGroupObject, err := getSingleSecurityGroup(scopeid, oldName.(string), nsxclient)
 	id := securityGroupObject.ObjectID
 
-	// TODO: change attributes other than name.
-	// attributes we can change are: name, setoperator, criteriaoperator, criteriakey, criteriavalue, criteria
+	// TODO: change attributes other than name. Requires changes in gonsx.
 	if d.HasChange("name") {
 		hasChanges = true
-		securityGroupObject.Name = name
+		securityGroupObject.Name = newName
 		log.Printf(fmt.Sprintf("[DEBUG] Changing name of security group from %s to %s", oldName.(string), newName.(string)))
 	}
 
