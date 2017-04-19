@@ -50,7 +50,6 @@ func resourceSecurityPolicy() *schema.Resource {
 			"securitygroups": {
 				Type:     schema.TypeList,
 				Optional: true,
-				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 		},
@@ -80,12 +79,11 @@ func resourceSecurityPolicyCreate(d *schema.ResourceData, meta interface{}) erro
 	if v, ok := d.GetOk("description"); ok {
 		description = v.(string)
 	} else {
-		return fmt.Errorf("description argument is required")
+		description = name
 	}
 
 	if v, ok := d.GetOk("securitygroups"); ok {
 		list := v.([]interface{})
-
 		securitygroups = make([]string, len(list))
 		for i, value := range list {
 			groupID, ok := value.(string)
@@ -95,7 +93,7 @@ func resourceSecurityPolicyCreate(d *schema.ResourceData, meta interface{}) erro
 			securitygroups[i] = groupID
 		}
 	} else {
-		return fmt.Errorf("security groups argument is required")
+		securitygroups = make([]string, 0)
 	}
 
 	log.Printf(fmt.Sprintf("[DEBUG] securitypolicy.NewCreate(%s, %s, %s, %s, %s)", name, precedence, description, securitygroups, actions))
@@ -179,7 +177,6 @@ func resourceSecurityPolicyDelete(d *schema.ResourceData, meta interface{}) erro
 	return nil
 }
 
-
 func resourceSecurityPolicyUpdate(d *schema.ResourceData, meta interface{}) error {
 	// flag if changes have to be applied
 	hasChanges := false
@@ -219,24 +216,32 @@ func resourceSecurityPolicyUpdate(d *schema.ResourceData, meta interface{}) erro
 		securityPolicyToChange.Precedence = d.Get("precedence").(string)
 	}
 
-	// TODO: this securitygroup stuff is not yet functional.
-	if v, ok := d.GetOk("securitygroups"); ok {
-		list := v.([]interface{})
+	if d.HasChange("securitygroups") {
+		hasChanges = true
 
-		securitygroups = make([]string, len(list))
-		for i, value := range list {
-			groupID, ok := value.(string)
-			if !ok {
-				return fmt.Errorf("empty element found in securitygroups")
-			}
-			securitygroups[i] = groupID
+		// TODO: fix this when API is updated, for now we remove everything first.
+		for _, securityGroup := range securityPolicyToChange.SecurityGroupBinding {
+			securityPolicyToChange.RemoveSecurityGroupBinding(securityGroup.ObjectID)
 		}
-	} else {
-		return fmt.Errorf("security groups argument is required")
-	}
 
-	for _, securityGroupID := range securitygroups {
-		securityPolicyToChange.AddSecurityGroupBinding(securityGroupID)
+		if v, ok := d.GetOk("securitygroups"); ok {
+			list := v.([]interface{})
+
+			securitygroups = make([]string, len(list))
+			for i, value := range list {
+				groupID, ok := value.(string)
+				if !ok {
+					return fmt.Errorf("empty element found in securitygroups")
+				}
+				securitygroups[i] = groupID
+			}
+		} else {
+			securitygroups = make([]string, 0)
+		}
+
+		for _, securityGroupID := range securitygroups {
+			securityPolicyToChange.AddSecurityGroupBinding(securityGroupID)
+		}
 	}
 
 	// do nothing if there are no changes
