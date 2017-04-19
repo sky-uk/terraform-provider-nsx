@@ -4,8 +4,7 @@ terraform-provider-nsx: config.go main.go provider.go resource_logical_switch.go
 install:
 	cp terraform-provider-nsx /usr/local/terraform/
 clean:
-	#rm -f terraform.tfstate  terraform.tfstate.backup terraform-provider-nsx crash.log terraform.log
-	rm -f terraform-provider-nsx terraform.log crash.log
+	rm -f terraform.tfstate  terraform.tfstate.backup terraform-provider-nsx crash.log terraform.log
 apply: terraform-provider-nsx
 	terraform apply 2>&1 | tee terraform.log
 apply-debug: terraform-provider-nsx
