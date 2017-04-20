@@ -28,6 +28,7 @@ func resourceSecurityGroup() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceSecurityGroupCreate,
 		Read:   resourceSecurityGroupRead,
+		Update: resourceSecurityGroupUpdate,
 		Delete: resourceSecurityGroupDelete,
 
 		Schema: map[string]*schema.Schema{
@@ -41,37 +42,31 @@ func resourceSecurityGroup() *schema.Resource {
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 
 			"setoperator": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 
 			"criteriaoperator": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 
 			"criteriakey": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 
 			"criteriavalue": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 
 			"criteria": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 		},
 	}
@@ -174,6 +169,40 @@ func resourceSecurityGroupRead(d *schema.ResourceData, m interface{}) error {
 	}
 
 	return nil
+}
+
+func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
+
+	var scopeid string
+	nsxclient := m.(*gonsx.NSXClient)
+	hasChanges := false
+
+	if v, ok := d.GetOk("scopeid"); ok {
+		scopeid = v.(string)
+	} else {
+		return fmt.Errorf("scopeid argument is required")
+	}
+
+	log.Printf(fmt.Sprintf("[DEBUG] securitygroup.NewGetAll(%s)", scopeid))
+	oldName, newName := d.GetChange("name")
+	securityGroupObject, err := getSingleSecurityGroup(scopeid, oldName.(string), nsxclient)
+	id := securityGroupObject.ObjectID
+
+	//TODO: change attributes other than name. Requires changes in gonsx.
+	if d.HasChange("name") {
+		hasChanges = true
+		securityGroupObject.Name = newName.(string)
+		log.Printf(fmt.Sprintf("[DEBUG] Changing name of security group from %s to %s", oldName.(string), newName.(string)))
+	}
+
+	if hasChanges {
+		updateAPI := securitygroup.NewUpdate(id, securityGroupObject)
+		err = nsxclient.Do(updateAPI)
+		if err != nil {
+			log.Printf(fmt.Sprintf("[DEBUG] Error updating security group: %s", err))
+		}
+	}
+	return resourceSecurityGroupRead(d, m)
 }
 
 func resourceSecurityGroupDelete(d *schema.ResourceData, m interface{}) error {
