@@ -199,7 +199,7 @@ func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
 		updateAPI := securitygroup.NewUpdate(id, securityGroupObject)
 		err = nsxclient.Do(updateAPI)
 		if err != nil {
-			log.Printf(fmt.Sprintf("[DEBUG] Error updating security group:", err))
+			log.Printf(fmt.Sprintf("[DEBUG] Error updating security group: %s", err))
 		}
 	}
 	return resourceSecurityGroupRead(d, m)
