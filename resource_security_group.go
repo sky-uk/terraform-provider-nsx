@@ -36,7 +36,6 @@ func resourceSecurityGroup() *schema.Resource {
 			"scopeid": {
 				Type:     schema.TypeString,
 				Required: true,
-				// Can't send update on scopeid
 				ForceNew: true,
 			},
 
@@ -200,17 +199,7 @@ func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
 		updateAPI := securitygroup.NewUpdate(id, securityGroupObject)
 		err = nsxclient.Do(updateAPI)
 		if err != nil {
-			fmt.Println("Error:", err)
-		}
-
-		if updateAPI.StatusCode() == 200 {
-			fmt.Println("Security Group object updated successfully.")
-			response := updateAPI.GetResponse()
-			fmt.Println(response)
-		} else {
-			fmt.Println("Failed to update the security group!")
-			fmt.Println("StatusCode:", updateAPI.StatusCode())
-			fmt.Println("ResponseObject:", updateAPI.ResponseObject())
+			log.Printf(fmt.Sprintf("[DEBUG] Error updating security group:", err))
 		}
 	}
 	return resourceSecurityGroupRead(d, m)
