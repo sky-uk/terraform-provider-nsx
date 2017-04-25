@@ -35,17 +35,18 @@ func resourceSecurityTag() *schema.Resource {
 		Create: resourceSecurityTagCreate,
 		Read:   resourceSecurityTagRead,
 		Delete: resourceSecurityTagDelete,
+		Update: resorceSecurityTagUpdate,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
+				ForceNew: false,
 			},
 			"desc": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
+				ForceNew: false,
 			},
 		},
 	}
@@ -180,5 +181,9 @@ func resourceSecurityTagDelete(d *schema.ResourceData, m interface{}) error {
 	// completion.
 	d.SetId("")
 	log.Printf(fmt.Sprintf("[DEBUG] id %s deleted.", id))
+	return nil
+}
+
+func resorceSecurityTagUpdate(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
