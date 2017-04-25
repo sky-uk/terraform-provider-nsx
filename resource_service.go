@@ -219,7 +219,6 @@ func resourceServiceDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-
 func resourceServiceUpdate(d *schema.ResourceData, meta interface{}) error {
 	nsxclient := meta.(*gonsx.NSXClient)
 	var scopeid string
