@@ -185,5 +185,38 @@ func resourceSecurityTagDelete(d *schema.ResourceData, m interface{}) error {
 }
 
 func resorceSecurityTagUpdate(d *schema.ResourceData, m interface{}) error {
-	return nil
+	nsxclient := m.(*gonsx.NSXClient)
+	var name, description string
+	hasChanges := false
+	if v, ok := d.GetOk("name"); ok {
+		name = v.(string)
+	} else {
+		return fmt.Errorf("name argument is required")
+	}
+	if v, ok := d.GetOk("description"); ok {
+		name = v.(string)
+	} else {
+		return fmt.Errorf("name argument is required")
+	}
+	oldName, newName := d.GetChange("name")
+	_, newDesc := d.GetChange("description")
+	securityTagObject, err := getSingleSecurityTag(oldName.(string), nsxclient)
+	securityTagID := securityTagObject.ObjectID
+	if d.HasChange("name") {
+		hasChanges := true
+		securityTagObject.Name = newName
+	}
+	if d.HasChange("description") {
+		hasChanges := true
+		securityTagObject.Description = newDesc
+	}
+	if hasChanges {
+		updateAPI := securitytag.NewUpdate(securityTagID, newName, newDesc)
+		err := nsxclient.Do(updateAPI)
+		if err != nil {
+			log.Printf(fmt.Sprintf("[DEBUG] Error updating security group: %s", err))
+		}
+	}
+
+	return resourceSecurityTag().Read(d, m)
 }
