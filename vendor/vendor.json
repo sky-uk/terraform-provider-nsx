@@ -484,22 +484,22 @@
 			"versionExact": "0.3.3"
 		},
 		{
-			"checksumSHA1": "yH36wFCEtb8v4Sz24ejsNlNttaE=",
+			"checksumSHA1": "MC/9nIfcV1yYySCuoF25nJMlUrw=",
 			"path": "github.com/sky-uk/terraform-provider-nsx",
-			"revision": "9d082d7076c61f33b54ef3127e9b5a9b9e7aa8a5",
-			"revisionTime": "2017-04-25T14:20:54Z"
+			"revision": "9f67fef9df05feec0e3692b569c241acdea033b9",
+			"revisionTime": "2017-04-26T09:48:18Z"
 		},
 		{
 			"checksumSHA1": "EDuFLwNrEaHuOiy1u6D3jmnIfUs=",
 			"path": "github.com/sky-uk/terraform-provider-nsx/internal",
-			"revision": "9d082d7076c61f33b54ef3127e9b5a9b9e7aa8a5",
-			"revisionTime": "2017-04-25T14:20:54Z"
+			"revision": "9f67fef9df05feec0e3692b569c241acdea033b9",
+			"revisionTime": "2017-04-26T09:48:18Z"
 		},
 		{
 			"checksumSHA1": "b9i2WXiA5hpsPbhughDT6lowO9Y=",
 			"path": "github.com/sky-uk/terraform-provider-nsx/internal/features/virtualwire",
-			"revision": "9d082d7076c61f33b54ef3127e9b5a9b9e7aa8a5",
-			"revisionTime": "2017-04-25T14:20:54Z"
+			"revision": "9f67fef9df05feec0e3692b569c241acdea033b9",
+			"revisionTime": "2017-04-26T09:48:18Z"
 		},
 		{
 			"checksumSHA1": "iydUphwYqZRq3WhstEdGsbvBAKs=",

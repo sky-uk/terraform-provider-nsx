@@ -203,20 +203,20 @@ func resorceSecurityTagUpdate(d *schema.ResourceData, m interface{}) error {
 	securityTagObject, err := getSingleSecurityTag(oldName.(string), nsxclient)
 	if err != nil {
 		log.Printf(fmt.Sprintf("[DEBUG] security tag : %s", oldDesc))
-		log.Printf(fmt.Sprintf("[DEBUG] Error getting the security tag : ", err))
+		log.Printf(fmt.Sprintf("[DEBUG] Error getting the security tag : %s", err))
 	}
 
 	securityTagID := securityTagObject.ObjectID
 	if d.HasChange("name") {
 		hasChanges := true
-		securityTagObject.Name = newName
+		securityTagObject.Name = newName.(string)
 	}
 	if d.HasChange("description") {
 		hasChanges := true
-		securityTagObject.Description = newDesc
+		securityTagObject.Description = newDesc.(string)
 	}
 	if hasChanges {
-		updateAPI := securitytag.NewUpdate(securityTagID, newName, newDesc)
+		updateAPI := securitytag.NewUpdate(securityTagID, securityTagObject.Name, securityTagObject.Description)
 		err := nsxclient.Do(updateAPI)
 		if err != nil {
 			log.Printf(fmt.Sprintf("[DEBUG] Error updating security tag: %s", err))
