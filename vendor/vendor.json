@@ -436,12 +436,12 @@
 			"versionExact": "0.3.3"
 		},
 		{
-			"checksumSHA1": "dsDimgTzQGJ7NMgvH+78VdW2JfI=",
+			"checksumSHA1": "gc2GfFksjfEeXxWUmcclCGKcZv8=",
 			"path": "github.com/sky-uk/gonsx/api/securitygroup",
-			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
-			"revisionTime": "2017-04-07T10:17:16Z",
-			"version": "0.3.3",
-			"versionExact": "0.3.3"
+			"revision": "0bc192581ae28af8a1da7ad91816f2d139606caa",
+			"revisionTime": "2017-04-25T16:24:44Z",
+			"version": "=0.3.6",
+			"versionExact": "0.3.6"
 		},
 		{
 			"checksumSHA1": "dZ2Lhb6nI5/mlA1ZBLM4ZMY7uBw=",

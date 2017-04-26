@@ -33,45 +33,53 @@ func resourceSecurityGroup() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 
-			"scopeid": {
+			"scopeid": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"setoperator": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
+			"dynamicmemberdefinition": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"dynamicsetoperator": &schema.Schema{
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"criteria": &schema.Schema{
+							Type:     schema.TypeList,
+							Required: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"operator": &schema.Schema{
+										Type:     schema.TypeString,
+										Required: true,
+									},
+									"key": &schema.Schema{
+										Type:     schema.TypeString,
+										Required: true,
+									},
+									"value": &schema.Schema{
+										Type:     schema.TypeString,
+										Required: true,
+									},
+									"criteria": &schema.Schema{
+										Type:     schema.TypeString,
+										Required: true,
+									},
 
-			"criteriaoperator": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
-			"criteriakey": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
-			"criteriavalue": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
-			"criteria": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+								},
+							},
+						},
+					},
+				},
 			},
 		},
 	}
@@ -79,10 +87,10 @@ func resourceSecurityGroup() *schema.Resource {
 
 func resourceSecurityGroupCreate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var scopeid, name, setoperator, criteriaoperator, criteriakey, criteriavalue, criteria string
+	var scopeid, name string
+	var dynamicMemberDefinition securitygroup.DynamicMemberDefinition
 
 	// Gather the attributes for the resource.
-
 	if v, ok := d.GetOk("scopeid"); ok {
 		scopeid = v.(string)
 	} else {
@@ -95,38 +103,55 @@ func resourceSecurityGroupCreate(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("name argument is required")
 	}
 
-	if v, ok := d.GetOk("setoperator"); ok {
-		setoperator = v.(string)
-	} else {
-		return fmt.Errorf("setoperator argument is required")
+	if vL, ok := d.GetOk("dynamicmemberdefinition"); ok {
+		dynamicSetList := make([]securitygroup.DynamicSet, len(vL.([]interface{})))
+		for i, v := range vL.([]interface{}) {
+			dynamicSet := v.(map[string]interface{})
+
+			if v, ok := dynamicSet["dynamicsetoperator"].(string); ok && v != "" {
+				dynamicSetList[i].Operator = v
+			} else {
+				return fmt.Errorf("dynamicsetoperator is required when using dynamicmemberdefinition")
+			}
+			if v, ok := dynamicSet["criteria"]; ok {
+				dynamicCriteria := make([]securitygroup.DynamicCriteria, len(v.([]interface{})))
+				for index, value := range v.([]interface{}) {
+					dynamicCriterion := value.(map[string]interface{})
+
+					if value, ok := dynamicCriterion["operator"].(string); ok && value != "" {
+						dynamicCriteria[index].Operator = value
+					} else {
+						return fmt.Errorf("operator is required when using dynamicmemberdefinition")
+					}
+
+					if value, ok := dynamicCriterion["key"].(string); ok && value != "" {
+						dynamicCriteria[index].Key = value
+					} else {
+						return fmt.Errorf("key is required when using dynamicmemberdefinition")
+					}
+
+					if value, ok := dynamicCriterion["value"].(string); ok && value != "" {
+						dynamicCriteria[index].Value = value
+					} else {
+						return fmt.Errorf("value is required when using dynamicmemberdefinition")
+					}
+
+					if value, ok := dynamicCriterion["criteria"].(string); ok && value != "" {
+						dynamicCriteria[index].Criteria = value
+					} else {
+						return fmt.Errorf("criteria is required when using dynamicmemberdefinition")
+					}
+				}
+				//dynamicSetList[i].DynamicCriteria = v
+			} else {
+				return fmt.Errorf("criteria is required when using dynamicmemberdefinition")
+			}
+		}
+		dynamicMemberDefinition.DynamicSet = dynamicSetList
 	}
 
-	if v, ok := d.GetOk("criteriaoperator"); ok {
-		criteriaoperator = v.(string)
-	} else {
-		return fmt.Errorf("criteriaoperator argument is required")
-	}
-
-	if v, ok := d.GetOk("criteriakey"); ok {
-		criteriakey = v.(string)
-	} else {
-		return fmt.Errorf("criteriakey argument is required")
-	}
-
-	if v, ok := d.GetOk("criteriavalue"); ok {
-		criteriavalue = v.(string)
-	} else {
-		return fmt.Errorf("criteriavalue argument is required")
-	}
-
-	if v, ok := d.GetOk("criteria"); ok {
-		criteria = v.(string)
-	} else {
-		return fmt.Errorf("criteria argument is required")
-	}
-
-	log.Printf(fmt.Sprintf("[DEBUG] securitygroup.NewCreate(%s, %s, %s, %s, %s, %s, %s)", scopeid, name, setoperator, criteriaoperator, criteriakey, criteriavalue, criteria))
-	createAPI := securitygroup.NewCreate(scopeid, name, setoperator, criteriaoperator, criteriakey, criteriavalue, criteria)
+	log.Printf(fmt.Sprintf("[DEBUG] securitygroup.NewCreate(%s, %s, %s", scopeid, name, &dynamicMemberDefinition))
+	createAPI := securitygroup.NewCreate(scopeid, name, &dynamicMemberDefinition)
 	err := nsxclient.Do(createAPI)
 
 	if err != nil {
