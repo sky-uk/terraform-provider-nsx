@@ -196,11 +196,16 @@ func resorceSecurityTagUpdate(d *schema.ResourceData, m interface{}) error {
 	if v, ok := d.GetOk("description"); ok {
 		name = v.(string)
 	} else {
-		return fmt.Errorf("name argument is required")
+		return fmt.Errorf("description argument is required")
 	}
 	oldName, newName := d.GetChange("name")
-	_, newDesc := d.GetChange("description")
+	oldDesc, newDesc := d.GetChange("description")
 	securityTagObject, err := getSingleSecurityTag(oldName.(string), nsxclient)
+	if err != nil {
+		log.Printf(fmt.Sprintf("[DEBUG] security tag : %s", oldDesc))
+		log.Printf(fmt.Sprintf("[DEBUG] Error getting the security tag : ", err))
+	}
+
 	securityTagID := securityTagObject.ObjectID
 	if d.HasChange("name") {
 		hasChanges := true
@@ -214,7 +219,7 @@ func resorceSecurityTagUpdate(d *schema.ResourceData, m interface{}) error {
 		updateAPI := securitytag.NewUpdate(securityTagID, newName, newDesc)
 		err := nsxclient.Do(updateAPI)
 		if err != nil {
-			log.Printf(fmt.Sprintf("[DEBUG] Error updating security group: %s", err))
+			log.Printf(fmt.Sprintf("[DEBUG] Error updating security tag: %s", err))
 		}
 	}
 
