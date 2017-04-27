@@ -216,7 +216,8 @@ func resourceSecurityTagUpdate(d *schema.ResourceData, m interface{}) error {
 			log.Printf(fmt.Sprintf("[DEBUG] Error updating security tag: %s", err))
 		}
 		log.Println("UPDATE OK !")
-
+		return resourceSecurityTagRead(d, m)
 	}
-	return resourceSecurityTagRead(d, m)
+	return nil
+
 }
