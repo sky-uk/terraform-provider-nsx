@@ -187,23 +187,14 @@ func resourceSecurityTagDelete(d *schema.ResourceData, m interface{}) error {
 func resourceSecurityTagUpdate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
 	hasChanges := false
-	var name string //, singleoperation string
-
-	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("name"); ok {
-		name = v.(string)
-	} else {
-		return fmt.Errorf("name argument is required")
-	}
-
-	securityTagObject, err := getSingleSecurityTag(name, nsxclient)
+	oldName, newName := d.GetChange("name")
+	securityTagObject, err := getSingleSecurityTag(oldName.(string), nsxclient)
 	if err != nil {
 		log.Printf(fmt.Sprintf("[DEBUG] Error getting the security tag : %s", err))
 	}
 
 	if d.HasChange("name") {
 		hasChanges = true
-		_, newName := d.GetChange("name")
 		securityTagObject.Name = newName.(string)
 		log.Printf(fmt.Sprintf("[DEBUG] security tag Name: %s", securityTagObject.Name))
 
@@ -224,7 +215,7 @@ func resourceSecurityTagUpdate(d *schema.ResourceData, m interface{}) error {
 		if err != nil {
 			log.Printf(fmt.Sprintf("[DEBUG] Error updating security tag: %s", err))
 		}
-		log.Printf(fmt.Sprintf("UPDATE OK!!!!!!"))
+		log.Println("UPDATE OK !")
 
 	}
 	return resourceSecurityTagRead(d, m)
