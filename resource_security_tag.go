@@ -198,15 +198,14 @@ func resourceSecurityTagUpdate(d *schema.ResourceData, m interface{}) error {
 
 	securityTagObject, err := getSingleSecurityTag(name, nsxclient)
 	if err != nil {
-		log.Printf(fmt.Sprintf("[DEBUG] Error getting the security tag : ", err))
+		log.Printf(fmt.Sprintf("[DEBUG] Error getting the security tag : %s", err))
 	}
 
-	//securityTagID := securityTagObject.ObjectID
 	if d.HasChange("name") {
 		hasChanges = true
 		_, newName := d.GetChange("name")
 		securityTagObject.Name = newName.(string)
-		log.Printf(fmt.Sprintf("[DEBUG] security tag : %s", securityTagObject.Name))
+		log.Printf(fmt.Sprintf("[DEBUG] security tag Name: %s", securityTagObject.Name))
 
 	}
 
@@ -214,7 +213,7 @@ func resourceSecurityTagUpdate(d *schema.ResourceData, m interface{}) error {
 		hasChanges = true
 		_, newDesc := d.GetChange("desc")
 		securityTagObject.Description = newDesc.(string)
-		log.Printf(fmt.Sprintf("[DEBUG] security tag : %s", securityTagObject.Description))
+		log.Printf(fmt.Sprintf("[DEBUG] security tag Description: %s", securityTagObject.Description))
 	}
 
 	if hasChanges {
@@ -222,10 +221,11 @@ func resourceSecurityTagUpdate(d *schema.ResourceData, m interface{}) error {
 		log.Printf(securityTagObject.Description)
 		updateAPI := securitytag.NewUpdate(securityTagObject.ObjectID, securityTagObject)
 		err := nsxclient.Do(updateAPI)
-		log.Printf(fmt.Sprintf("UPDATE OK!!!!!!"))
 		if err != nil {
 			log.Printf(fmt.Sprintf("[DEBUG] Error updating security tag: %s", err))
 		}
+		log.Printf(fmt.Sprintf("UPDATE OK!!!!!!"))
+
 	}
 	return resourceSecurityTagRead(d, m)
 }
