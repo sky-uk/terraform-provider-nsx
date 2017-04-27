@@ -10,15 +10,10 @@ type UpdateSecurityTagAPI struct {
 	*api.BaseAPI
 }
 
-// NewUpdate - Generates a new UpdateSecurityTagAPI object.
-func NewUpdate(securityTagID, name, desc string) *UpdateSecurityTagAPI {
+//NewUpdate - Generates a new UpdateSecurityTagAPI object.
+func NewUpdate(securityTagID string, securityTagPayload *SecurityTag) *UpdateSecurityTagAPI {
 	this := new(UpdateSecurityTagAPI)
-	requestPayload := new(SecurityTag)
-	requestPayload.Name = name
-	requestPayload.Description = desc
-	requestPayload.TypeName = "SecurityTag"
-	requestPayload.ObjectID = securityTagID
-	this.BaseAPI = api.NewBaseAPI(http.MethodPut, "/api/2.0/services/securitytags/tag/"+securityTagID, requestPayload, new(SecurityTag))
+	this.BaseAPI = api.NewBaseAPI(http.MethodPut, "/api/2.0/services/securitytags/tag/"+securityTagID, securityTagPayload, new(SecurityTag))
 	return this
 }
 

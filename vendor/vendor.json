@@ -404,9 +404,9 @@
 			"revision": "a422bbe96644373c5753384a59d678f7d261ff10"
 		},
 		{
-			"checksumSHA1": "gC4nk2xz+Ol9BuRPiNwEZyP3bN0=",
+			"checksumSHA1": "RTMekwLpUJhBRfGrgH6jg3zj+EQ=",
 			"path": "github.com/sky-uk/gonsx",
-			"revision": "0bc192581ae28af8a1da7ad91816f2d139606caa",
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
 			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
@@ -414,7 +414,7 @@
 		{
 			"checksumSHA1": "1KwQ4O1Kk2aUgnPlCpt5E7iOhuk=",
 			"path": "github.com/sky-uk/gonsx/api",
-			"revision": "0bc192581ae28af8a1da7ad91816f2d139606caa",
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
 			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
@@ -422,7 +422,7 @@
 		{
 			"checksumSHA1": "mKHPeRXdfRPjoWqgxx6u98rbPqA=",
 			"path": "github.com/sky-uk/gonsx/api/dhcprelay",
-			"revision": "0bc192581ae28af8a1da7ad91816f2d139606caa",
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
 			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
@@ -430,15 +430,15 @@
 		{
 			"checksumSHA1": "HOAJv0BVJy4Q8v5K8qWJ+G8ace4=",
 			"path": "github.com/sky-uk/gonsx/api/edgeinterface",
-			"revision": "0bc192581ae28af8a1da7ad91816f2d139606caa",
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
 			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
 		},
 		{
-			"checksumSHA1": "gc2GfFksjfEeXxWUmcclCGKcZv8=",
+			"checksumSHA1": "dsDimgTzQGJ7NMgvH+78VdW2JfI=",
 			"path": "github.com/sky-uk/gonsx/api/securitygroup",
-			"revision": "0bc192581ae28af8a1da7ad91816f2d139606caa",
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
 			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
@@ -446,15 +446,15 @@
 		{
 			"checksumSHA1": "dZ2Lhb6nI5/mlA1ZBLM4ZMY7uBw=",
 			"path": "github.com/sky-uk/gonsx/api/securitypolicy",
-			"revision": "0bc192581ae28af8a1da7ad91816f2d139606caa",
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
 			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
 		},
 		{
-			"checksumSHA1": "FhPhkTxhBDDScc3fXTFhn0ZD9aw=",
+			"checksumSHA1": "JfWuLGIJ4HKaOktz1iEP8/s3KGI=",
 			"path": "github.com/sky-uk/gonsx/api/securitytag",
-			"revision": "0bc192581ae28af8a1da7ad91816f2d139606caa",
+			"revision": "f14d80872fe9a5c60cc15b2809587ef47cd5f2e0",
 			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
@@ -462,7 +462,7 @@
 		{
 			"checksumSHA1": "UpbA43PSGyAOp3WfQlMvKitZTKI=",
 			"path": "github.com/sky-uk/gonsx/api/service",
-			"revision": "0bc192581ae28af8a1da7ad91816f2d139606caa",
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
 			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
@@ -470,7 +470,7 @@
 		{
 			"checksumSHA1": "K1PMAqhEoFwvMc4aZbJEEyssovo=",
 			"path": "github.com/sky-uk/gonsx/api/tzone",
-			"revision": "0bc192581ae28af8a1da7ad91816f2d139606caa",
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
 			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
@@ -478,7 +478,7 @@
 		{
 			"checksumSHA1": "14Q7FjC0yj57cT4bAZSIQvlCqWU=",
 			"path": "github.com/sky-uk/gonsx/api/virtualwire",
-			"revision": "0bc192581ae28af8a1da7ad91816f2d139606caa",
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
 			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"

@@ -35,7 +35,7 @@ func resourceSecurityTag() *schema.Resource {
 		Create: resourceSecurityTagCreate,
 		Read:   resourceSecurityTagRead,
 		Delete: resourceSecurityTagDelete,
-		Update: resorceSecurityTagUpdate,
+		Update: resourceSecurityTagUpdate,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -184,44 +184,48 @@ func resourceSecurityTagDelete(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func resorceSecurityTagUpdate(d *schema.ResourceData, m interface{}) error {
+func resourceSecurityTagUpdate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var name, description string
 	hasChanges := false
+	var name string //, singleoperation string
+
+	// Gather the attributes for the resource.
 	if v, ok := d.GetOk("name"); ok {
 		name = v.(string)
 	} else {
 		return fmt.Errorf("name argument is required")
 	}
-	if v, ok := d.GetOk("description"); ok {
-		name = v.(string)
-	} else {
-		return fmt.Errorf("description argument is required")
-	}
-	oldName, newName := d.GetChange("name")
-	oldDesc, newDesc := d.GetChange("description")
-	securityTagObject, err := getSingleSecurityTag(oldName.(string), nsxclient)
+
+	securityTagObject, err := getSingleSecurityTag(name, nsxclient)
 	if err != nil {
-		log.Printf(fmt.Sprintf("[DEBUG] security tag : %s", oldDesc))
-		log.Printf(fmt.Sprintf("[DEBUG] Error getting the security tag : %s", err))
+		log.Printf(fmt.Sprintf("[DEBUG] Error getting the security tag : ", err))
 	}
 
-	securityTagID := securityTagObject.ObjectID
+	//securityTagID := securityTagObject.ObjectID
 	if d.HasChange("name") {
-		hasChanges := true
+		hasChanges = true
+		_, newName := d.GetChange("name")
 		securityTagObject.Name = newName.(string)
+		log.Printf(fmt.Sprintf("[DEBUG] security tag : %s", securityTagObject.Name))
+
 	}
-	if d.HasChange("description") {
-		hasChanges := true
+
+	if d.HasChange("desc") {
+		hasChanges = true
+		_, newDesc := d.GetChange("desc")
 		securityTagObject.Description = newDesc.(string)
+		log.Printf(fmt.Sprintf("[DEBUG] security tag : %s", securityTagObject.Description))
 	}
+
 	if hasChanges {
-		updateAPI := securitytag.NewUpdate(securityTagID, securityTagObject.Name, securityTagObject.Description)
+		log.Printf(securityTagObject.Name)
+		log.Printf(securityTagObject.Description)
+		updateAPI := securitytag.NewUpdate(securityTagObject.ObjectID, securityTagObject)
 		err := nsxclient.Do(updateAPI)
+		log.Printf(fmt.Sprintf("UPDATE OK!!!!!!"))
 		if err != nil {
 			log.Printf(fmt.Sprintf("[DEBUG] Error updating security tag: %s", err))
 		}
 	}
-
-	return resourceSecurityTag().Read(d, m)
+	return resourceSecurityTagRead(d, m)
 }
