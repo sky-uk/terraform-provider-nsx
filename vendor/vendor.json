@@ -484,12 +484,6 @@
 			"versionExact": "0.3.3"
 		},
 		{
-			"checksumSHA1": "MC/9nIfcV1yYySCuoF25nJMlUrw=",
-			"path": "github.com/sky-uk/terraform-provider-nsx",
-			"revision": "9f67fef9df05feec0e3692b569c241acdea033b9",
-			"revisionTime": "2017-04-26T09:48:18Z"
-		},
-		{
 			"checksumSHA1": "EDuFLwNrEaHuOiy1u6D3jmnIfUs=",
 			"path": "github.com/sky-uk/terraform-provider-nsx/internal",
 			"revision": "9f67fef9df05feec0e3692b569c241acdea033b9",
