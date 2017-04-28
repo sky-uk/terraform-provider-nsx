@@ -21,13 +21,13 @@ func getSingleSecurityTag(name string, nsxclient *gonsx.NSXClient) (*securitytag
 		return nil, fmt.Errorf("Status code: %d, Response: %s", getAllAPI.StatusCode(), getAllAPI.ResponseObject())
 	}
 
-	securitytag := getAllAPI.GetResponse().FilterByName(name)
+	securityTag := getAllAPI.GetResponse().FilterByName(name)
 
-	if securitytag.ObjectID == "" {
+	if securityTag.ObjectID == "" {
 		return nil, fmt.Errorf("Not found %s", name)
 	}
 
-	return securitytag, nil
+	return securityTag, nil
 }
 
 func resourceSecurityTag() *schema.Resource {
@@ -35,17 +35,18 @@ func resourceSecurityTag() *schema.Resource {
 		Create: resourceSecurityTagCreate,
 		Read:   resourceSecurityTagRead,
 		Delete: resourceSecurityTagDelete,
+		Update: resourceSecurityTagUpdate,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
+				ForceNew: false,
 			},
 			"desc": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
+				ForceNew: false,
 			},
 		},
 	}
@@ -187,4 +188,40 @@ func resourceSecurityTagDelete(d *schema.ResourceData, m interface{}) error {
 	d.SetId("")
 	log.Printf(fmt.Sprintf("[DEBUG] id %s deleted.", id))
 	return nil
+}
+
+func resourceSecurityTagUpdate(d *schema.ResourceData, m interface{}) error {
+	nsxclient := m.(*gonsx.NSXClient)
+	hasChanges := false
+	oldName, newName := d.GetChange("name")
+
+	securityTagObject, err := getSingleSecurityTag(oldName.(string), nsxclient)
+	if err != nil {
+		log.Printf(fmt.Sprintf("[DEBUG] Error getting the security tag : %s", err))
+	}
+
+	if d.HasChange("name") {
+		hasChanges = true
+		securityTagObject.Name = newName.(string)
+
+	}
+
+	if d.HasChange("desc") {
+		hasChanges = true
+		_, newDesc := d.GetChange("desc")
+		securityTagObject.Description = newDesc.(string)
+
+	}
+
+	if hasChanges {
+		securityTagObject.Revision += securityTagObject.Revision
+		updateAPI := securitytag.NewUpdate(securityTagObject.ObjectID, securityTagObject)
+		err := nsxclient.Do(updateAPI)
+		if err != nil {
+			log.Printf(fmt.Sprintf("[DEBUG] Error updating security tag: %s", err))
+		}
+		return resourceSecurityTagRead(d, m)
+	}
+	return nil
+
 }

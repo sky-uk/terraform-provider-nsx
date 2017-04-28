@@ -14,6 +14,7 @@ type SecurityTag struct {
 	Name        string   `xml:"name"`
 	Description string   `xml:"description"`
 	TypeName    string   `xml:"type>typeName"`
+	Revision    int      `xml:"revision,omitempty"`
 }
 
 // BasicInfoList struct to get info of vms attached to tags

@@ -407,7 +407,7 @@
 			"checksumSHA1": "RTMekwLpUJhBRfGrgH6jg3zj+EQ=",
 			"path": "github.com/sky-uk/gonsx",
 			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
-			"revisionTime": "2017-04-07T10:17:16Z",
+			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
 		},
@@ -415,7 +415,7 @@
 			"checksumSHA1": "1KwQ4O1Kk2aUgnPlCpt5E7iOhuk=",
 			"path": "github.com/sky-uk/gonsx/api",
 			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
-			"revisionTime": "2017-04-07T10:17:16Z",
+			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
 		},
@@ -423,7 +423,7 @@
 			"checksumSHA1": "mKHPeRXdfRPjoWqgxx6u98rbPqA=",
 			"path": "github.com/sky-uk/gonsx/api/dhcprelay",
 			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
-			"revisionTime": "2017-04-07T10:17:16Z",
+			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
 		},
@@ -431,7 +431,7 @@
 			"checksumSHA1": "HOAJv0BVJy4Q8v5K8qWJ+G8ace4=",
 			"path": "github.com/sky-uk/gonsx/api/edgeinterface",
 			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
-			"revisionTime": "2017-04-07T10:17:16Z",
+			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
 		},
@@ -439,7 +439,7 @@
 			"checksumSHA1": "dsDimgTzQGJ7NMgvH+78VdW2JfI=",
 			"path": "github.com/sky-uk/gonsx/api/securitygroup",
 			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
-			"revisionTime": "2017-04-07T10:17:16Z",
+			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
 		},
@@ -447,15 +447,15 @@
 			"checksumSHA1": "dZ2Lhb6nI5/mlA1ZBLM4ZMY7uBw=",
 			"path": "github.com/sky-uk/gonsx/api/securitypolicy",
 			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
-			"revisionTime": "2017-04-07T10:17:16Z",
+			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
 		},
 		{
-			"checksumSHA1": "sWX5ui8JcfUYXKvpUIT5Z/SYwKM=",
+			"checksumSHA1": "VrggSym3CmfjxG5/O4hx94qCl/M=",
 			"path": "github.com/sky-uk/gonsx/api/securitytag",
-			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
-			"revisionTime": "2017-04-07T10:17:16Z",
+			"revision": "6368358b876eb2557185db182a4d5db092daa4b3",
+			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
 		},
@@ -463,7 +463,7 @@
 			"checksumSHA1": "UpbA43PSGyAOp3WfQlMvKitZTKI=",
 			"path": "github.com/sky-uk/gonsx/api/service",
 			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
-			"revisionTime": "2017-04-07T10:17:16Z",
+			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
 		},
@@ -471,7 +471,7 @@
 			"checksumSHA1": "K1PMAqhEoFwvMc4aZbJEEyssovo=",
 			"path": "github.com/sky-uk/gonsx/api/tzone",
 			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
-			"revisionTime": "2017-04-07T10:17:16Z",
+			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
 		},
@@ -479,27 +479,9 @@
 			"checksumSHA1": "14Q7FjC0yj57cT4bAZSIQvlCqWU=",
 			"path": "github.com/sky-uk/gonsx/api/virtualwire",
 			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
-			"revisionTime": "2017-04-07T10:17:16Z",
+			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"
-		},
-		{
-			"checksumSHA1": "cZ2c6CJ5uvKiKvoZHk7F8Ypdo8g=",
-			"path": "github.com/sky-uk/terraform-provider-nsx",
-			"revision": "ab772b6e85c22621d5331b4c81fad1084a24b987",
-			"revisionTime": "2016-08-03T10:32:08Z"
-		},
-		{
-			"checksumSHA1": "EDuFLwNrEaHuOiy1u6D3jmnIfUs=",
-			"path": "github.com/sky-uk/terraform-provider-nsx/internal",
-			"revision": "ab772b6e85c22621d5331b4c81fad1084a24b987",
-			"revisionTime": "2016-08-03T10:32:08Z"
-		},
-		{
-			"checksumSHA1": "KydCkz0SdiV42U4AGZLLI6wCVho=",
-			"path": "github.com/sky-uk/terraform-provider-nsx/internal/features/virtualwire",
-			"revision": "ab772b6e85c22621d5331b4c81fad1084a24b987",
-			"revisionTime": "2016-08-03T10:32:08Z"
 		},
 		{
 			"checksumSHA1": "iydUphwYqZRq3WhstEdGsbvBAKs=",
