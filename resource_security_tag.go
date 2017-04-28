@@ -21,13 +21,13 @@ func getSingleSecurityTag(name string, nsxclient *gonsx.NSXClient) (*securitytag
 		return nil, fmt.Errorf("Status code: %d, Response: %s", getAllAPI.StatusCode(), getAllAPI.ResponseObject())
 	}
 
-	securitytag := getAllAPI.GetResponse().FilterByName(name)
+	securityTag := getAllAPI.GetResponse().FilterByName(name)
 
-	if securitytag.ObjectID == "" {
+	if securityTag.ObjectID == "" {
 		return nil, fmt.Errorf("Not found %s", name)
 	}
 
-	return securitytag, nil
+	return securityTag, nil
 }
 
 func resourceSecurityTag() *schema.Resource {
@@ -188,6 +188,7 @@ func resourceSecurityTagUpdate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
 	hasChanges := false
 	oldName, newName := d.GetChange("name")
+	log.Printf(fmt.Sprintf("[DEBUG] security tag OLD Name: %s", oldName.(string)))
 	securityTagObject, err := getSingleSecurityTag(oldName.(string), nsxclient)
 	if err != nil {
 		log.Printf(fmt.Sprintf("[DEBUG] Error getting the security tag : %s", err))
@@ -210,6 +211,7 @@ func resourceSecurityTagUpdate(d *schema.ResourceData, m interface{}) error {
 	if hasChanges {
 		log.Printf(securityTagObject.Name)
 		log.Printf(securityTagObject.Description)
+		securityTagObject.Revision += securityTagObject.Revision
 		updateAPI := securitytag.NewUpdate(securityTagObject.ObjectID, securityTagObject)
 		err := nsxclient.Do(updateAPI)
 		if err != nil {

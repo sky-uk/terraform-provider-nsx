@@ -452,9 +452,9 @@
 			"versionExact": "0.3.3"
 		},
 		{
-			"checksumSHA1": "JfWuLGIJ4HKaOktz1iEP8/s3KGI=",
+			"checksumSHA1": "VrggSym3CmfjxG5/O4hx94qCl/M=",
 			"path": "github.com/sky-uk/gonsx/api/securitytag",
-			"revision": "f14d80872fe9a5c60cc15b2809587ef47cd5f2e0",
+			"revision": "6368358b876eb2557185db182a4d5db092daa4b3",
 			"revisionTime": "2017-04-25T16:24:44Z",
 			"version": "0.3.3",
 			"versionExact": "0.3.3"

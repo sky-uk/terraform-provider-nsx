@@ -3,7 +3,12 @@ package securitytag
 import "fmt"
 
 func (s SecurityTags) String() string {
-	return fmt.Sprintf("%s", s.SecurityTags)
+	var returnString = "Security tags contains a list of securitytags"
+	return returnString
+}
+
+func (s SecurityTag) String() string {
+	return fmt.Sprintf("Security tag name %s and id %s", s.Name, s.ObjectID)
 }
 
 // FilterByName - Filters the SecurityTags->SecurityTag with provided name
