@@ -70,10 +70,16 @@ func resourceSecurityTagCreate(d *schema.ResourceData, m interface{}) error {
 
 	log.Printf(fmt.Sprintf("[DEBUG] securitytag.NewCreate(%s, %s)", name, desc))
 	createAPI := securitytag.NewCreate(name, desc)
-	nsxclient.Do(createAPI)
+	err := nsxclient.Do(createAPI)
+
+	if err != nil {
+		log.Printf(fmt.Sprintf("[DEBUG] Error while creating security tag: %s", err))
+		return err
+	}
 
 	if createAPI.StatusCode() != 201 {
-		return fmt.Errorf("Failed to create security tag %s", name)
+		return fmt.Errorf("Failed to create security tag %s. StatusCode: %d, Response:%s",
+			name, createAPI.StatusCode(), createAPI.GetResponse())
 	}
 
 	// If we get to here creation was successful. Set the ID for the Terraform state file
