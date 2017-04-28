@@ -46,7 +46,8 @@ func resourceSecurityGroup() *schema.Resource {
 
 			"dynamicmemberdefinition": &schema.Schema{
 				Type:     schema.TypeList,
-				Optional: true,
+				// When adding exclusion / inclusion lists we'll want to make this optional.
+				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"dynamicset": &schema.Schema{
@@ -94,65 +95,96 @@ func resourceSecurityGroup() *schema.Resource {
 }
 
 
-func getDynamicMemberDefinitionFromTemplate(templateDynamicMemberDefinition interface{}) securitygroup.DynamicMemberDefinition{
+func getDynamicMemberDefinitionFromTemplate(templateDynamicMemberDefinition interface{}) (securitygroup.DynamicMemberDefinition, string) {
+
+	var error string = ""
 
 	var newDynamicMemberDefinition securitygroup.DynamicMemberDefinition
-
-
 	for _, value := range templateDynamicMemberDefinition.([]interface{}) {
 		dynamicMemberDefinition := value.(map[string]interface{})
 		if v, ok := dynamicMemberDefinition["dynamicset"]; ok {
-			dynamicSetList := getDynamicSetsFromTemplate(v, len(v.([]interface{})))
+			dynamicSetList, error := getDynamicSetsFromTemplate(v, len(v.([]interface{})))
+			if error != "" {
+				return newDynamicMemberDefinition, error
+			}
 			newDynamicMemberDefinition.DynamicSet = dynamicSetList
+		} else {
+			error = "dynamicmemberdefinition requires dynamicset list"
+			return newDynamicMemberDefinition, error
 		}
 	}
-	return newDynamicMemberDefinition
+	return newDynamicMemberDefinition, error
 }
 
-func getDynamicSetsFromTemplate(templateDynamicSets interface{}, numberDynamicSets int) []securitygroup.DynamicSet{
+func getDynamicSetsFromTemplate(templateDynamicSets interface{}, numberDynamicSets int) ([]securitygroup.DynamicSet, string){
+
+	var error string = ""
 
 	newDynamicSets := make([]securitygroup.DynamicSet, numberDynamicSets)
 	for index, value := range templateDynamicSets.([]interface{}) {
 		dynamicSets := value.(map[string]interface{})
-		if v, ok := dynamicSets["dynamicsetoperator"].(string); ok {
+		if v, ok := dynamicSets["dynamicsetoperator"].(string); ok && v != "" {
 			newDynamicSets[index].Operator = v
+		} else {
+			error = "dynamicmemberdefinition -> dynamicset requires dynamicsetoperator arguement"
+			return newDynamicSets, error
 		}
 		if v, ok := dynamicSets["criteria"]; ok {
-			newDynamicCriteriaList := getDynamicCriterionFromTemplate(v, len(v.([]interface{})))
+			newDynamicCriteriaList, error := getDynamicCriterionFromTemplate(v, len(v.([]interface{})))
+			if error != "" {
+				return newDynamicSets, error
+			}
 			newDynamicSets[index].DynamicCriteria = newDynamicCriteriaList
+		} else {
+			error = "dynamicmemberdefinition -> dynamicset requires criteria list"
+			return newDynamicSets, error
 		}
 	}
-	return newDynamicSets
+	return newDynamicSets, error
 }
 
 
 
-func getDynamicCriterionFromTemplate(templateDynamicCriterion interface{}, numberDynamicCriteria int) []securitygroup.DynamicCriteria {
+func getDynamicCriterionFromTemplate(templateDynamicCriterion interface{}, numberDynamicCriteria int) ([]securitygroup.DynamicCriteria, string) {
+
+	var error string = ""
 
 	newDynamicCriterion := make([]securitygroup.DynamicCriteria, numberDynamicCriteria)
 	for index, value := range templateDynamicCriterion.([]interface{}) {
 		dynamicCriterion := value.(map[string]interface{})
-		if v, ok := dynamicCriterion["operator"].(string); ok {
+		if v, ok := dynamicCriterion["operator"].(string); ok && v != "" {
 			newDynamicCriterion[index].Operator = v
+		} else {
+			error = "dynamicmemberdefinition -> dynamicset -> criteria requires operator arguement"
+			return newDynamicCriterion, error
 		}
-		if v, ok := dynamicCriterion["key"].(string); ok {
+		if v, ok := dynamicCriterion["key"].(string); ok && v != "" {
 			newDynamicCriterion[index].Key = v
+		} else {
+			error = "dynamicmemberdefinition -> dynamicset -> criteria requires key arguement"
+			return newDynamicCriterion, error
 		}
-		if v, ok := dynamicCriterion["value"].(string); ok {
+		if v, ok := dynamicCriterion["value"].(string); ok && v != "" {
 			newDynamicCriterion[index].Value = v
+		} else {
+			error = "dynamicmemberdefinition -> dynamicset -> criteria requires value arguement"
+			return newDynamicCriterion, error
 		}
-		if v, ok := dynamicCriterion["criteria"].(string); ok {
+		if v, ok := dynamicCriterion["criteria"].(string); ok && v != "" {
 			newDynamicCriterion[index].Criteria = v
+		} else {
+			error = "dynamicmemberdefinition -> dynamicset -> criteria requires criteria arguement"
+			return newDynamicCriterion, error
 		}
 	}
-	return newDynamicCriterion
+	return newDynamicCriterion, error
 }
 
 
 func resourceSecurityGroupCreate(d *schema.ResourceData, m interface{}) error {
 
 	nsxclient := m.(*gonsx.NSXClient)
-	var scopeid, name string
+	var scopeid, name, error string
 	var dynamicMemberDefinition securitygroup.DynamicMemberDefinition
 
 	// Gather the attributes for the resource.
@@ -169,64 +201,14 @@ func resourceSecurityGroupCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if v, ok := d.GetOk("dynamicmemberdefinition"); ok {
-		dynamicMemberDefinition = getDynamicMemberDefinitionFromTemplate(v)
-	}
-
-
-/*
-	if vL, ok := d.GetOk("dynamicmemberdefinition"); ok {
-		newDynamicSetList := make([]securitygroup.DynamicSet, len(vL.([]interface{})))
-
-		for index, value := range vL.([]interface{}) {
-			dynamicSetList := value.(map[string]interface{})
-			log.Printf(fmt.Sprintf("[DEBUG] index(index) is: %d", index))
-
-			if avL, ok := dynamicSetList["dynamicset"]; ok {
-				newDynamicCriteriaList := make([]securitygroup.DynamicCriteria, len(avL.([]interface{})))
-
-				for idx, anotherValue := range avL.([]interface{}) {
-					dynamicSet := anotherValue.(map[string]interface{})
-					log.Printf(fmt.Sprintf("[DEBUG] index(idx) is: %d", idx))
-
-					if yavL, ok := dynamicSet["dynamicsetoperator"].(string); ok {
-						log.Printf(fmt.Sprintf("[DEBUG] dynamicsetoperator is: %s", yavL))
-						newDynamicCriteriaList[index].Operator = yavL
-					}
-
-					if yavL, ok := dynamicSet["criteria"]; ok {
-						newDynamicCriteria := make([]securitygroup.DynamicCriteria, len(yavL.([]interface{})))
-						for i, v := range yavL.([]interface{}) {
-							dynamicCriterion := v.(map[string]interface{})
-							log.Printf(fmt.Sprintf("[DEBUG] index(i) is: %d", i))
-
-							if v, ok := dynamicCriterion["operator"].(string); ok {
-								newDynamicCriteria[i].Operator = v
-								log.Printf(fmt.Sprintf("[DEBUG] operator is: %s", v))
-							}
-							if v, ok := dynamicCriterion["key"].(string); ok {
-								newDynamicCriteria[i].Key = v
-								log.Printf(fmt.Sprintf("[DEBUG] key is: %s", v))
-							}
-							if v, ok := dynamicCriterion["value"].(string); ok {
-								newDynamicCriteria[i].Value = v
-								log.Printf(fmt.Sprintf("[DEBUG] value is: %s", v))
-							}
-							if v, ok := dynamicCriterion["criteria"].(string); ok {
-								newDynamicCriteria[i].Criteria = v
-								log.Printf(fmt.Sprintf("[DEBUG] criteria is: %s", v))
-							}
-						}
-						newDynamicCriteriaList = append(newDynamicCriteriaList, newDynamicCriteria)
-					}
-					newDynamicSetList = append(newDynamicSetList, newDynamicSet)
-				}
-
-			}
+		dynamicMemberDefinition, error = getDynamicMemberDefinitionFromTemplate(v)
+		log.Printf(fmt.Sprintf("The errors are %s", error))
+		if error != "" {
+			return fmt.Errorf(error)
 		}
-		newDynamicMemberDefinition.DynamicSet = newDynamicSetList
+	} else {
+		return fmt.Errorf("dynamicmemberdefinition list is required")
 	}
-*/
-	log.Printf(fmt.Sprintf("[DEBUG] newDynamicMemberDefinition: %s", dynamicMemberDefinition))
 
 	log.Printf(fmt.Sprintf("[DEBUG] securitygroup.NewCreate(%s, %s, %s", scopeid, name, dynamicMemberDefinition))
 	createAPI := securitygroup.NewCreate(scopeid, name, &dynamicMemberDefinition)
