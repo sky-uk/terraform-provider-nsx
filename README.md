@@ -33,10 +33,10 @@ with the proper credentials before it can be used.
 ### Security Group
 
 > *resource "nsx_security_group" "paas_test" {  
-    +name = "paas_test-oooo_test_security_group"  
-    +scopeid = "globalroot-0"  
-    +dynamicmembership {  
-        ++membershipcriterialist {  
+    ~name = "paas_test-oooo_test_security_group"  
+    ~scopeid = "globalroot-0"  
+    ~dynamicmembership {  
+        ~~membershipcriterialist {  
             +++membershipoperator = "OR"  
             +++criteriadetails {  
                 ++++criteriaoperator = "OR"  
