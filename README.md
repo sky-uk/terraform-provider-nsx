@@ -33,41 +33,41 @@ with the proper credentials before it can be used.
 ### Security Group
 
 > resource "nsx_security_group" "paas_test" {  
-    name = "paas_test-oooo_test_security_group"
-    scopeid = "globalroot-0"
-    dynamicmembership {
-        membershipcriterialist {
-            membershipoperator = "OR"
-            criteriadetails {
-                criteriaoperator = "OR"
-                key = "VM.SECURITY_TAG"
-                value = "dynamicset1_criteria1"
-                criteria = "contains"
-            }
-            criteriadetails {
-                criteriaoperator = "OR"
-                key = "VM.SECURITY_TAG"
-                value = "dynamicset1_criteria2"
-                criteria = "contains"
-            }
-        }
-        membershipcriterialist {
-            membershipoperator = "OR"
-            criteriadetails {
-                criteriaoperator = "OR"
-                key = "VM.SECURITY_TAG"
-                value = "dynamicset2_criteria1"
-                criteria = "contains"
-            }
-            criteriadetails {
-                criteriaoperator = "OR"
-                key = "VM.SECURITY_TAG"
-                value = "dynamicset2_criteria2"
-                criteria = "contains"
-            }
-        }
-    }
-}
+    name = "paas_test-oooo_test_security_group"  
+    scopeid = "globalroot-0"  
+    dynamicmembership {  
+        membershipcriterialist {  
+            membershipoperator = "OR"  
+            criteriadetails {  
+                criteriaoperator = "OR"  
+                key = "VM.SECURITY_TAG"  
+                value = "dynamicset1_criteria1"  
+                criteria = "contains"  
+            }  
+            criteriadetails {  
+                criteriaoperator = "OR"  
+                key = "VM.SECURITY_TAG"  
+                value = "dynamicset1_criteria2"  
+                criteria = "contains"  
+            }  
+        }  
+        membershipcriterialist {  
+            membershipoperator = "OR"  
+            criteriadetails {  
+                criteriaoperator = "OR"  
+                key = "VM.SECURITY_TAG"  
+                value = "dynamicset2_criteria1"  
+                criteria = "contains"  
+            }  
+            criteriadetails {  
+                criteriaoperator = "OR"  
+                key = "VM.SECURITY_TAG"  
+                value = "dynamicset2_criteria2"  
+                criteria = "contains"  
+            }  
+        }  
+    }  
+}  
 
 
 ### Security Policy
