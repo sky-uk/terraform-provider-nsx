@@ -95,7 +95,7 @@ func resourceSecurityGroup() *schema.Resource {
 
 func getDynamicMemberDefinitionFromTemplate(templateDynamicMemberDefinition interface{}) (securitygroup.DynamicMemberDefinition, string) {
 
-	var error string = ""
+	var error string
 
 	var newDynamicMemberDefinition securitygroup.DynamicMemberDefinition
 	for _, value := range templateDynamicMemberDefinition.([]interface{}) {
@@ -116,7 +116,7 @@ func getDynamicMemberDefinitionFromTemplate(templateDynamicMemberDefinition inte
 
 func getDynamicSetsFromTemplate(templateDynamicSets interface{}, numberDynamicSets int) ([]securitygroup.DynamicSet, string) {
 
-	var error string = ""
+	var error string
 
 	newDynamicSets := make([]securitygroup.DynamicSet, numberDynamicSets)
 	for index, value := range templateDynamicSets.([]interface{}) {
@@ -143,7 +143,7 @@ func getDynamicSetsFromTemplate(templateDynamicSets interface{}, numberDynamicSe
 
 func getDynamicCriterionFromTemplate(templateDynamicCriterion interface{}, numberDynamicCriteria int) ([]securitygroup.DynamicCriteria, string) {
 
-	var error string = ""
+	var error string
 
 	newDynamicCriterion := make([]securitygroup.DynamicCriteria, numberDynamicCriteria)
 	for index, value := range templateDynamicCriterion.([]interface{}) {
