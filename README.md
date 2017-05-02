@@ -32,9 +32,9 @@ with the proper credentials before it can be used.
 
 ### Security Group
 
-***Example
+***Example  
 Here is an example of a security group resource. Currently a security group can only be created with dynamic membership list. The terraform-provider-nsx doesn't support exclusion and inclusion lists.
-In the below example we are creating two dynamic membership lists, each containing two criteria.
+In the below example we are creating two dynamic membership lists, each containing two criteria.  
 > resource "nsx_security_group" "My Security Group" {  
   &nbsp;&nbsp;name = "my_security_group_name"  
   &nbsp;&nbsp;scopeid = "globalroot-0"  
