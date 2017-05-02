@@ -32,41 +32,41 @@ with the proper credentials before it can be used.
 
 ### Security Group
 
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;resource "nsx_security_group" "paas_test" {  
-    name = "paas_test-oooo_test_security_group"  
-    scopeid = "globalroot-0"  
-    dynamicmembership {  
-        membershipcriterialist {  
-            membershipoperator = "OR"  
-            criteriadetails {  
-                criteriaoperator = "OR"  
-                key = "VM.SECURITY_TAG"  
-                value = "dynamicset1_criteria1"  
-                criteria = "contains"  
-            }  
-            criteriadetails {  
-                criteriaoperator = "OR"  
-                key = "VM.SECURITY_TAG"  
-                value = "dynamicset1_criteria2"  
-                criteria = "contains"  
-            }  
-        }  
-        membershipcriterialist {  
-            membershipoperator = "OR"  
-            criteriadetails {  
-                criteriaoperator = "OR"  
-                key = "VM.SECURITY_TAG"  
-                value = "dynamicset2_criteria1"  
-                criteria = "contains"  
-            }  
-            criteriadetails {  
-                criteriaoperator = "OR"  
-                key = "VM.SECURITY_TAG"  
-                value = "dynamicset2_criteria2"  
-                criteria = "contains"  
-            }  
-        }  
-    }  
+> resource "nsx_security_group" "paas_test" {  
+  &nbsp;&nbsp;name = "paas_test-oooo_test_security_group"  
+  &nbsp;&nbsp;scopeid = "globalroot-0"  
+  &nbsp;&nbsp;dynamicmembership {  
+  &nbsp;&nbsp;&nbsp;&nbsp;membershipcriterialist {  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;membershipoperator = "OR"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;criteriadetails {  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;criteriaoperator = "OR"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;key = "VM.SECURITY_TAG"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;value = "dynamicset1_criteria1"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;criteria = "contains"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;criteriadetails {  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;criteriaoperator = "OR"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;key = "VM.SECURITY_TAG"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;value = "dynamicset1_criteria2"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;criteria = "contains"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}  
+  &nbsp;&nbsp;&nbsp;&nbsp;}  
+  &nbsp;&nbsp;&nbsp;&nbsp;membershipcriterialist {  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          membershipoperator = "OR"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;criteriadetails {  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;criteriaoperator = "OR"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;key = "VM.SECURITY_TAG"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;value = "dynamicset2_criteria1"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;criteria = "contains"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;criteriadetails {  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;criteriaoperator = "OR"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;key = "VM.SECURITY_TAG"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;value = "dynamicset2_criteria2"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;criteria = "contains"  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}  
+  &nbsp;&nbsp;&nbsp;&nbsp;}  
+  &nbsp;&nbsp;}  
 }  
 
 
