@@ -124,7 +124,7 @@ func getDynamicSetsFromTemplate(templateDynamicSets interface{}, numberDynamicSe
 		if v, ok := dynamicSets["membershipoperator"].(string); ok && v != "" {
 			newDynamicSets[index].Operator = v
 		} else {
-			error = "dynamicmembership -> membershipcriterialist requires membershipoperator arguement"
+			error = "dynamicmembership -> membershipcriterialist requires membershipoperator argument"
 			return newDynamicSets, error
 		}
 		if v, ok := dynamicSets["criteriadetails"]; ok {
@@ -151,25 +151,25 @@ func getDynamicCriterionFromTemplate(templateDynamicCriterion interface{}, numbe
 		if v, ok := dynamicCriterion["match"].(string); ok && v != "" {
 			newDynamicCriterion[index].Operator = v
 		} else {
-			error = "dynamicmembership -> membershipcriterialist -> criteriadetails requires match arguement"
+			error = "dynamicmembership -> membershipcriterialist -> criteriadetails requires match argument"
 			return newDynamicCriterion, error
 		}
 		if v, ok := dynamicCriterion["key"].(string); ok && v != "" {
 			newDynamicCriterion[index].Key = v
 		} else {
-			error = "dynamicmembership -> membershipcriterialist -> criteriadetails requires key arguement"
+			error = "dynamicmembership -> membershipcriterialist -> criteriadetails requires key argument"
 			return newDynamicCriterion, error
 		}
 		if v, ok := dynamicCriterion["value"].(string); ok && v != "" {
 			newDynamicCriterion[index].Value = v
 		} else {
-			error = "dynamicmembership -> membershipcriterialist -> criteriadetails requires value arguement"
+			error = "dynamicmembership -> membershipcriterialist -> criteriadetails requires value argument"
 			return newDynamicCriterion, error
 		}
 		if v, ok := dynamicCriterion["criteria"].(string); ok && v != "" {
 			newDynamicCriterion[index].Criteria = v
 		} else {
-			error = "dynamicmembership -> membershipcriterialist -> criteriadetails requires criteria arguement"
+			error = "dynamicmembership -> membershipcriterialist -> criteriadetails requires criteria argument"
 			return newDynamicCriterion, error
 		}
 	}
