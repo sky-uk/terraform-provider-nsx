@@ -440,7 +440,7 @@
 			"path": "github.com/sky-uk/gonsx/api/securitygroup",
 			"revision": "0bc192581ae28af8a1da7ad91816f2d139606caa",
 			"revisionTime": "2017-04-25T16:24:44Z",
-			"version": "=0.3.6",
+			"version": "0.3.6",
 			"versionExact": "0.3.6"
 		},
 		{
