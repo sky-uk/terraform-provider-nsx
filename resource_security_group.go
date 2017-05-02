@@ -45,7 +45,7 @@ func resourceSecurityGroup() *schema.Resource {
 			},
 
 			"dynamicmembership": &schema.Schema{
-				Type:     schema.TypeList,
+				Type: schema.TypeList,
 				// When adding exclusion / inclusion lists we'll want to make this optional.
 				Required: true,
 				Elem: &schema.Resource{
@@ -80,7 +80,6 @@ func resourceSecurityGroup() *schema.Resource {
 													Type:     schema.TypeString,
 													Required: true,
 												},
-
 											},
 										},
 									},
@@ -93,7 +92,6 @@ func resourceSecurityGroup() *schema.Resource {
 		},
 	}
 }
-
 
 func getDynamicMemberDefinitionFromTemplate(templateDynamicMemberDefinition interface{}) (securitygroup.DynamicMemberDefinition, string) {
 
@@ -116,7 +114,7 @@ func getDynamicMemberDefinitionFromTemplate(templateDynamicMemberDefinition inte
 	return newDynamicMemberDefinition, error
 }
 
-func getDynamicSetsFromTemplate(templateDynamicSets interface{}, numberDynamicSets int) ([]securitygroup.DynamicSet, string){
+func getDynamicSetsFromTemplate(templateDynamicSets interface{}, numberDynamicSets int) ([]securitygroup.DynamicSet, string) {
 
 	var error string = ""
 
@@ -142,8 +140,6 @@ func getDynamicSetsFromTemplate(templateDynamicSets interface{}, numberDynamicSe
 	}
 	return newDynamicSets, error
 }
-
-
 
 func getDynamicCriterionFromTemplate(templateDynamicCriterion interface{}, numberDynamicCriteria int) ([]securitygroup.DynamicCriteria, string) {
 
@@ -180,7 +176,6 @@ func getDynamicCriterionFromTemplate(templateDynamicCriterion interface{}, numbe
 	return newDynamicCriterion, error
 }
 
-
 func resourceSecurityGroupCreate(d *schema.ResourceData, m interface{}) error {
 
 	nsxclient := m.(*gonsx.NSXClient)
@@ -210,7 +205,7 @@ func resourceSecurityGroupCreate(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("dynamicmembership list is required")
 	}
 
-	log.Printf(fmt.Sprintf("[DEBUG] securitygroup.NewCreate(%s, %s, %s", scopeid, name, dynamicMemberDefinition))
+	log.Printf(fmt.Sprintf("[DEBUG] securitygroup.NewCreate(%s, %s, %v", scopeid, name, dynamicMemberDefinition))
 	createAPI := securitygroup.NewCreate(scopeid, name, &dynamicMemberDefinition)
 	err := nsxclient.Do(createAPI)
 
@@ -224,8 +219,6 @@ func resourceSecurityGroupCreate(d *schema.ResourceData, m interface{}) error {
 
 	d.SetId(createAPI.GetResponse())
 	return resourceSecurityGroupRead(d, m)
-
-	return nil
 }
 
 func resourceSecurityGroupRead(d *schema.ResourceData, m interface{}) error {
