@@ -17,6 +17,18 @@ type SecurityTag struct {
 	Revision    int      `xml:"revision,omitempty"`
 }
 
+// AttachmentList struct
+type AttachmentList struct {
+	XMLName                xml.Name     `xml:"securityTags"`
+	SecurityTagAttachments []Attachment `xml:"securityTag"`
+}
+
+// Attachment object struct
+type Attachment struct {
+	//XMLName	xml.Name `xml:"securityTag"`
+	ObjectID string `xml:"objectId"`
+}
+
 // BasicInfoList struct to get info of vms attached to tags
 type BasicInfoList struct {
 	BasicInfoList []BasicInfo `xml:"basicinfo"`
