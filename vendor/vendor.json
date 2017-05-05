@@ -444,12 +444,12 @@
 			"versionExact": "0.3.6"
 		},
 		{
-			"checksumSHA1": "dZ2Lhb6nI5/mlA1ZBLM4ZMY7uBw=",
+			"checksumSHA1": "75L6Iipw6U7O0SQE78e8Uv+zvig=",
 			"path": "github.com/sky-uk/gonsx/api/securitypolicy",
-			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
-			"revisionTime": "2017-04-25T16:24:44Z",
-			"version": "0.3.3",
-			"versionExact": "0.3.3"
+			"revision": "1f21b52484ec9462b06faf01cb991edb7b610f1f",
+			"revisionTime": "2017-05-02T08:57:25Z",
+			"version": "0.3.8",
+			"versionExact": "0.3.8"
 		},
 		{
 			"checksumSHA1": "VrggSym3CmfjxG5/O4hx94qCl/M=",
