@@ -98,8 +98,8 @@ func (sp *SecurityPolicy) AddOutboundFirewallAction(name, action, direction stri
 	if action != "allow" && action != "block" {
 		return errors.New("Action can be only 'allow' or 'block'")
 	}
-	if direction != "outbound" && direction != "inbound" {
-		return errors.New("Direction can be only 'inbound' or 'outbound'")
+	if direction != "outbound" {
+		return errors.New("Direction can only be 'outbound'")
 	}
 
 	var secondarySecurityGroupList = []SecurityGroup{}
@@ -131,6 +131,51 @@ func (sp *SecurityPolicy) AddOutboundFirewallAction(name, action, direction stri
 		IsEnabled:              true,
 		SecondarySecurityGroup: secondarySecurityGroupList,
 		Applications:           secondaryApplicationsList,
+	}
+
+	if sp.ActionsByCategory.Category == "firewall" && len(sp.ActionsByCategory.Actions) >= 1 {
+		sp.ActionsByCategory.Actions = append(sp.ActionsByCategory.Actions, newAction)
+		return nil
+	}
+
+	// Build actionsByCategory list.
+	actionsByCategory := ActionsByCategory{Category: "firewall"}
+	actionsByCategory.Actions = []Action{newAction}
+	sp.ActionsByCategory = actionsByCategory
+	return nil
+}
+
+// AddInboundFirewallAction adds outbound firewall action rule into security policy.
+func (sp *SecurityPolicy) AddInboundFirewallAction(name, action, direction string, applicationObjectIDs []string) error {
+	if action != "allow" && action != "block" {
+		return errors.New("Action can be only 'allow' or 'block'")
+	}
+	if direction != "inbound" {
+		return errors.New("Direction can only be 'inbound'")
+	}
+
+	var secondaryApplicationsList = &Applications{}
+
+	if applicationObjectIDs[0] != "any" {
+		var secondaryApplicationList = []Application{}
+		for _, applicationObjectID := range applicationObjectIDs {
+			application := Application{ObjectID: applicationObjectID}
+			secondaryApplicationList = append(secondaryApplicationList, application)
+		}
+
+		secondaryApplicationsList.Applications = secondaryApplicationList
+	} else {
+		secondaryApplicationsList = nil
+	}
+
+	newAction := Action{
+		Class:        "firewallSecurityAction",
+		Name:         name,
+		Action:       action,
+		Category:     "firewall",
+		Direction:    direction,
+		IsEnabled:    true,
+		Applications: secondaryApplicationsList,
 	}
 
 	if sp.ActionsByCategory.Category == "firewall" && len(sp.ActionsByCategory.Actions) >= 1 {
