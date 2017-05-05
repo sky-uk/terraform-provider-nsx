@@ -42,8 +42,8 @@ func resourceSecurityPolicyRule() *schema.Resource {
 
 			"securitygroupids": {
 				Type:     schema.TypeList,
-				Required: true,
 				ForceNew: true,
+				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
@@ -100,7 +100,9 @@ func resourceSecurityPolicyRuleCreate(d *schema.ResourceData, m interface{}) err
 			securitygroupids[i] = groupID
 		}
 	} else {
-		return fmt.Errorf("securitygroupids argument is required")
+		if action == "outbound" {
+			return fmt.Errorf("securitygroupids argument is required")
+		}
 	}
 
 	if v, ok := d.GetOk("serviceids"); ok {
@@ -131,12 +133,22 @@ func resourceSecurityPolicyRuleCreate(d *schema.ResourceData, m interface{}) err
 		return fmt.Errorf("Firewall rule with same name already exists in this security policy")
 	}
 
-	log.Printf(fmt.Sprintf("[DEBUG] policyToModify.AddOutboundFirewallAction(%s, %s, %s, %s, %s)", name, action, direction, securitygroupids, serviceids))
-	modifyErr := policyToModify.AddOutboundFirewallAction(name, action, direction, securitygroupids, serviceids)
-	if err != nil {
-		return fmt.Errorf("Error in adding the rule to policy object: %s", modifyErr)
+	if direction == "inbound" {
+		log.Printf(fmt.Sprintf("[DEBUG] policyToModify.AddInboundFirewallAction(%s, %s, %s, %s)", name, action, direction, serviceids))
+		modifyErr := policyToModify.AddInboundFirewallAction(name, action, direction, serviceids)
+		if err != nil {
+			return fmt.Errorf("Error in adding the rule to policy object: %s", modifyErr)
+		}
+	} else {
+		log.Printf(fmt.Sprintf("[DEBUG] policyToModify.AddOutboundFirewallAction(%s, %s, %s, %s, %s)", name, action, direction, securitygroupids, serviceids))
+		modifyErr := policyToModify.AddOutboundFirewallAction(name, action, direction, securitygroupids, serviceids)
+		if err != nil {
+			return fmt.Errorf("Error in adding the rule to policy object: %s", modifyErr)
+		}
 	}
+
 	log.Printf("[DEBUG] - policyTOModify :%s", policyToModify)
+	policyToModify.Revision += policyToModify.Revision
 	updateAPI := securitypolicy.NewUpdate(policyToModify.ObjectID, policyToModify)
 
 	err = nsxclient.Do(updateAPI)

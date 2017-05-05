@@ -249,6 +249,7 @@ func resourceSecurityPolicyUpdate(d *schema.ResourceData, meta interface{}) erro
 		return nil
 	}
 
+	securityPolicyToChange.Revision += securityPolicyToChange.Revision
 	updateAPI := securitypolicy.NewUpdate(id, securityPolicyToChange)
 	err = nsxclient.Do(updateAPI)
 
