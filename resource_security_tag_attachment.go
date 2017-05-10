@@ -25,7 +25,7 @@ func getAllSecurityTagsAttached(moid string, nsxclient *gonsx.NSXClient) (*secur
 	return securityTagsAttached, err
 }
 
-func getAttachmentList(tagIDs []string) (*securitytag.AttachmentList) {
+func getAttachmentList(tagIDs []string) *securitytag.AttachmentList {
 	securityTags := new(securitytag.AttachmentList)
 	for _, value := range tagIDs {
 		attachment := securitytag.Attachment{ObjectID: value}
@@ -102,20 +102,19 @@ func resourceSecurityTagAttachmentCreate(d *schema.ResourceData, m interface{}) 
 		return fmt.Errorf("tagid argument is required")
 	}
 
-
 	/*
-	tagIDs, err := verifyAndGetTagIDs(d)
+		tagIDs, err := verifyAndGetTagIDs(d)
 
 
-	for _, tag := range tagIDs {
+		for _, tag := range tagIDs {
 
-		log.Printf(fmt.Sprintf("[DEBUG] TEST TAG: %v", tag))
-	}
+			log.Printf(fmt.Sprintf("[DEBUG] TEST TAG: %v", tag))
+		}
 
-	if err != nil{
-		return err
-	}
-*/
+		if err != nil{
+			return err
+		}
+	*/
 	if v, ok := d.GetOk("moid"); ok {
 		moid = v.(string)
 	} else {
