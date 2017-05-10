@@ -1,15 +1,15 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sky-uk/gonsx"
 	"github.com/sky-uk/gonsx/api/securitytag"
 	"log"
-	"errors"
 )
 
-func getAllSecurityTagsAttached(moid string, nsxclient *gonsx.NSXClient) (*securitytag.SecurityTags, error)  {
+func getAllSecurityTagsAttached(moid string, nsxclient *gonsx.NSXClient) (*securitytag.SecurityTags, error) {
 	getAllAttachedToVmAPI := securitytag.NewGetAllAttachedToVM(moid)
 	err := nsxclient.Do(getAllAttachedToVmAPI)
 
@@ -22,28 +22,18 @@ func getAllSecurityTagsAttached(moid string, nsxclient *gonsx.NSXClient) (*secur
 	}
 	securityTagsAttached := getAllAttachedToVmAPI.GetResponse()
 
-	return  securityTagsAttached, err
+	return securityTagsAttached, err
 }
 
 func getAttachmentList(d *schema.ResourceData) (*securitytag.AttachmentList, error) {
 	securityTags := new(securitytag.AttachmentList)
-	log.Println("[DEBUG] Entered getAttachmentList")
 	// Gather the attributes for the resource.
 	if v, ok := d.GetOk("tagid"); ok {
-		log.Println("[DEBUG] tagid is okay")
 		idList := v.([]interface{})
-
-		//securityTags := make([]securitytag.AttachmentList, len(idList))
 		for _, value := range idList {
-			log.Println("[DEBUG] Entered for loop")
-			//*log.Println(value.(string))
 			attachment := securitytag.Attachment{ObjectID: value.(string)}
-			log.Println("[DEBUG] Attachment made from security tag")
-			log.Println(attachment.ObjectID)
 			securityTags.AddSecurityTagToAttachmentList(attachment)
-			log.Println("[DEBUG] Added tag to attachment list")
 			if !ok {
-				log.Println("[DEBUG] empty element found in securityTags")
 				return nil, fmt.Errorf("empty element found in securityTags")
 			}
 		}
@@ -63,7 +53,7 @@ func resourceSecurityTagAttachment() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:	schema.TypeString,
+				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
@@ -82,6 +72,24 @@ func resourceSecurityTagAttachment() *schema.Resource {
 	}
 }
 
+func verifyAndGetTagIDs(d *schema.ResourceData) ([]string, error) {
+	var tagIDs []string
+	if v, ok := d.GetOk("tagid"); ok {
+		tagList := v.([]interface{})
+		tagIDs := make([]string, len(tagList))
+		for i, value := range tagList {
+			tagID, ok := value.(string)
+			if !ok {
+				return nil, fmt.Errorf("empty element found in securitytags")
+			}
+			tagIDs[i] = tagID
+		}
+	} else {
+		return nil, fmt.Errorf("tagid argument is required")
+	}
+	return tagIDs, nil
+}
+
 func resourceSecurityTagAttachmentCreate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
 	var name, moid string
@@ -93,20 +101,26 @@ func resourceSecurityTagAttachmentCreate(d *schema.ResourceData, m interface{}) 
 	if tagError != nil {
 		return tagError
 	}
+
 	if v, ok := d.GetOk("tagid"); ok {
 		tagList := v.([]interface{})
 		tagIDs = make([]string, len(tagList))
 		for i, value := range tagList {
 			tagID, ok := value.(string)
 			if !ok {
-				return fmt.Errorf("empty element found in securitygroups")
+				return fmt.Errorf("empty element found in securitytags")
 			}
 			tagIDs[i] = tagID
 		}
 	} else {
 		return fmt.Errorf("tagid argument is required")
 	}
-
+	/*
+	tagIDs, err := verifyAndGetTagIDs(d)
+	if err != nil{
+		return err
+	}
+*/
 	if v, ok := d.GetOk("moid"); ok {
 		moid = v.(string)
 	} else {
@@ -120,9 +134,9 @@ func resourceSecurityTagAttachmentCreate(d *schema.ResourceData, m interface{}) 
 	}
 
 	createAPI := securitytag.NewUpdateAttachedTags(moid, securityTags)
-	err := nsxclient.Do(createAPI)
-	if err != nil {
-		return err
+	createErr := nsxclient.Do(createAPI)
+	if createErr != nil {
+		return createErr
 	}
 
 	if createAPI.StatusCode() != 200 {
@@ -144,7 +158,7 @@ func resourceSecurityTagAttachmentCreate(d *schema.ResourceData, m interface{}) 
 
 func resourceSecurityTagAttachmentRead(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var name,moid string
+	var name, moid string
 	var tagList []interface{}
 	var tagIDs []string
 
@@ -161,7 +175,12 @@ func resourceSecurityTagAttachmentRead(d *schema.ResourceData, m interface{}) er
 	} else {
 		return fmt.Errorf("tag argument is required")
 	}
-
+	/*
+	tagIDs, err := verifyAndGetTagIDs(d)
+	if err != nil {
+		return err
+	}
+*/
 	if v, ok := d.GetOk("moid"); ok {
 		moid = v.(string)
 		d.Set("moid", moid)
@@ -172,8 +191,7 @@ func resourceSecurityTagAttachmentRead(d *schema.ResourceData, m interface{}) er
 	// See if we can find our specifically named resource within the list of
 	// resources associated with the scopeid.
 	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", moid))
-	securityTagAttachedList, err := getAllSecurityTagsAttached(moid,nsxclient)
-
+	securityTagAttachedList, err := getAllSecurityTagsAttached(moid, nsxclient)
 
 	log.Println("The tags attached to the vm are:")
 	log.Println(securityTagAttachedList.SecurityTags)
@@ -184,6 +202,7 @@ func resourceSecurityTagAttachmentRead(d *schema.ResourceData, m interface{}) er
 
 	id := name + "/" + moid
 	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
+
 
 	if len(tagIDs) > 0 && moid != "" {
 		d.SetId(id)
@@ -197,12 +216,11 @@ func resourceSecurityTagAttachmentRead(d *schema.ResourceData, m interface{}) er
 func resourceSecurityTagAttachmentDelete(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
 	var moid string
-	var tagList []interface{}
+	//var tagList []interface{}
 	var tagIDs []string
 
-
 	if v, ok := d.GetOk("tagid"); ok {
-		tagList = v.([]interface{})
+		tagList := v.([]interface{})
 		tagIDs = make([]string, len(tagList))
 		for i, value := range tagList {
 			tagID, ok := value.(string)
@@ -214,7 +232,12 @@ func resourceSecurityTagAttachmentDelete(d *schema.ResourceData, m interface{}) 
 	} else {
 		return fmt.Errorf("tag argument is required")
 	}
-
+/*
+	tagIDs, err := verifyAndGetTagIDs(d)
+	if err != nil{
+		return err
+	}
+*/
 	if v, ok := d.GetOk("moid"); ok {
 		moid = v.(string)
 	} else {
@@ -224,14 +247,14 @@ func resourceSecurityTagAttachmentDelete(d *schema.ResourceData, m interface{}) 
 	// See if we can find our specifically named resource within the list of
 	// resources associated with the scopeid.
 	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", moid))
-	attachedTags, err := getAllSecurityTagsAttached(moid,nsxclient)
+	attachedTags, err := getAllSecurityTagsAttached(moid, nsxclient)
 
 	if err != nil {
 		return err
 	}
 
 	//If a tag has been manually removed from the VM, then we remove it from the list to detach
-	for i, id := range tagIDs{
+	for i, id := range tagIDs {
 		found := false
 		for _, securityTag := range attachedTags.SecurityTags {
 			if securityTag.ObjectID == id {
@@ -239,11 +262,10 @@ func resourceSecurityTagAttachmentDelete(d *schema.ResourceData, m interface{}) 
 			}
 		}
 		if !found {
-			tagIDs = append(tagIDs[:i],tagIDs[i+1:]...)
-			log.Println("DEBUG: ID NO LONGER NEEDED TO DETACH:"+id)
+			tagIDs = append(tagIDs[:i], tagIDs[i+1:]...)
+			log.Println("DEBUG: ID NO LONGER NEEDED TO DETACH:" + id)
 		}
 	}
-
 
 	// If the resource has been removed manually, notify Terraform of this fact.
 	if len(tagIDs) == 0 {
@@ -252,10 +274,10 @@ func resourceSecurityTagAttachmentDelete(d *schema.ResourceData, m interface{}) 
 	}
 
 	// If we got here, the resource exists, so we attempt to delete it.
-	for _, id := range tagIDs{
+	for _, id := range tagIDs {
 		detachAPI := securitytag.NewDetach(id, moid)
 		err = nsxclient.Do(detachAPI)
-		log.Println("DEBUG DETACHED TAG :"+id)
+		log.Println("DEBUG DETACHED TAG :" + id)
 		if err != nil {
 			return err
 		}
@@ -277,27 +299,6 @@ func resourceSecurityTagAttachmentUpdate(d *schema.ResourceData, m interface{}) 
 	nsxclient := m.(*gonsx.NSXClient)
 	var name, moid string
 	var tagIDs []string
-	var securityTags *securitytag.AttachmentList
-
-	securityTags, tagError := getAttachmentList(d)
-
-	if tagError != nil {
-		return tagError
-	}
-
-	if v, ok := d.GetOk("tagid"); ok {
-		tagList := v.([]interface{})
-		tagIDs = make([]string, len(tagList))
-		for i, value := range tagList {
-			tagID, ok := value.(string)
-			if !ok {
-				return fmt.Errorf("empty element found in securitygroups")
-			}
-			tagIDs[i] = tagID
-		}
-	} else {
-		return fmt.Errorf("tagid argument is required")
-	}
 
 	if v, ok := d.GetOk("moid"); ok {
 		moid = v.(string)
@@ -311,59 +312,85 @@ func resourceSecurityTagAttachmentUpdate(d *schema.ResourceData, m interface{}) 
 		return fmt.Errorf("name argument is required")
 	}
 
+	if d.HasChange("tagid") {
 
-	attachedTags, err := getAllSecurityTagsAttached(moid,nsxclient)
+		securityTags, tagError := getAttachmentList(d)
 
-	if err != nil {
-		return err
-	}
-
-	// We check to see if any of the tag's currently attached to the VM need to be detached
-	var tagsToDetach []string
-	for _, tag := range attachedTags.SecurityTags {
-		log.Println("DEBUG On Tag :"+tag.ObjectID)
-		if !securityTags.CheckByObjectID(tag.ObjectID){
-			log.Println("DEBUG Tag to detach :"+tag.ObjectID)
-			tagsToDetach = append(tagsToDetach, tag.ObjectID)
+		if tagError != nil {
+			return tagError
 		}
-	}
 
-	for _, id := range tagsToDetach{
-		detachAPI := securitytag.NewDetach(id, moid)
-		err = nsxclient.Do(detachAPI)
-		log.Println("DEBUG DETACHED TAG :"+id)
+		if v, ok := d.GetOk("tagid"); ok {
+			tagList := v.([]interface{})
+			tagIDs = make([]string, len(tagList))
+			for i, value := range tagList {
+				tagID, ok := value.(string)
+				if !ok {
+					return fmt.Errorf("empty element found in securitygroups")
+				}
+				tagIDs[i] = tagID
+			}
+		} else {
+			return fmt.Errorf("tagid argument is required")
+		}
+		/*
+		tagIDs, err := verifyAndGetTagIDs(d)
+		if err != nil{
+			return err
+		}
+*/
+		attachedTags, err := getAllSecurityTagsAttached(moid, nsxclient)
+
 		if err != nil {
 			return err
 		}
+
+		// We check to see if any of the tag's currently attached to the VM need to be detached
+		var tagsToDetach []string
+		for _, tag := range attachedTags.SecurityTags {
+			log.Println("DEBUG On Tag :" + tag.ObjectID)
+			if !securityTags.CheckByObjectID(tag.ObjectID) {
+				log.Println("DEBUG Tag to detach :" + tag.ObjectID)
+				tagsToDetach = append(tagsToDetach, tag.ObjectID)
+			}
+		}
+
+		for _, id := range tagsToDetach {
+			detachAPI := securitytag.NewDetach(id, moid)
+			err = nsxclient.Do(detachAPI)
+			log.Println("DEBUG DETACHED TAG :" + id)
+			if err != nil {
+				return err
+			}
+		}
+
+		// We now attach the tag's included in the update payload
+
+		for _, tag := range securityTags.SecurityTagAttachments {
+			log.Println("Updating with tag :" + tag.ObjectID)
+		}
+
+		updateAPI := securitytag.NewUpdateAttachedTags(moid, securityTags)
+		updateErr := nsxclient.Do(updateAPI)
+		log.Println("UpdateAPI completed")
+		if updateErr != nil {
+			return err
+		}
+
+		if updateAPI.StatusCode() != 200 {
+			log.Printf(fmt.Sprintf("[DEBUG] Response %v", updateAPI.ResponseObject()))
+			return fmt.Errorf("Failed to attach security tags")
+		}
+
+		id := name + "/" + moid
+		log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
+
+		if len(tagIDs) > 0 && moid != "" {
+			d.SetId(id)
+		} else {
+			return errors.New("Can not establish the id of the updated resource")
+		}
+		return resourceSecurityTagAttachmentRead(d, m)
 	}
-
-	// We now attach the tag's included in the update payload
-
-	for _, tag := range securityTags.SecurityTagAttachments{
-		log.Println("Updating with tag :"+tag.ObjectID)
-	}
-
-	updateAPI := securitytag.NewUpdateAttachedTags(moid, securityTags)
-	updateErr := nsxclient.Do(updateAPI)
-	log.Println("UpdateAPI completed")
-	if updateErr != nil {
-		return err
-	}
-
-	if updateAPI.StatusCode() != 200 {
-		log.Printf(fmt.Sprintf("[DEBUG] Response %v", updateAPI.ResponseObject()))
-		return fmt.Errorf("Failed to attach security tags")
-	}
-
-	id := name + "/" + moid
-	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
-
-	if len(tagIDs) > 0 && moid != "" {
-		d.SetId(id)
-	} else {
-		return errors.New("Can not establish the id of the updated resource")
-	}
-	return resourceSecurityTagAttachmentRead(d, m)
+	return nil
 }
-
-
