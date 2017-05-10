@@ -10,17 +10,17 @@ import (
 )
 
 func getAllSecurityTagsAttached(moid string, nsxclient *gonsx.NSXClient) (*securitytag.SecurityTags, error) {
-	getAllAttachedToVmAPI := securitytag.NewGetAllAttachedToVM(moid)
-	err := nsxclient.Do(getAllAttachedToVmAPI)
+	getAllAttachedToVMAPI := securitytag.NewGetAllAttachedToVM(moid)
+	err := nsxclient.Do(getAllAttachedToVMAPI)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if getAllAttachedToVmAPI.StatusCode() != 200 {
-		return nil, fmt.Errorf("Status code: %d, Response: %s", getAllAttachedToVmAPI.StatusCode(), getAllAttachedToVmAPI.ResponseObject())
+	if getAllAttachedToVMAPI.StatusCode() != 200 {
+		return nil, fmt.Errorf("Status code: %d, Response: %s", getAllAttachedToVMAPI.StatusCode(), getAllAttachedToVMAPI.ResponseObject())
 	}
-	securityTagsAttached := getAllAttachedToVmAPI.GetResponse()
+	securityTagsAttached := getAllAttachedToVMAPI.GetResponse()
 
 	return securityTagsAttached, err
 }
