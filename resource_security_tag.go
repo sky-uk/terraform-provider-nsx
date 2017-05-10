@@ -48,7 +48,6 @@ func resourceSecurityTag() *schema.Resource {
 				Required: true,
 				ForceNew: false,
 			},
-
 		},
 	}
 }
