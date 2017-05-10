@@ -87,7 +87,7 @@ func resourceSecurityTagAttachmentCreate(d *schema.ResourceData, m interface{}) 
 	var tagIDs []string
 
 	// We get an AttachmentList from the resource data
-/*
+
 	if v, ok := d.GetOk("tagid"); ok {
 		tagList := v.([]interface{})
 		tagIDs = make([]string, len(tagList))
@@ -101,9 +101,11 @@ func resourceSecurityTagAttachmentCreate(d *schema.ResourceData, m interface{}) 
 	} else {
 		return fmt.Errorf("tagid argument is required")
 	}
-*/
 
+
+	/*
 	tagIDs, err := verifyAndGetTagIDs(d)
+
 
 	for _, tag := range tagIDs {
 
@@ -113,7 +115,7 @@ func resourceSecurityTagAttachmentCreate(d *schema.ResourceData, m interface{}) 
 	if err != nil{
 		return err
 	}
-
+*/
 	if v, ok := d.GetOk("moid"); ok {
 		moid = v.(string)
 	} else {
