@@ -25,23 +25,14 @@ func getAllSecurityTagsAttached(moid string, nsxclient *gonsx.NSXClient) (*secur
 	return securityTagsAttached, err
 }
 
-func getAttachmentList(d *schema.ResourceData) (*securitytag.AttachmentList, error) {
+func getAttachmentList(tagIDs []string) (*securitytag.AttachmentList) {
 	securityTags := new(securitytag.AttachmentList)
-	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("tagid"); ok {
-		idList := v.([]interface{})
-		for _, value := range idList {
-			attachment := securitytag.Attachment{ObjectID: value.(string)}
-			securityTags.AddSecurityTagToAttachmentList(attachment)
-			if !ok {
-				return nil, fmt.Errorf("empty element found in securityTags")
-			}
-		}
-	} else {
-		return nil, fmt.Errorf("tagid argument is required")
+	for _, value := range tagIDs {
+		attachment := securitytag.Attachment{ObjectID: value}
+		securityTags.AddSecurityTagToAttachmentList(attachment)
 	}
 	log.Println(securityTags.SecurityTagAttachments)
-	return securityTags, nil
+	return securityTags
 }
 
 func resourceSecurityTagAttachment() *schema.Resource {
@@ -94,14 +85,9 @@ func resourceSecurityTagAttachmentCreate(d *schema.ResourceData, m interface{}) 
 	nsxclient := m.(*gonsx.NSXClient)
 	var name, moid string
 	var tagIDs []string
-	var securityTags *securitytag.AttachmentList
 
 	// We get an AttachmentList from the resource data
-	securityTags, tagError := getAttachmentList(d)
-	if tagError != nil {
-		return tagError
-	}
-
+/*
 	if v, ok := d.GetOk("tagid"); ok {
 		tagList := v.([]interface{})
 		tagIDs = make([]string, len(tagList))
@@ -115,12 +101,19 @@ func resourceSecurityTagAttachmentCreate(d *schema.ResourceData, m interface{}) 
 	} else {
 		return fmt.Errorf("tagid argument is required")
 	}
-	/*
+*/
+
 	tagIDs, err := verifyAndGetTagIDs(d)
+
+	for _, tag := range tagIDs {
+
+		log.Printf(fmt.Sprintf("[DEBUG] TEST TAG: %v", tag))
+	}
+
 	if err != nil{
 		return err
 	}
-*/
+
 	if v, ok := d.GetOk("moid"); ok {
 		moid = v.(string)
 	} else {
@@ -133,6 +126,7 @@ func resourceSecurityTagAttachmentCreate(d *schema.ResourceData, m interface{}) 
 		return fmt.Errorf("name argument is required")
 	}
 
+	securityTags := getAttachmentList(tagIDs)
 	createAPI := securitytag.NewUpdateAttachedTags(moid, securityTags)
 	createErr := nsxclient.Do(createAPI)
 	if createErr != nil {
@@ -173,14 +167,14 @@ func resourceSecurityTagAttachmentRead(d *schema.ResourceData, m interface{}) er
 			tagIDs[i] = tagID
 		}
 	} else {
-		return fmt.Errorf("tag argument is required")
+		return fmt.Errorf("tagid argument is required")
 	}
 	/*
-	tagIDs, err := verifyAndGetTagIDs(d)
-	if err != nil {
-		return err
-	}
-*/
+		tagIDs, err := verifyAndGetTagIDs(d)
+		if err != nil {
+			return err
+		}
+	*/
 	if v, ok := d.GetOk("moid"); ok {
 		moid = v.(string)
 		d.Set("moid", moid)
@@ -202,7 +196,6 @@ func resourceSecurityTagAttachmentRead(d *schema.ResourceData, m interface{}) er
 
 	id := name + "/" + moid
 	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
-
 
 	if len(tagIDs) > 0 && moid != "" {
 		d.SetId(id)
@@ -232,12 +225,12 @@ func resourceSecurityTagAttachmentDelete(d *schema.ResourceData, m interface{}) 
 	} else {
 		return fmt.Errorf("tag argument is required")
 	}
-/*
-	tagIDs, err := verifyAndGetTagIDs(d)
-	if err != nil{
-		return err
-	}
-*/
+	/*
+		tagIDs, err := verifyAndGetTagIDs(d)
+		if err != nil{
+			return err
+		}
+	*/
 	if v, ok := d.GetOk("moid"); ok {
 		moid = v.(string)
 	} else {
@@ -314,12 +307,6 @@ func resourceSecurityTagAttachmentUpdate(d *schema.ResourceData, m interface{}) 
 
 	if d.HasChange("tagid") {
 
-		securityTags, tagError := getAttachmentList(d)
-
-		if tagError != nil {
-			return tagError
-		}
-
 		if v, ok := d.GetOk("tagid"); ok {
 			tagList := v.([]interface{})
 			tagIDs = make([]string, len(tagList))
@@ -334,11 +321,12 @@ func resourceSecurityTagAttachmentUpdate(d *schema.ResourceData, m interface{}) 
 			return fmt.Errorf("tagid argument is required")
 		}
 		/*
-		tagIDs, err := verifyAndGetTagIDs(d)
-		if err != nil{
-			return err
-		}
-*/
+			tagIDs, err := verifyAndGetTagIDs(d)
+			if err != nil{
+				return err
+			}
+		*/
+		securityTags := getAttachmentList(tagIDs)
 		attachedTags, err := getAllSecurityTagsAttached(moid, nsxclient)
 
 		if err != nil {
