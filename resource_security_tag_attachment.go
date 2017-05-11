@@ -145,7 +145,6 @@ func resourceSecurityTagAttachmentRead(d *schema.ResourceData, m interface{}) er
 
 	_, err := getAllSecurityTagsAttached(moid, nsxclient)
 
-
 	if err != nil {
 		return err
 	}
