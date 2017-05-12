@@ -16,17 +16,15 @@ with the proper credentials before it can be used.
 | Logical Switch          |   Y    |   Y   |    N    |   Y    |
 | Security Group          |   Y    |   Y   |    Y    |   Y    |
 | Security Policy         |   Y    |   Y   |    Y    |   Y    |
-| Security Policy Rules   |   Y    |   Y   |    N    |   Y    |
-| Security Tag            |   Y    |   Y   |    N    |   Y    |
-| Security Tag Attachment |   Y    |   Y   |    N    |   Y    |
-| Service                 |   Y    |   Y   |    N    |   Y    |
+| Security Policy Rules   |   Y    |   Y   |    Y    |   Y    |
+| Security Tag            |   Y    |   Y   |    Y    |   Y    |
+| Security Tag Attachment |   Y    |   Y   |    Y    |   Y    |
+| Service                 |   Y    |   Y   |    Y    |   Y    |
 
 
 ### Limitations
 
-This is currently a proof of concept and only has a very limited number of
-supported resources.  These resources also have a very limited number
-of attributes.
+At the moment only a very limited number of vSphere NSX resources have been implemented.  These resources also have the basic attributes implemented, look at wiki link above to find more details about each of these resources.
 
 We have only implemented the ability to Create, Read and Delete resources.
 Currently there is no implementation of Update.
