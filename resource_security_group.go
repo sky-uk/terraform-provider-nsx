@@ -1,12 +1,12 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sky-uk/gonsx"
 	"github.com/sky-uk/gonsx/api/securitygroup"
 	"log"
-	"errors"
 )
 
 func getSingleSecurityGroup(scopeID, name string, nsxclient *gonsx.NSXClient) (*securitygroup.SecurityGroup, error) {
@@ -43,17 +43,19 @@ func resourceSecurityGroup() *schema.Resource {
 				Required: true,
 			},
 			"dynamic_membership": &schema.Schema{
-				Type: schema.TypeList,
+				Type:     schema.TypeList,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"set_operator": &schema.Schema{
-							Type:     schema.TypeString,
-							Required: true,
+							Type:         schema.TypeString,
+							Required:     true,
+							ValidateFunc: validateSecurityGroupSetOperator,
 						},
 						"rules_operator": &schema.Schema{
-							Type:     schema.TypeString,
-							Required: true,
+							Type:         schema.TypeString,
+							Required:     true,
+							ValidateFunc: validateSecurityGroupRulesOperator,
 						},
 						"rules": &schema.Schema{
 							Type:     schema.TypeSet,
@@ -61,8 +63,9 @@ func resourceSecurityGroup() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"key": &schema.Schema{
-										Type:     schema.TypeString,
-										Required: true,
+										Type:         schema.TypeString,
+										Required:     true,
+										ValidateFunc: validateSecurityGroupRuleKey,
 									},
 									"value": &schema.Schema{
 										Type:     schema.TypeString,
@@ -80,6 +83,33 @@ func resourceSecurityGroup() *schema.Resource {
 			},
 		},
 	}
+}
+
+func validateSecurityGroupSetOperator(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+	if value != "OR" && value != "AND" {
+		errors = append(errors, fmt.Errorf("%q must be one of \"OR\" or \"AND\" ", k))
+	}
+	return
+}
+
+func validateSecurityGroupRulesOperator(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+	if value != "OR" && value != "AND" {
+		errors = append(errors, fmt.Errorf("%q must be one of \"OR\" or \"AND\" ", k))
+	}
+	return
+}
+
+func validateSecurityGroupRuleKey(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+	viewTypes := map[string]bool{
+		"VM.SECURITY_TAG": true,
+	}
+	if !viewTypes[value] {
+		errors = append(errors, fmt.Errorf("%q must be a valid DynamoDB StreamViewType", k))
+	}
+	return
 }
 
 func buildDynamicMemberDefinition(m interface{}) (securitygroup.DynamicMemberDefinition, error) {
@@ -214,31 +244,35 @@ func resourceSecurityGroupRead(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	log.Printf(fmt.Sprintf("[DEBUG] dynamicMembership := %v", securityGroupObject.DynamicMemberDefinition))
-
-	for idx, dynamicSet := range securityGroupObject.DynamicMemberDefinition.DynamicSet {
-		dynamicMembership.DynamicSet[idx].Operator = dynamicSet.Operator
-		for _, localRule := range dynamicMembership.DynamicSet[idx].DynamicCriteria {
-			for _, remoteRule := range dynamicSet.DynamicCriteria {
-				if localRule.Value == remoteRule.Value {
-					localRule.Criteria = remoteRule.Criteria
-					localRule.Key = remoteRule.Key
-					break
-				}
-			}
-		}
-	}
-	d.Set("dynamic_membership", dynamicMembership)
-
 	id := securityGroupObject.ObjectID
 	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
 
 	// If the resource has been removed manually, notify Terraform of this fact.
 	if id == "" {
 		d.SetId("")
+		return nil
 	}
 
+	log.Printf(fmt.Sprintf("[DEBUG] dynamicMembership := %v", securityGroupObject.DynamicMemberDefinition))
+	for idx, remoteDynamicSet := range securityGroupObject.DynamicMemberDefinition.DynamicSet {
+		dynamicMembership.DynamicSet[idx].Operator = remoteDynamicSet.Operator
+		readDynamicCriteria(dynamicMembership.DynamicSet[idx].DynamicCriteria,
+			remoteDynamicSet.DynamicCriteria)
+	}
+	d.Set("dynamic_membership", dynamicMembership)
 	return nil
+}
+
+func readDynamicCriteria(localCriteriaList, remoteCriteriaList []securitygroup.DynamicCriteria) {
+	for _, localRule := range localCriteriaList {
+		for _, remoteRule := range remoteCriteriaList {
+			if localRule.Value == remoteRule.Value {
+				localRule.Criteria = remoteRule.Criteria
+				localRule.Key = remoteRule.Key
+				break
+			}
+		}
+	}
 }
 
 func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
