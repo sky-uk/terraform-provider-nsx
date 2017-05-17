@@ -72,8 +72,9 @@ func resourceSecurityGroup() *schema.Resource {
 										Required: true,
 									},
 									"criteria": &schema.Schema{
-										Type:     schema.TypeString,
-										Required: true,
+										Type:         schema.TypeString,
+										Required:     true,
+										ValidateFunc: validateSecurityGroupRuleCriteria,
 									},
 								},
 							},
@@ -103,11 +104,32 @@ func validateSecurityGroupRulesOperator(v interface{}, k string) (ws []string, e
 
 func validateSecurityGroupRuleKey(v interface{}, k string) (ws []string, errors []error) {
 	value := v.(string)
-	viewTypes := map[string]bool{
-		"VM.SECURITY_TAG": true,
+	keyTypes := map[string]bool{
+		"VM.SECURITY_TAG":       true,
+		"VM.GUEST_OS_FULL_NAME": true,
+		"VM.GUEST_HOST_NAME":    true,
+		"VM.NAME":               true,
+		"ENTITY":                true,
 	}
-	if !viewTypes[value] {
-		errors = append(errors, fmt.Errorf("%q must be a valid DynamoDB StreamViewType", k))
+	if !keyTypes[value] {
+		errors = append(errors, fmt.Errorf("%q must be a valid key, check documentation for acceptable values", k))
+	}
+	return
+}
+
+func validateSecurityGroupRuleCriteria(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+	possibleCriteriaValues := map[string]bool{
+		"belongs_to":  true,
+		"starts_with": true,
+		"ends_with":   true,
+		"=":           true,
+		"!=":          true,
+		"contains":    true,
+		"similar_to":  true,
+	}
+	if !possibleCriteriaValues[value] {
+		errors = append(errors, fmt.Errorf("%q must be a valid criteria value, check documentation for acceptable values", k))
 	}
 	return
 }
@@ -173,13 +195,13 @@ func resourceSecurityGroupCreate(d *schema.ResourceData, m interface{}) error {
 	if v, ok := d.GetOk("scopeid"); ok {
 		scopeid = v.(string)
 	} else {
-		return fmt.Errorf("scopeid argument is required")
+		return errors.New("scopeid argument is required")
 	}
 
 	if v, ok := d.GetOk("name"); ok {
 		name = v.(string)
 	} else {
-		return fmt.Errorf("name argument is required")
+		return errors.New("name argument is required")
 	}
 
 	if v, ok := d.GetOk("dynamic_membership"); ok {
@@ -190,7 +212,7 @@ func resourceSecurityGroupCreate(d *schema.ResourceData, m interface{}) error {
 		}
 		//dynamicMemberDefinition, err = getDynamicMemberDefinitionFromTemplate(v)
 	} else {
-		return fmt.Errorf("dynamicmembership list is required")
+		return errors.New("dynamicmembership list is required")
 	}
 
 	log.Printf(fmt.Sprintf("[DEBUG] securitygroup.NewCreate(%s, %s, %v", scopeid, name, dynamicMemberDefinition))
@@ -218,13 +240,13 @@ func resourceSecurityGroupRead(d *schema.ResourceData, m interface{}) error {
 	if v, ok := d.GetOk("scopeid"); ok {
 		scopeid = v.(string)
 	} else {
-		return fmt.Errorf("scopeid argument is required")
+		return errors.New("scopeid argument is required")
 	}
 
 	if v, ok := d.GetOk("name"); ok {
 		name = v.(string)
 	} else {
-		return fmt.Errorf("name argument is required")
+		return errors.New("name argument is required")
 	}
 
 	if v, ok := d.GetOk("dynamic_membership"); ok {
@@ -233,7 +255,7 @@ func resourceSecurityGroupRead(d *schema.ResourceData, m interface{}) error {
 			return err
 		}
 	} else {
-		return fmt.Errorf("name argument is required")
+		return errors.New("dynamic_membership is required")
 	}
 
 	// See if we can find our specifically named resource within the list of
@@ -287,7 +309,7 @@ func resourceSecurityGroupUpdate(d *schema.ResourceData, m interface{}) error {
 	if v, ok := d.GetOk("scopeid"); ok {
 		scopeid = v.(string)
 	} else {
-		return fmt.Errorf("scopeid argument is required")
+		return errors.New("scopeid argument is required")
 	}
 
 	log.Printf(fmt.Sprintf("[DEBUG] securitygroup.NewGetAll(%s)", scopeid))
@@ -331,13 +353,13 @@ func resourceSecurityGroupDelete(d *schema.ResourceData, m interface{}) error {
 	if v, ok := d.GetOk("scopeid"); ok {
 		scopeid = v.(string)
 	} else {
-		return fmt.Errorf("scopeid argument is required")
+		return errors.New("scopeid argument is required")
 	}
 
 	if v, ok := d.GetOk("name"); ok {
 		name = v.(string)
 	} else {
-		return fmt.Errorf("name argument is required")
+		return errors.New("name argument is required")
 	}
 
 	// Gather all the resources that are associated with the specified
