@@ -138,23 +138,16 @@ func buildDynamicMemberDefinition(m interface{}) (securitygroup.DynamicMemberDef
 	var newDynamicMemberDefinition securitygroup.DynamicMemberDefinition
 
 	dynamicSetList := make([]securitygroup.DynamicSet, len(m.([]interface{})))
-	for idx, v := range m.([]interface{}) {
-		log.Printf(fmt.Sprintf("[DEBUG] buildDynamicMemberDefinition v : %+v", v))
+	for index, v := range m.([]interface{}) {
 		data := v.(map[string]interface{})
-
-		if v, ok := data["set_operator"].(string); ok && v != "" {
-			dynamicSetList[idx].Operator = data["set_operator"].(string)
-		} else {
-			return newDynamicMemberDefinition, errors.New("'set_operator' required for dynamic_membership")
-		}
-
-		dynamicSetList[idx].Operator = data["set_operator"].(string)
 		dynamicRulesList, err := buildDynamicRules(data["rules"], data["rules_operator"].(string))
 		if err != nil {
 			return newDynamicMemberDefinition, err
 		}
-		dynamicSetList[idx].DynamicCriteria = dynamicRulesList
+		dynamicSetList[index].Operator = data["set_operator"].(string)
+		dynamicSetList[index].DynamicCriteria = dynamicRulesList
 		log.Printf(fmt.Sprintf("[DEBUG] DynamicSetList: %v", dynamicSetList))
+
 	}
 	newDynamicMemberDefinition.DynamicSet = dynamicSetList
 	return newDynamicMemberDefinition, nil
@@ -165,21 +158,9 @@ func buildDynamicRules(m interface{}, rulesOperator string) ([]securitygroup.Dyn
 	for index, value := range m.(*schema.Set).List() {
 		dynamicCriterion := value.(map[string]interface{})
 		newDynamicCriterion[index].Operator = rulesOperator
-		if v, ok := dynamicCriterion["key"].(string); ok && v != "" {
-			newDynamicCriterion[index].Key = v
-		} else {
-			return newDynamicCriterion, errors.New("dynamic_membership -> rules -> key required")
-		}
-		if v, ok := dynamicCriterion["value"].(string); ok && v != "" {
-			newDynamicCriterion[index].Value = v
-		} else {
-			return newDynamicCriterion, errors.New("dynamic_membership -> rules -> value required")
-		}
-		if v, ok := dynamicCriterion["criteria"].(string); ok && v != "" {
-			newDynamicCriterion[index].Criteria = v
-		} else {
-			return newDynamicCriterion, errors.New("dynamic_membership -> rules -> criteria required")
-		}
+		newDynamicCriterion[index].Key = dynamicCriterion["key"].(string)
+		newDynamicCriterion[index].Value = dynamicCriterion["value"].(string)
+		newDynamicCriterion[index].Criteria = dynamicCriterion["criteria"].(string)
 	}
 	return newDynamicCriterion, nil
 }
