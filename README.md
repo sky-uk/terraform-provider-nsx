@@ -24,8 +24,6 @@ with the proper credentials before it can be used.
 
 ### Limitations
 
-At the moment only a very limited number of vSphere NSX resources have been implemented.  These resources also have the basic attributes implemented, look at wiki link above to find more details about each of these resources.
-
-We have only implemented the ability to Create, Read and Delete resources.
-Currently there is no implementation of Update.
+* Security-tag resource requires vsphere-provider with moid parameter implemented. ([branch](https://github.com/sky-uk/terraform/tree/OREP-176) not yet pushed to upstream). Docker image link with already built vsphere-provider available in getting started link above.
+* At the moment only a very limited number of vSphere NSX resources have been implemented.  These resources also have the basic attributes implemented, look at wiki link above to find more details about each of these resources.
 
