@@ -5,7 +5,6 @@ import (
 	"github.com/hashicorp/terraform/helper/mutexkv"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
-	"os"
 )
 
 // Provider is a basic structure that describes a provider: the configuration
@@ -25,19 +24,19 @@ func Provider() terraform.ResourceProvider {
 				Default:  false,
 			},
 			"nsxusername": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  os.Getenv("NSXUSERNAME"),
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("NSXUSERNAME", nil),
 			},
 			"nsxpassword": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  os.Getenv("NSXPASSWORD"),
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("NSXPASSWORD", nil),
 			},
 			"nsxserver": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  os.Getenv("NSXSERVER"),
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("NSXSERVER", nil),
 			},
 		},
 

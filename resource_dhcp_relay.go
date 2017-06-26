@@ -29,6 +29,7 @@ func resourceDHCPRelay() *schema.Resource {
 		Create: resourceDHCPRelayCreate,
 		Read:   resourceDHCPRelayRead,
 		Delete: resourceDHCPRelayDelete,
+		Update: resourceDHCPRelayUpdate,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -40,37 +41,48 @@ func resourceDHCPRelay() *schema.Resource {
 			"edgeid": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
+				ForceNew: false,
 			},
-
-			"vnicindex": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
-			"giaddress": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
 			"dhcpserverip": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
+				ForceNew: false,
 			},
+			"agent": &schema.Schema{
+				Type:     schema.TypeSet,
+				Optional: true,
+				ForceNew: false,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"vnicindex": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: false,
+						},
+
+						"giaddress": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: false,
+						},
+
+					},
+				},
+			},
+
 		},
 	}
 }
 
 func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var name, edgeid, vnicindex, giaddress, dhcpserverip string
-
+	var name, edgeid,dhcpserverip   string
+	var agentList []dhcprelay.RelayAgent
+	var dhcpRelay dhcprelay.DhcpRelay
 	// Gather the attributes for the resource.
 	if v, ok := d.GetOk("name"); ok {
 		name = v.(string)
+		dhcpRelay.RelayServer.DomainName = name
 	} else {
 		return fmt.Errorf("name argument is required")
 	}
@@ -81,27 +93,41 @@ func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("edgeid argument is required")
 	}
 
-	if v, ok := d.GetOk("vnicindex"); ok {
-		vnicindex = v.(string)
-	} else {
-		return fmt.Errorf("vnicindex argument is required")
+	if v, ok := d.GetOk("agent"); ok {
+		if agents, ok := v.(*schema.Set); ok {
+			for _, value := range agents.List() {
+				agentObject := value.(map[string]interface{})
+				newAgent := dhcprelay.RelayAgent{}
+				if vnicIndexValue, ok := agentObject["vnicindex"]; ok {
+					newAgent.VnicIndex = vnicIndexValue.(string)
+				}
+
+				if giAddressValue, ok := agentObject["giaddress"]; ok {
+					newAgent.GiAddress = giAddressValue.(string)
+				}
+
+				if dhcpserveripValue, ok := agentObject["dhcpserverip"]; ok {
+					newAgent.GiAddress = dhcpserveripValue.(string)
+				}
+
+				//finally add to the list
+				agentList = append(agentList, newAgent)
+			}
+
+		}
+		dhcpRelay.RelayAgents = agentList
 	}
 
-	if v, ok := d.GetOk("giaddress"); ok {
-		giaddress = v.(string)
-	} else {
-		return fmt.Errorf("giaddress argument is required")
-	}
 
 	if v, ok := d.GetOk("dhcpserverip"); ok {
 		dhcpserverip = v.(string)
+		dhcpRelay.RelayServer.IPAddress = dhcpserverip
 	} else {
 		return fmt.Errorf("dhcpserverip argument is required")
 	}
-
-	nsxMutexKV.Lock(edgeid)
+ 	nsxMutexKV.Lock(edgeid)
 	defer nsxMutexKV.Unlock(edgeid)
-
+/*
 	// Create the API, use it and check for errors.
 	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.getAllDhcpRelays(%s, %v)", edgeid, nsxclient))
 	currentDHCPRelay, err := getAllDhcpRelays(edgeid, nsxclient)
@@ -117,9 +143,10 @@ func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
 	newRelayAgentsList := append(currentDHCPRelay.RelayAgents, newRelayAgent)
 
 	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.NewUpdate(%s, %s, %s)", dhcpserverip, edgeid, newRelayAgentsList))
-	updateAPI := dhcprelay.NewUpdate(dhcpserverip, edgeid, newRelayAgentsList)
+	*/
 
-	err = nsxclient.Do(updateAPI)
+	updateAPI := dhcprelay.NewCreate(edgeid, dhcpRelay)
+	err := nsxclient.Do(updateAPI)
 
 	if err != nil {
 		return fmt.Errorf("Error: %v", err)
@@ -130,7 +157,8 @@ func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
 	// If we get here, everything is OK.  Set the ID for the Terraform state
 	// and return the response from the READ method.
 	d.SetId(name)
-	return resourceDHCPRelayRead(d, m)
+	//return resourceDHCPRelayRead(d, m)
+	return nil
 }
 
 func resourceDHCPRelayRead(d *schema.ResourceData, m interface{}) error {
@@ -165,8 +193,23 @@ func resourceDHCPRelayRead(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
+func resourceDHCPRelayUpdate(d *schema.ResourceData, m interface{}) error {
+	/*nsxclient := m.(*gonsx.NSXClient)
+	var edgeid, vnicindex string
+	var updateRelay dhcprelay.DhcpRelay
+	if d.HasChange("edgeid") {
+		if v, ok := d.GetOk("edgeid"); ok {
+			edgeid = v.(string)
+			updateRelay
+		}
+
+	}*/
+	return nil
+
+}
+
 func resourceDHCPRelayDelete(d *schema.ResourceData, m interface{}) error {
-	nsxclient := m.(*gonsx.NSXClient)
+	/*nsxclient := m.(*gonsx.NSXClient)
 	var edgeid, vnicindex string
 
 	// Gather the attributes for the resource.
@@ -225,7 +268,7 @@ func resourceDHCPRelayDelete(d *schema.ResourceData, m interface{}) error {
 		} else {
 			log.Printf("Updated DHCP Relay - %s", updateAPI.GetResponse())
 		}
-	}
+	}*/
 
 	return nil
 }

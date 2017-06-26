@@ -11,12 +11,9 @@ type UpdateDhcpRelayAPI struct {
 }
 
 // NewUpdate creates a new object of UpdateDhcpRelayAPI
-func NewUpdate(dhcpIPAddress, edgeID string, relayAgentslist []RelayAgent) *UpdateDhcpRelayAPI {
+func NewUpdate(edgeID string, dhcpRelay DhcpRelay) *UpdateDhcpRelayAPI {
 	this := new(UpdateDhcpRelayAPI)
-	requestPayload := new(DhcpRelay)
-	requestPayload.RelayServer.IPAddress = dhcpIPAddress
-	requestPayload.RelayAgents = relayAgentslist
-
+	requestPayload := dhcpRelay
 	this.BaseAPI = api.NewBaseAPI(http.MethodPut, "/api/4.0/edges/"+edgeID+"/dhcp/config/relay", requestPayload, new(string))
 	return this
 }
