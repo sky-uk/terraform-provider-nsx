@@ -440,12 +440,12 @@
 			"versionExact": "0.3.3"
 		},
 		{
-			"checksumSHA1": "R5Fb9gMTcMtNFt3/NOOQ6y/ky0Y=",
+			"checksumSHA1": "UqvzMuZlz/W4tS93GfxXO0puuLc=",
 			"path": "github.com/sky-uk/gonsx/api/dhcprelay",
-			"revision": "0c0a61e56ff65087639f7c8459291fb00ba47bf0",
-			"revisionTime": "2017-06-26T09:12:17Z",
-			"version": "0.3.9",
-			"versionExact": "0.3.9"
+			"revision": "06b76c1d8c6dea3684ab903b2e66e395df77da17",
+			"revisionTime": "2017-06-27T10:15:15Z",
+			"version": "0.3.10",
+			"versionExact": "0.3.10"
 		},
 		{
 			"checksumSHA1": "HOAJv0BVJy4Q8v5K8qWJ+G8ace4=",
