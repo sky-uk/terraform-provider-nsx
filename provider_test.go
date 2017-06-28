@@ -29,15 +29,15 @@ func TestProvider_impl(t *testing.T) {
 }
 
 func testAccPreCheck(t *testing.T) {
-	if v := os.Getenv("INFOBLOX_USERNAME"); v == "" {
-		t.Fatal("INFOBLOX_USERNAME must be set for acceptance tests")
+	if v := os.Getenv("NSXUSERNAME"); v == "" {
+		t.Fatal("NSXUSERNAME must be set for acceptance tests")
 	}
 
-	if v := os.Getenv("INFOBLOX_PASSWORD"); v == "" {
-		t.Fatal("INFOBLOX_USERNAME must be set for acceptance tests")
+	if v := os.Getenv("NSXPASSWORD"); v == "" {
+		t.Fatal("NSXPASSWORD must be set for acceptance tests")
 	}
 
-	if v := os.Getenv("INFOBLOX_SERVER"); v == "" {
-		t.Fatal("INFOBLOX_SERVER must be set for acceptance tests")
+	if v := os.Getenv("NSXSERVER"); v == "" {
+		t.Fatal("NSXSERVER must be set for acceptance tests")
 	}
 }
