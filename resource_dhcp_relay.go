@@ -29,12 +29,22 @@ func resourceDHCPRelay() *schema.Resource {
 		Create: resourceDHCPRelayCreate,
 		Read:   resourceDHCPRelayRead,
 		Delete: resourceDHCPRelayDelete,
+		Update: resourceDHCPRelayUpdate,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+
+			"ipsets": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: false,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"fqdn": {
+				Type:        schema.TypeList,
+				Required:    true,
+				ForceNew:    false,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "Comma separated lists of Domain names (maximum 2)",
 			},
 
 			"edgeid": {
@@ -42,23 +52,32 @@ func resourceDHCPRelay() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
-
-			"vnicindex": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
-			"giaddress": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
 			"dhcpserverip": {
-				Type:     schema.TypeString,
+				Type:        schema.TypeList,
+				Required:    true,
+				ForceNew:    false,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "Comma separated lists of IP Addresses (maximum 16)",
+			},
+			"agent": &schema.Schema{
+				Type:     schema.TypeSet,
 				Required: true,
-				ForceNew: true,
+				ForceNew: false,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"vnicindex": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: false,
+						},
+
+						"giaddress": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: false,
+						},
+					},
+				},
 			},
 		},
 	}
@@ -66,13 +85,25 @@ func resourceDHCPRelay() *schema.Resource {
 
 func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var name, edgeid, vnicindex, giaddress, dhcpserverip string
+	var edgeid string
+	var agentList []dhcprelay.RelayAgent
+	var dhcpRelay dhcprelay.DhcpRelay
 
-	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("name"); ok {
-		name = v.(string)
+	if v, ok := d.GetOk("ipsets"); ok {
+		for _, ipset := range v.([]interface{}) {
+			dhcpRelay.RelayServer.IPSets = append(dhcpRelay.RelayServer.IPSets, ipset.(string))
+		}
+	}
+
+	if v, ok := d.GetOk("fqdn"); ok {
+		for _, name := range v.([]interface{}) {
+			dhcpRelay.RelayServer.DomainName = append(dhcpRelay.RelayServer.DomainName, name.(string))
+		}
 	} else {
 		return fmt.Errorf("name argument is required")
+	}
+	if len(dhcpRelay.RelayServer.DomainName) > 2 {
+		return fmt.Errorf("Error: Field fqdn only Supports 2 domains")
 	}
 
 	if v, ok := d.GetOk("edgeid"); ok {
@@ -81,45 +112,48 @@ func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("edgeid argument is required")
 	}
 
-	if v, ok := d.GetOk("vnicindex"); ok {
-		vnicindex = v.(string)
-	} else {
-		return fmt.Errorf("vnicindex argument is required")
-	}
+	if v, ok := d.GetOk("agent"); ok {
+		if agents, ok := v.(*schema.Set); ok {
+			for _, value := range agents.List() {
+				agentObject := value.(map[string]interface{})
+				newAgent := dhcprelay.RelayAgent{}
+				if vnicIndexValue, ok := agentObject["vnicindex"]; ok {
+					newAgent.VnicIndex = vnicIndexValue.(string)
+				}
 
-	if v, ok := d.GetOk("giaddress"); ok {
-		giaddress = v.(string)
+				if giAddressValue, ok := agentObject["giaddress"]; ok {
+					newAgent.GiAddress = giAddressValue.(string)
+				}
+
+				if dhcpServerIpValue, ok := agentObject["dhcpserverip"]; ok {
+					newAgent.GiAddress = dhcpServerIpValue.(string)
+				}
+
+				//finally add to the list
+				agentList = append(agentList, newAgent)
+			}
+
+		}
+
+		dhcpRelay.RelayAgents = agentList
 	} else {
-		return fmt.Errorf("giaddress argument is required")
+		return fmt.Errorf("agent parameter is required (DHCP Relay Agent) ")
 	}
 
 	if v, ok := d.GetOk("dhcpserverip"); ok {
-		dhcpserverip = v.(string)
+		for _, ipaddr := range v.([]interface{}) {
+			dhcpRelay.RelayServer.IPAddress = append(dhcpRelay.RelayServer.IPAddress, ipaddr.(string))
+		}
 	} else {
 		return fmt.Errorf("dhcpserverip argument is required")
 	}
-
+	if len(dhcpRelay.RelayServer.IPAddress) > 16 {
+		return fmt.Errorf("Error: Field IP addresses  only Supports 16 records")
+	}
 	nsxMutexKV.Lock(edgeid)
 	defer nsxMutexKV.Unlock(edgeid)
-
-	// Create the API, use it and check for errors.
-	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.getAllDhcpRelays(%s, %v)", edgeid, nsxclient))
-	currentDHCPRelay, err := getAllDhcpRelays(edgeid, nsxclient)
-
-	if err != nil {
-		return fmt.Errorf("Error: %v", err)
-	}
-
-	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.RelayAgent(%s, %s)", vnicindex, giaddress))
-	newRelayAgent := dhcprelay.RelayAgent{VnicIndex: vnicindex, GiAddress: giaddress}
-
-	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.append(%s, %s)", currentDHCPRelay.RelayAgents, newRelayAgent))
-	newRelayAgentsList := append(currentDHCPRelay.RelayAgents, newRelayAgent)
-
-	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.NewUpdate(%s, %s, %s)", dhcpserverip, edgeid, newRelayAgentsList))
-	updateAPI := dhcprelay.NewUpdate(dhcpserverip, edgeid, newRelayAgentsList)
-
-	err = nsxclient.Do(updateAPI)
+	updateAPI := dhcprelay.NewCreate(edgeid, dhcpRelay)
+	err := nsxclient.Do(updateAPI)
 
 	if err != nil {
 		return fmt.Errorf("Error: %v", err)
@@ -129,14 +163,15 @@ func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
 
 	// If we get here, everything is OK.  Set the ID for the Terraform state
 	// and return the response from the READ method.
-	d.SetId(name)
+	d.SetId(edgeid)
 	return resourceDHCPRelayRead(d, m)
+	//return nil
 }
 
 func resourceDHCPRelayRead(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var edgeid, vnicindex string
-
+	var edgeid string
+	var agentList []dhcprelay.RelayAgent
 	// Gather the attributes for the resource.
 	if v, ok := d.GetOk("edgeid"); ok {
 		edgeid = v.(string)
@@ -144,30 +179,161 @@ func resourceDHCPRelayRead(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("edgeid argument is required")
 	}
 
-	if v, ok := d.GetOk("vnicindex"); ok {
-		vnicindex = v.(string)
-	} else {
-		return fmt.Errorf("vnicindex argument is required")
-	}
-
-	// Create the API, use it and check for errors.
-	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.getAllDhcpRelays(%s, %v)", edgeid, nsxclient))
-	currentDHCPRelay, err := getAllDhcpRelays(edgeid, nsxclient)
-
+	DHCPRelay, err := getAllDhcpRelays(edgeid, nsxclient)
 	if err != nil {
 		return fmt.Errorf("Error: %v", err)
 	}
 
-	if !currentDHCPRelay.CheckByVnicIndex(vnicindex) {
-		d.SetId("")
+	if len(DHCPRelay.RelayServer.IPSets) > 0 {
+		d.Set("ipsets", DHCPRelay.RelayServer.IPSets)
+	}
+
+	if len(DHCPRelay.RelayServer.DomainName) > 0 {
+		d.Set("fqdn", DHCPRelay.RelayServer.DomainName)
+	}
+
+	if len(DHCPRelay.RelayServer.IPAddress) > 0 {
+		d.Set("dhcpserverip", DHCPRelay.RelayServer.IPAddress)
+	}
+
+	if len(DHCPRelay.RelayAgents) > 0 {
+		if v, ok := d.GetOk("agent"); ok {
+			if agents, ok := v.(*schema.Set); ok {
+				for _, value := range agents.List() {
+					agentObject := value.(map[string]interface{})
+					newAgent := dhcprelay.RelayAgent{}
+					if vnicIndexValue, ok := agentObject["vnicindex"]; ok {
+						newAgent.VnicIndex = vnicIndexValue.(string)
+					}
+
+					if giAddressValue, ok := agentObject["giaddress"]; ok {
+						newAgent.GiAddress = giAddressValue.(string)
+					}
+
+					if dhcpServerIpValue, ok := agentObject["dhcpserverip"]; ok {
+						newAgent.GiAddress = dhcpServerIpValue.(string)
+					}
+
+					//finally add to the list
+					agentList = append(agentList, newAgent)
+				}
+
+			}
+
+			DHCPRelay.RelayAgents = agentList
+		}
+	} else {
+		return fmt.Errorf("RelayAgents should not be empty since this is not allowed by api ...")
 	}
 
 	return nil
 }
 
+func resourceDHCPRelayUpdate(d *schema.ResourceData, m interface{}) error {
+	nsxclient := m.(*gonsx.NSXClient)
+	var agentList []dhcprelay.RelayAgent
+	var currentRelay *dhcprelay.DhcpRelay
+	var hasChanges bool
+	var updateObject dhcprelay.DhcpRelay
+	currentRelay, getAllErr := getAllDhcpRelays(d.Id(), nsxclient)
+	if getAllErr != nil {
+		return fmt.Errorf("Error: %v", getAllErr)
+	}
+
+	if d.HasChange("ipsets") {
+		hasChanges = true
+		if v, ok := d.GetOk("ipsets"); ok {
+			for _, ipset := range v.([]interface{}) {
+				updateObject.RelayServer.IPSets = append(updateObject.RelayServer.IPSets, ipset.(string))
+			}
+		}
+
+	} else {
+		updateObject.RelayServer.IPSets = currentRelay.RelayServer.IPSets
+	}
+
+	if d.HasChange("fqdn") {
+		hasChanges = true
+		if v, ok := d.GetOk("fqdn"); ok {
+			for _, name := range v.([]interface{}) {
+				updateObject.RelayServer.DomainName = append(updateObject.RelayServer.DomainName, name.(string))
+			}
+		}
+	} else {
+		updateObject.RelayServer.DomainName = currentRelay.RelayServer.DomainName
+	}
+
+	if len(updateObject.RelayServer.DomainName) > 2 {
+		return fmt.Errorf("Error: Field fqdn only Supports 2 domains")
+	}
+
+	if d.HasChange("dhcpserverip") {
+		hasChanges = true
+		if v, ok := d.GetOk("dhcpserverip"); ok {
+			for _, ipaddr := range v.([]interface{}) {
+				updateObject.RelayServer.IPAddress = append(updateObject.RelayServer.IPAddress, ipaddr.(string))
+			}
+		}
+	} else {
+		updateObject.RelayServer.IPAddress = currentRelay.RelayServer.IPAddress
+	}
+
+	if len(updateObject.RelayServer.IPAddress) > 16 {
+		return fmt.Errorf("Error: Field IP addresses  only Supports 16 records")
+	}
+	if d.HasChange("agent") {
+		hasChanges = true
+		if v, ok := d.GetOk("agent"); ok {
+			if agents, ok := v.(*schema.Set); ok {
+				for _, value := range agents.List() {
+					agentObject := value.(map[string]interface{})
+					newAgent := dhcprelay.RelayAgent{}
+					if vnicIndexValue, ok := agentObject["vnicindex"]; ok {
+						newAgent.VnicIndex = vnicIndexValue.(string)
+					}
+
+					if giAddressValue, ok := agentObject["giaddress"]; ok {
+						newAgent.GiAddress = giAddressValue.(string)
+					}
+
+					if dhcpServerIpValue, ok := agentObject["dhcpserverip"]; ok {
+						newAgent.GiAddress = dhcpServerIpValue.(string)
+					}
+
+					//finally add to the list
+					agentList = append(agentList, newAgent)
+				}
+
+			}
+
+			updateObject.RelayAgents = agentList
+		}
+	} else {
+		updateObject.RelayAgents = currentRelay.RelayAgents
+	}
+
+	if hasChanges {
+		nsxMutexKV.Lock(d.Id())
+		defer nsxMutexKV.Unlock(d.Id())
+		updateAPI := dhcprelay.NewUpdate(d.Id(), updateObject)
+		err := nsxclient.Do(updateAPI)
+		if err != nil {
+			return fmt.Errorf("Could not update the resource : %s", err)
+		}
+		if updateAPI.StatusCode() != 204 {
+			d.SetId("")
+			return fmt.Errorf("Error updating record : %s:", updateAPI.GetResponse())
+		}
+		return resourceDHCPRelayRead(d, m)
+	}
+
+	return nil
+
+}
+
 func resourceDHCPRelayDelete(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var edgeid, vnicindex string
+	var edgeid string
 
 	// Gather the attributes for the resource.
 	if v, ok := d.GetOk("edgeid"); ok {
@@ -175,57 +341,14 @@ func resourceDHCPRelayDelete(d *schema.ResourceData, m interface{}) error {
 	} else {
 		return fmt.Errorf("edgeid argument is required")
 	}
-
-	if v, ok := d.GetOk("vnicindex"); ok {
-		vnicindex = v.(string)
-	} else {
-		return fmt.Errorf("vnicindex argument is required")
-	}
-
 	nsxMutexKV.Lock(edgeid)
 	defer nsxMutexKV.Unlock(edgeid)
-
-	// Create the API, use it and check for errors.
-	log.Printf(fmt.Sprintf("[DEBUG] dhcprelay.getAllDhcpRelays(%s, %v)", edgeid, nsxclient))
-	currentDHCPRelay, err := getAllDhcpRelays(edgeid, nsxclient)
-
+	deleteAPI := dhcprelay.NewDelete(edgeid)
+	err := nsxclient.Do(deleteAPI)
 	if err != nil {
 		return fmt.Errorf("Error: %v", err)
 	}
-
-	// Check to see if an entry with the vnicindex exists at all.  If
-	// not, assume it has been deleted manually and notify Terraform
-	// and exit gracefully.
-	if !currentDHCPRelay.CheckByVnicIndex(vnicindex) {
-		d.SetId("")
-		return nil
-	}
-
-	if currentDHCPRelay.CheckByVnicIndex(vnicindex) && (len(currentDHCPRelay.RelayAgents) == 1) {
-		deleteAPI := dhcprelay.NewDelete(edgeid)
-		err = nsxclient.Do(deleteAPI)
-		if err != nil {
-			return fmt.Errorf("Error: %v", err)
-		}
-
-		log.Println("DHCP Relay agent deleted.")
-	} else {
-		// if we got more than one relay agents, then we have to call update after removing
-		// the entry we want to remove.
-		log.Println("There are other DHCP Relay agents, only removing single entry with update.")
-		newRelayAgentsList := currentDHCPRelay.RemoveByVnicIndex(vnicindex).RelayAgents
-
-		updateAPI := dhcprelay.NewUpdate(currentDHCPRelay.RelayServer.IPAddress, edgeid, newRelayAgentsList)
-		err = nsxclient.Do(updateAPI)
-
-		if err != nil {
-			return fmt.Errorf("Error: %v", err)
-		} else if updateAPI.StatusCode() != 204 {
-			return fmt.Errorf(updateAPI.GetResponse())
-		} else {
-			log.Printf("Updated DHCP Relay - %s", updateAPI.GetResponse())
-		}
-	}
-
+	log.Println("DHCP Relay agent deleted.")
+	d.SetId("")
 	return nil
 }
