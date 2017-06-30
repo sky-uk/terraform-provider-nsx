@@ -36,4 +36,6 @@ with the proper credentials before it can be used.
  - Transport Zones
  - Distributed Switch
  - Distributed Firewall (L2 / L3 rules) 
+ - Edge Device Nat config and rules 
+ - Edge Device Routing config
  
