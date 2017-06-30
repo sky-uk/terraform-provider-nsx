@@ -7,6 +7,7 @@ import (
 	"github.com/sky-uk/gonsx"
 	"github.com/sky-uk/gonsx/api/virtualwire"
 	"log"
+	"net/http"
 )
 
 func getSingleLogicalSwitch(scopeid, name string, nsxclient *gonsx.NSXClient) (*virtualwire.VirtualWire, error) {
@@ -34,31 +35,28 @@ func resourceLogicalSwitch() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceLogicalSwitchCreate,
 		Read:   resourceLogicalSwitchRead,
+		Update: resourceLogicalSwitchUpdate,
 		Delete: resourceLogicalSwitchDelete,
 
 		Schema: map[string]*schema.Schema{
 			"desc": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 
 			"tenantid": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 
 			"scopeid": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 		},
 	}
@@ -152,7 +150,53 @@ func resourceLogicalSwitchRead(d *schema.ResourceData, m interface{}) error {
 		d.SetId("")
 	}
 
+	d.SetId(id)
+	d.Set("name", logicalSwitchObject.Name)
+	d.Set("desc", logicalSwitchObject.Description)
+	d.Set("tenentid", logicalSwitchObject.TenantID)
+
 	return nil
+}
+
+func resourceLogicalSwitchUpdate(d *schema.ResourceData, m interface{}) error {
+	nsxClient := m.(*gonsx.NSXClient)
+	logicalSwitchID := d.Id()
+	hasChanges := false
+	var name, description string
+
+	if v, ok := d.GetOk("name"); ok && v != "" {
+		if d.HasChange("name") {
+			hasChanges = true
+		}
+		name = v.(string)
+	} else {
+		return fmt.Errorf("name argument is required")
+	}
+	if v, ok := d.GetOk("desc"); ok && v != "" {
+		if d.HasChange("desc") {
+			hasChanges = true
+		}
+		description = v.(string)
+	} else {
+		return fmt.Errorf("desc argument is required")
+	}
+	if hasChanges {
+		updateLogicalSwitchAPI := virtualwire.NewUpdate(name, description, logicalSwitchID)
+		err := nsxClient.Do(updateLogicalSwitchAPI)
+		if err != nil {
+			return fmt.Errorf("error updating logical switch %v", err)
+		}
+		if updateLogicalSwitchAPI.StatusCode() != http.StatusOK {
+			return fmt.Errorf("error updating logical switch - received invalid http response code %d", updateLogicalSwitchAPI.StatusCode())
+		}
+		updateResponse := updateLogicalSwitchAPI.GetUpdateResponse()
+
+		log.Printf(fmt.Sprintf("[DEBUG] response was %+v", updateResponse))
+		//d.SetId(logicalSwitchID)
+		//d.Set("name", updateResponse.Name)
+		//d.Set("desc", updateResponse.Description)
+	}
+	return resourceLogicalSwitchRead(d, m)
 }
 
 func resourceLogicalSwitchDelete(d *schema.ResourceData, m interface{}) error {
