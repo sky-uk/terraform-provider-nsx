@@ -2,11 +2,10 @@
 
 project_name = 'gonsx'
 project_owner = 'sky-uk'
-project_github_token = '7eec88ceb08431126182c7ce85631cb45bd0f98a'
 
 project_src_path = "github.com/${project_owner}/${project_name}"
-git_credentials_id = '9be96924-ccbc-4f9e-a07c-18818fff868c'
-git_helper_credentials_id = 'paas-jenkins-pipelines-deploy-key'
+github_token_id = 'svc-paas-github-access-token-as-text'
+github_credentials_id = 'svc-paas-github-deploy-key'
 
 version_file = 'VERSION'
 major_version = null
@@ -33,7 +32,7 @@ slackHelper.notificationWrapper(slackChannel, currentBuild, env, true) {
                 deleteDir()
                 git_branch = env.BRANCH_NAME
                 checkout scm
-                gitHelper.prepareGit('paas-jenkins', 'paas-jenkins@jenkins.paas.int.ovp.bskyb.com')
+                gitHelper.prepareGit('svc-paas-github', 'svc-paas-github@jenkins.paas.int.ovp.bskyb.com')
 
                 stage 'version'
                 if (autoincVersion()) {
@@ -76,7 +75,7 @@ slackHelper.notificationWrapper(slackChannel, currentBuild, env, true) {
         }
     }
     // we only release from master
-    if (git_branch == 'master' && !gitHelper.isLastCommitFromUser('paas-jenkins')) {
+    if (git_branch == 'master' && !gitHelper.isLastCommitFromUser('svc-paas-github')) {
         stage 'release'
         def approved = true
         timeout(time: 2, unit: 'HOURS') {
@@ -92,13 +91,16 @@ slackHelper.notificationWrapper(slackChannel, currentBuild, env, true) {
             echo "Release has been approved!"
             node() {
                 gitHelper.tag(version(), "Jenkins ${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}")
-                gitHelper.push(git_credentials_id, git_branch)
+                gitHelper.push(github_credentials_id, git_branch)
 
                 echo "Creating GitHub Release v${version()}"
-                github_release_response = gitHelper.createGitHubRelease(project_github_token, project_owner, project_name, version(), git_branch)
-//              FIXME: this is not working yet
-//              echo "Attaching artifacts to GitHub Release v${version()}"
-//              gitHelper.uploadToGitHubRelease(project_github_token, project_owner, project_name, github_release_response.id, "${pwd()}/coverage.html", 'application/html')
+                withCredentials([string(credentialsId: github_token_id, variable: 'GITHUB_TOKEN')]) {
+                    def github_release_response = gitHelper.createGitHubRelease(env.GITHUB_TOKEN, project_owner, project_name, version(), git_branch)
+                    echo "${github_release_response}"
+                    // FIXME: this is not working yet
+                    // echo "Attaching artifacts to GitHub Release v${version()}"
+                    // gitHelper.uploadToGitHubRelease(project_github_token, project_owner, project_name, github_release_response.id, "${pwd()}/coverage.html", 'application/html')
+                }
             }
             currentBuild.description = "Released ${version()}"
         }
@@ -106,7 +108,7 @@ slackHelper.notificationWrapper(slackChannel, currentBuild, env, true) {
 }
 
 def loadHelpers() {
-    fileLoader.withGit('git@github.com:sky-uk/paas-jenkins-pipelines.git', 'master', git_helper_credentials_id, '') {
+    fileLoader.withGit('git@github.com:sky-uk/paas-jenkins-pipelines.git', 'master', github_credentials_id, '') {
         this.gitHelper = fileLoader.load('lib/helpers/git')
         this.shellHelper = fileLoader.load('lib/helpers/shell')
         this.goHelper = fileLoader.load('lib/helpers/go')

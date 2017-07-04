@@ -20,7 +20,7 @@ func TestAccNSXLogicalSwitchBasic(t *testing.T) {
 	scopeID := "vdnscope-1"
 	testResourceName := "nsx_logical_switch.acctest"
 
-	fmt.Printf("\n\nSwitch name is %s\n\n", switchName)
+	fmt.Printf("\n\nlogical switch name is %s\n\n", switchName)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
@@ -46,6 +46,10 @@ func TestAccNSXLogicalSwitchBasic(t *testing.T) {
 				ExpectError: regexp.MustCompile(`required field is not set`),
 			},
 			{
+				Config:      testAccInfobloxLogicalSwitchInvalidControlPlaneModeTemplate(switchName, scopeID),
+				ExpectError: regexp.MustCompile(`must be one of UNICAST_MODE, HYBRID_MODE or MULTICAST_MODE`),
+			},
+			{
 				Config: testAccInfobloxLogicalSwitchCreateTemplate(switchName, scopeID),
 				Check: resource.ComposeTestCheckFunc(
 					testAccInfobloxLogicalSwitchExists(switchName, scopeID, testResourceName),
@@ -53,6 +57,7 @@ func TestAccNSXLogicalSwitchBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(testResourceName, "desc", "Acceptance Test"),
 					resource.TestCheckResourceAttr(testResourceName, "tenantid", "tf_testid"),
 					resource.TestCheckResourceAttr(testResourceName, "scopeid", scopeID),
+					resource.TestCheckResourceAttr(testResourceName, "controlplanemode", "UNICAST_MODE"),
 				),
 			},
 			{
@@ -63,6 +68,7 @@ func TestAccNSXLogicalSwitchBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(testResourceName, "desc", "Acceptance Test Update"),
 					resource.TestCheckResourceAttr(testResourceName, "tenantid", "tf_testid"),
 					resource.TestCheckResourceAttr(testResourceName, "scopeid", scopeID),
+					resource.TestCheckResourceAttr(testResourceName, "controlplanemode", "UNICAST_MODE"),
 				),
 			},
 		},
@@ -132,6 +138,7 @@ resource "nsx_logical_switch" "acctest" {
 desc = "Acceptance Test Update"
 tenantid = "tf_testid"
 scopeid = "%s"
+controlplanemode = "UNICAST_MODE"
 }`, scopeID)
 }
 
@@ -141,6 +148,7 @@ resource "nsx_logical_switch" "acctest" {
 name = "%s"
 tenantid = "tf_testid"
 scopeid = "%s"
+controlplanemode = "UNICAST_MODE"
 }`, name, scopeID)
 }
 
@@ -150,6 +158,7 @@ resource "nsx_logical_switch" "acctest" {
 name = "%s"
 desc = "Acceptance Test Update"
 scopeid = "%s"
+controlplanemode = "UNICAST_MODE"
 }`, name, scopeID)
 }
 
@@ -159,7 +168,19 @@ resource "nsx_logical_switch" "acctest" {
 name = "%s"
 desc = "Acceptance Test Update"
 tenantid = "tf_testid"
+controlplanemode = "UNICAST_MODE"
 }`, name)
+}
+
+func testAccInfobloxLogicalSwitchInvalidControlPlaneModeTemplate(switchName, scopeID string) string {
+	return fmt.Sprintf(`
+resource "nsx_logical_switch" "acctest" {
+name = "%s"
+desc = "Acceptance Test"
+tenantid = "tf_testid"
+scopeid = "%s"
+controlplanemode = "INVALID_CONTROL_PLANE_MODE"
+}`, switchName, scopeID)
 }
 
 func testAccInfobloxLogicalSwitchCreateTemplate(switchName, scopeID string) string {
@@ -169,6 +190,7 @@ name = "%s"
 desc = "Acceptance Test"
 tenantid = "tf_testid"
 scopeid = "%s"
+controlplanemode = "UNICAST_MODE"
 }`, switchName, scopeID)
 }
 
@@ -179,5 +201,6 @@ name = "%s"
 desc = "Acceptance Test Update"
 tenantid = "tf_testid"
 scopeid = "%s"
+controlplanemode = "UNICAST_MODE"
 }`, switchUpdateName, scopeID)
 }
