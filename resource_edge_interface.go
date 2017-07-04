@@ -1,5 +1,5 @@
 package main
-
+/*
 import (
 	"errors"
 	"fmt"
@@ -250,3 +250,4 @@ func resourceEdgeInterfaceDelete(d *schema.ResourceData, m interface{}) error {
 	log.Printf(fmt.Sprintf("[DEBUG] id %s deleted.", id))
 	return nil
 }
+*/
