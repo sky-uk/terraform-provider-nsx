@@ -26,7 +26,7 @@ func TestAccNSXLogicalSwitchBasic(t *testing.T) {
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		CheckDestroy: func(state *terraform.State) error {
-			return testAccNSXLogicalSwitchCheckDestroy(state, switchName, scopeID)
+			return testAccNSXLogicalSwitchCheckDestroy(state, switchName)
 		},
 		Steps: []resource.TestStep{
 			{
@@ -46,13 +46,17 @@ func TestAccNSXLogicalSwitchBasic(t *testing.T) {
 				ExpectError: regexp.MustCompile(`required field is not set`),
 			},
 			{
+				Config:      testAccInfobloxLogicalSwitchNoControlPlaneModeTemplate(switchName, scopeID),
+				ExpectError: regexp.MustCompile(`required field is not set`),
+			},
+			{
 				Config:      testAccInfobloxLogicalSwitchInvalidControlPlaneModeTemplate(switchName, scopeID),
 				ExpectError: regexp.MustCompile(`must be one of UNICAST_MODE, HYBRID_MODE or MULTICAST_MODE`),
 			},
 			{
 				Config: testAccInfobloxLogicalSwitchCreateTemplate(switchName, scopeID),
 				Check: resource.ComposeTestCheckFunc(
-					testAccInfobloxLogicalSwitchExists(switchName, scopeID, testResourceName),
+					testAccInfobloxLogicalSwitchExists(switchName, testResourceName),
 					resource.TestCheckResourceAttr(testResourceName, "name", switchName),
 					resource.TestCheckResourceAttr(testResourceName, "desc", "Acceptance Test"),
 					resource.TestCheckResourceAttr(testResourceName, "tenantid", "tf_testid"),
@@ -63,7 +67,7 @@ func TestAccNSXLogicalSwitchBasic(t *testing.T) {
 			{
 				Config: testAccInfobloxLogicalSwitchUpdateTemplate(updateSwitchName, scopeID),
 				Check: resource.ComposeTestCheckFunc(
-					testAccInfobloxLogicalSwitchExists(updateSwitchName, scopeID, testResourceName),
+					testAccInfobloxLogicalSwitchExists(updateSwitchName, testResourceName),
 					resource.TestCheckResourceAttr(testResourceName, "name", updateSwitchName),
 					resource.TestCheckResourceAttr(testResourceName, "desc", "Acceptance Test Update"),
 					resource.TestCheckResourceAttr(testResourceName, "tenantid", "tf_testid"),
@@ -76,7 +80,7 @@ func TestAccNSXLogicalSwitchBasic(t *testing.T) {
 
 }
 
-func testAccInfobloxLogicalSwitchExists(name, scopeID, resourceName string) resource.TestCheckFunc {
+func testAccInfobloxLogicalSwitchExists(name, resourceName string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 
 		nsxClient := testAccProvider.Meta().(*gonsx.NSXClient)
@@ -85,47 +89,53 @@ func testAccInfobloxLogicalSwitchExists(name, scopeID, resourceName string) reso
 		if !ok {
 			return fmt.Errorf("NSX logical switch resource %s not found in resources", resourceName)
 		}
-		if rs.Primary.ID == "" {
+
+		resourceID := rs.Primary.ID
+		if resourceID == "" {
 			return fmt.Errorf("NSX logical switch resource ID not set in resources ")
 		}
 
-		getAllAPI := virtualwire.NewGetAll(scopeID)
-		err := nsxClient.Do(getAllAPI)
+		getLogicalSwitchAPI := virtualwire.NewGet(resourceID)
+		err := nsxClient.Do(getLogicalSwitchAPI)
 		if err != nil {
-			return fmt.Errorf("Error while checking if logical switch exists %v", err)
+			return fmt.Errorf("Error while retrieving logical switch ID %s. Error: %v", resourceID, err)
 		}
-		if getAllAPI.StatusCode() != http.StatusOK {
-			return fmt.Errorf("Error while checking if logical switch exists. HTTP return code was %d", getAllAPI.StatusCode())
+		responseCode := getLogicalSwitchAPI.StatusCode()
+		logicalSwitch := getLogicalSwitchAPI.GetResponse()
+		if responseCode != http.StatusOK {
+			return fmt.Errorf("Error while checking if logical switch %s exists. HTTP return code was %d", resourceID, responseCode)
 		}
-		virtualWire := getAllAPI.GetResponse().FilterByName(name)
 
-		if name == virtualWire.Name {
+		if name == logicalSwitch.Name {
 			return nil
 		}
 		return fmt.Errorf("NSX logical switch %s wasn't found", name)
 	}
 }
 
-func testAccNSXLogicalSwitchCheckDestroy(state *terraform.State, name, scopeID string) error {
+func testAccNSXLogicalSwitchCheckDestroy(state *terraform.State, name string) error {
 
 	nsxClient := testAccProvider.Meta().(*gonsx.NSXClient)
 
 	for _, rs := range state.RootModule().Resources {
+
 		if rs.Type != "nsx_logical_switch" {
 			continue
 		}
-		if id, ok := rs.Primary.Attributes["id"]; ok && id != "" {
-			return nil
-		}
 
-		getAllAPI := virtualwire.NewGetAll(scopeID)
-		err := nsxClient.Do(getAllAPI)
+		resourceID := rs.Primary.Attributes["id"]
+		getLogicalSwitchAPI := virtualwire.NewGet(resourceID)
+		err := nsxClient.Do(getLogicalSwitchAPI)
 		if err != nil {
+			return fmt.Errorf("Error while retrieving logical switch ID %s. Error: %v", resourceID, err)
+		}
+
+		if getLogicalSwitchAPI.StatusCode() == http.StatusNotFound {
 			return nil
 		}
-		virtualWire := getAllAPI.GetResponse().FilterByName(name)
 
-		if name == virtualWire.Name {
+		logicalSwitch := getLogicalSwitchAPI.GetResponse()
+		if name == logicalSwitch.Name {
 			return fmt.Errorf("NSX logical switch %s still exists", name)
 		}
 	}
@@ -135,7 +145,7 @@ func testAccNSXLogicalSwitchCheckDestroy(state *terraform.State, name, scopeID s
 func testAccInfobloxLogicalSwitchNoNameTemplate(scopeID string) string {
 	return fmt.Sprintf(`
 resource "nsx_logical_switch" "acctest" {
-desc = "Acceptance Test Update"
+desc = "Acceptance Test No Name Template"
 tenantid = "tf_testid"
 scopeid = "%s"
 controlplanemode = "UNICAST_MODE"
@@ -170,6 +180,16 @@ desc = "Acceptance Test Update"
 tenantid = "tf_testid"
 controlplanemode = "UNICAST_MODE"
 }`, name)
+}
+
+func testAccInfobloxLogicalSwitchNoControlPlaneModeTemplate(name, scopeID string) string {
+	return fmt.Sprintf(`
+resource "nsx_logical_switch" "acctest" {
+name = "%s"
+desc = "Acceptance Test Update"
+tenantid = "tf_testid"
+scopeid = "%s"
+}`, name, scopeID)
 }
 
 func testAccInfobloxLogicalSwitchInvalidControlPlaneModeTemplate(switchName, scopeID string) string {
