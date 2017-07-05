@@ -41,7 +41,7 @@ func resourceLogicalSwitch() *schema.Resource {
 			"scopeid": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "The transport zone ID where the logical switch should reside. Only required for creation.",
+				Description: "The transport zone ID. Only required for creation.",
 			},
 		},
 	}
@@ -57,6 +57,7 @@ func validateLogicalSwitchControlPlaneMode(v interface{}, k string) (ws []string
 }
 
 func resourceLogicalSwitchCreate(d *schema.ResourceData, m interface{}) error {
+
 	nsxClient := m.(*gonsx.NSXClient)
 	var scopeID string
 	var logicalSwitchCreate virtualwire.CreateSpec
@@ -98,7 +99,7 @@ func resourceLogicalSwitchCreate(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("Error while creating logical switch %s. Invalid HTTP response code %d received. Response: %v", logicalSwitchCreate.Name, createResponseCode, createResponse)
 	}
 
-	// NSX API returned the virtualwire ID as a string on successful creation and nothing else. E.g. virtualwire-101
+	// NSX API returns the virtualwire ID as a string on successful creation and nothing else. E.g. virtualwire-101
 	d.SetId(createResponse)
 	return resourceLogicalSwitchRead(d, m)
 }
@@ -114,7 +115,7 @@ func resourceLogicalSwitchRead(d *schema.ResourceData, m interface{}) error {
 	getAPI := virtualwire.NewGet(logicalSwitchID)
 	err := nsxClient.Do(getAPI)
 	if err != nil {
-		return fmt.Errorf("Error while reading logical switch(virtualwire) ID %s. Error: %v", logicalSwitchID, err)
+		return fmt.Errorf("Error while reading logical switch ID %s. Error: %v", logicalSwitchID, err)
 	}
 	if getAPI.StatusCode() == http.StatusNotFound {
 		d.SetId("")
@@ -132,8 +133,8 @@ func resourceLogicalSwitchRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceLogicalSwitchUpdate(d *schema.ResourceData, m interface{}) error {
-	nsxClient := m.(*gonsx.NSXClient)
 
+	nsxClient := m.(*gonsx.NSXClient)
 	var updateVirtualWire virtualwire.VirtualWire
 	hasChanges := false
 	updateVirtualWire.ObjectID = d.Id()
@@ -167,6 +168,15 @@ func resourceLogicalSwitchUpdate(d *schema.ResourceData, m interface{}) error {
 	} else {
 		return fmt.Errorf("Error logical switch update: controlplanemode attribute is required")
 	}
+	// Tenant ID can't be updated. Update will return as successful, but doesn't change attribute.
+	if v, ok := d.GetOk("tenantid"); ok && v != "" {
+		if d.HasChange("tenantid") {
+			hasChanges = true
+		}
+		updateVirtualWire.TenantID = v.(string)
+	} else {
+		return fmt.Errorf("Error logical switch update: tenantid attribute is required")
+	}
 
 	if hasChanges {
 		updateLogicalSwitchAPI := virtualwire.NewUpdate(updateVirtualWire)
@@ -183,6 +193,7 @@ func resourceLogicalSwitchUpdate(d *schema.ResourceData, m interface{}) error {
 		d.Set("name", updateVirtualWire.Name)
 		d.Set("desc", updateVirtualWire.Description)
 		d.Set("controlplanemode", updateVirtualWire.ControlPlaneMode)
+		d.Set("tenantid", updateVirtualWire.TenantID)
 	}
 	return resourceLogicalSwitchRead(d, m)
 }
