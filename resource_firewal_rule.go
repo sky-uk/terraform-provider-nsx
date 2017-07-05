@@ -219,7 +219,13 @@ func resourceFirewallRuleCreate(d *schema.ResourceData, m interface{}) error {
 	if v, ok := d.GetOk("edgeid"); ok {
 		fwRule.EdgeID = v.(string)
 	} else {
-		return fmt.Errorf("Edge ID required")
+		return fmt.Errorf("Edge ID is required")
+	}
+
+	if v,ok := d.GetOk("sectionid"); ok {
+		fwRule.SectionID = v.(int)
+	} else {
+		return fmt.Errorf("Section ID is required")
 	}
 
 	return nil
