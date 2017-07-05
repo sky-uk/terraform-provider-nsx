@@ -140,7 +140,7 @@ func resourceEdgeInterfaceCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if createAPI.StatusCode() != 200 {
-		return fmt.Errorf("Failed to create edge interface:%v StatusCode:%d Response:%s", err, createAPI.StatusCode(), createAPI.RawResponse())
+		return fmt.Errorf("Failed to create edge interface:%s StatusCode:%s Response:%s", err, createAPI.StatusCode(), createAPI.RawResponse())
 	}
 
 	// If we go here, everything is OK.  Set the ID for the Terraform state
