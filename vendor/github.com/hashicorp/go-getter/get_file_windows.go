@@ -13,13 +13,8 @@ import (
 )
 
 func (g *FileGetter) Get(dst string, u *url.URL) error {
-	path := u.Path
-	if u.RawPath != "" {
-		path = u.RawPath
-	}
-
 	// The source path must exist and be a directory to be usable.
-	if fi, err := os.Stat(path); err != nil {
+	if fi, err := os.Stat(u.Path); err != nil {
 		return fmt.Errorf("source path error: %s", err)
 	} else if !fi.IsDir() {
 		return fmt.Errorf("source path must be a directory")
@@ -48,7 +43,7 @@ func (g *FileGetter) Get(dst string, u *url.URL) error {
 		return err
 	}
 
-	sourcePath := toBackslash(path)
+	sourcePath := toBackslash(u.Path)
 
 	// Use mklink to create a junction point
 	output, err := exec.Command("cmd", "/c", "mklink", "/J", dst, sourcePath).CombinedOutput()
@@ -60,13 +55,8 @@ func (g *FileGetter) Get(dst string, u *url.URL) error {
 }
 
 func (g *FileGetter) GetFile(dst string, u *url.URL) error {
-	path := u.Path
-	if u.RawPath != "" {
-		path = u.RawPath
-	}
-
 	// The source path must exist and be a directory to be usable.
-	if fi, err := os.Stat(path); err != nil {
+	if fi, err := os.Stat(u.Path); err != nil {
 		return fmt.Errorf("source path error: %s", err)
 	} else if fi.IsDir() {
 		return fmt.Errorf("source path must be a file")
@@ -92,11 +82,11 @@ func (g *FileGetter) GetFile(dst string, u *url.URL) error {
 
 	// If we're not copying, just symlink and we're done
 	if !g.Copy {
-		return os.Symlink(path, dst)
+		return os.Symlink(u.Path, dst)
 	}
 
 	// Copy
-	srcF, err := os.Open(path)
+	srcF, err := os.Open(u.Path)
 	if err != nil {
 		return err
 	}

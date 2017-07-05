@@ -35,10 +35,6 @@ type Getter interface {
 	// reference a single file. If possible, the Getter should check if
 	// the remote end contains the same file and no-op this operation.
 	GetFile(string, *url.URL) error
-
-	// ClientMode returns the mode based on the given URL. This is used to
-	// allow clients to let the getters decide which mode to use.
-	ClientMode(*url.URL) (ClientMode, error)
 }
 
 // Getters is the mapping of scheme to the Getter implementation that will
@@ -50,7 +46,7 @@ var Getters map[string]Getter
 var forcedRegexp = regexp.MustCompile(`^([A-Za-z0-9]+)::(.+)$`)
 
 func init() {
-	httpGetter := &HttpGetter{Netrc: true}
+	httpGetter := new(HttpGetter)
 
 	Getters = map[string]Getter{
 		"file":  new(FileGetter),
