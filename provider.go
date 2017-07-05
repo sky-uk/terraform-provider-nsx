@@ -19,8 +19,8 @@ func Provider() terraform.ResourceProvider {
 				Default:  false,
 			},
 			"insecure": &schema.Schema{
-				Type:     schema.TypeBool,
-				Optional: true,
+				Type:        schema.TypeBool,
+				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("NSX_ALLOW_UNVERIFIED_SSL", false),
 			},
 			"nsxusername": &schema.Schema{
