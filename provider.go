@@ -42,7 +42,7 @@ func Provider() terraform.ResourceProvider {
 
 		ResourcesMap: map[string]*schema.Resource{
 			"nsx_logical_switch":          resourceLogicalSwitch(),
-			//"nsx_edge_interface":          resourceEdgeInterface(),
+			"nsx_edge_interface":          resourceEdgeInterface(),
 			"nsx_dhcp_relay":              resourceDHCPRelay(),
 			"nsx_service":                 resourceService(),
 			"nsx_security_group":          resourceSecurityGroup(),
