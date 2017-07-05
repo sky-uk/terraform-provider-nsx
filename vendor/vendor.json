@@ -383,14 +383,6 @@
 			"versionExact": "v0.9.6"
 		},
 		{
-			"checksumSHA1": "ZcY9YbDucbey7sESh+e5JgU+sI4=",
-			"path": "github.com/hashicorp/terraform/helper/acctest",
-			"revision": "85e0979c6af6a15345c9131e4478ba712bb3c21d",
-			"revisionTime": "2017-05-25T15:56:03Z",
-			"version": "v0.9.6",
-			"versionExact": "v0.9.6"
-		},
-		{
 			"checksumSHA1": "uT6Q9RdSRAkDjyUgQlJ2XKJRab4=",
 			"path": "github.com/hashicorp/terraform/helper/config",
 			"revision": "85e0979c6af6a15345c9131e4478ba712bb3c21d",
@@ -548,84 +540,84 @@
 			"revision": "a422bbe96644373c5753384a59d678f7d261ff10"
 		},
 		{
-			"checksumSHA1": "mR58SsCx8aqsR+5s2WILo9Yfph4=",
+			"checksumSHA1": "RTMekwLpUJhBRfGrgH6jg3zj+EQ=",
 			"path": "github.com/sky-uk/gonsx",
-			"revision": "e0ab5b0cb742dd91b99da5768de99eedf0217ca5",
-			"revisionTime": "2017-07-05T10:17:22Z",
-			"version": "0.3.13",
-			"versionExact": "0.3.13"
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
+			"revisionTime": "2017-04-25T16:24:44Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
 			"checksumSHA1": "1KwQ4O1Kk2aUgnPlCpt5E7iOhuk=",
 			"path": "github.com/sky-uk/gonsx/api",
-			"revision": "e0ab5b0cb742dd91b99da5768de99eedf0217ca5",
-			"revisionTime": "2017-07-05T10:17:22Z",
-			"version": "0.3.13",
-			"versionExact": "0.3.13"
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
+			"revisionTime": "2017-04-25T16:24:44Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
 			"checksumSHA1": "UqvzMuZlz/W4tS93GfxXO0puuLc=",
 			"path": "github.com/sky-uk/gonsx/api/dhcprelay",
-			"revision": "e0ab5b0cb742dd91b99da5768de99eedf0217ca5",
-			"revisionTime": "2017-07-05T10:17:22Z",
-			"version": "0.3.13",
-			"versionExact": "0.3.13"
+			"revision": "06b76c1d8c6dea3684ab903b2e66e395df77da17",
+			"revisionTime": "2017-06-27T10:15:15Z",
+			"version": "0.3.10",
+			"versionExact": "0.3.10"
 		},
 		{
-			"checksumSHA1": "HGnr5hyR1svsx3iZfW6ceyTj0wc=",
+			"checksumSHA1": "HOAJv0BVJy4Q8v5K8qWJ+G8ace4=",
 			"path": "github.com/sky-uk/gonsx/api/edgeinterface",
-			"revision": "e0ab5b0cb742dd91b99da5768de99eedf0217ca5",
-			"revisionTime": "2017-07-05T10:17:22Z",
-			"version": "0.3.13",
-			"versionExact": "0.3.13"
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
+			"revisionTime": "2017-04-25T16:24:44Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
 			"checksumSHA1": "gc2GfFksjfEeXxWUmcclCGKcZv8=",
 			"path": "github.com/sky-uk/gonsx/api/securitygroup",
-			"revision": "e0ab5b0cb742dd91b99da5768de99eedf0217ca5",
-			"revisionTime": "2017-07-05T10:17:22Z",
-			"version": "0.3.13",
-			"versionExact": "0.3.13"
+			"revision": "0bc192581ae28af8a1da7ad91816f2d139606caa",
+			"revisionTime": "2017-04-25T16:24:44Z",
+			"version": "0.3.6",
+			"versionExact": "0.3.6"
 		},
 		{
 			"checksumSHA1": "75L6Iipw6U7O0SQE78e8Uv+zvig=",
 			"path": "github.com/sky-uk/gonsx/api/securitypolicy",
-			"revision": "e0ab5b0cb742dd91b99da5768de99eedf0217ca5",
-			"revisionTime": "2017-07-05T10:17:22Z",
-			"version": "0.3.13",
-			"versionExact": "0.3.13"
+			"revision": "1f21b52484ec9462b06faf01cb991edb7b610f1f",
+			"revisionTime": "2017-05-02T08:57:25Z",
+			"version": "0.3.8",
+			"versionExact": "0.3.8"
 		},
 		{
 			"checksumSHA1": "aFuZIGmIb9qnv2pohE2hY8kgn9A=",
 			"path": "github.com/sky-uk/gonsx/api/securitytag",
-			"revision": "e0ab5b0cb742dd91b99da5768de99eedf0217ca5",
-			"revisionTime": "2017-07-05T10:17:22Z",
-			"version": "0.3.13",
-			"versionExact": "0.3.13"
+			"revision": "eafbe96739765e6b773e5319618fbc767e589d39",
+			"revisionTime": "2017-04-25T16:24:44Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
 			"checksumSHA1": "UpbA43PSGyAOp3WfQlMvKitZTKI=",
 			"path": "github.com/sky-uk/gonsx/api/service",
-			"revision": "e0ab5b0cb742dd91b99da5768de99eedf0217ca5",
-			"revisionTime": "2017-07-05T10:17:22Z",
-			"version": "0.3.13",
-			"versionExact": "0.3.13"
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
+			"revisionTime": "2017-04-25T16:24:44Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
 			"checksumSHA1": "K1PMAqhEoFwvMc4aZbJEEyssovo=",
 			"path": "github.com/sky-uk/gonsx/api/tzone",
-			"revision": "e0ab5b0cb742dd91b99da5768de99eedf0217ca5",
-			"revisionTime": "2017-07-05T10:17:22Z",
-			"version": "0.3.13",
-			"versionExact": "0.3.13"
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
+			"revisionTime": "2017-04-25T16:24:44Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
-			"checksumSHA1": "8RIuzZ0G3rpKehv5r/Zrl5jlruM=",
+			"checksumSHA1": "14Q7FjC0yj57cT4bAZSIQvlCqWU=",
 			"path": "github.com/sky-uk/gonsx/api/virtualwire",
-			"revision": "e0ab5b0cb742dd91b99da5768de99eedf0217ca5",
-			"revisionTime": "2017-07-05T10:17:22Z",
-			"version": "0.3.13",
-			"versionExact": "0.3.13"
+			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
+			"revisionTime": "2017-04-25T16:24:44Z",
+			"version": "0.3.3",
+			"versionExact": "0.3.3"
 		},
 		{
 			"checksumSHA1": "iydUphwYqZRq3WhstEdGsbvBAKs=",
@@ -644,30 +636,6 @@
 			"path": "golang.org/x/crypto/blowfish",
 			"revision": "adbae1b6b6fb4b02448a0fc0dbbc9ba2b95b294d",
 			"revisionTime": "2017-06-19T06:03:41Z"
-		},
-		{
-			"checksumSHA1": "MlEHIE/60sB86Lmf0MPTIXHzKzE=",
-			"path": "golang.org/x/crypto/curve25519",
-			"revision": "51714a8c4ac1764f07ab4127d7f739351ced4759",
-			"revisionTime": "2017-07-04T13:41:27Z"
-		},
-		{
-			"checksumSHA1": "i3dNaI+oCYeDGIsNj7LwecTsIAs=",
-			"path": "golang.org/x/crypto/ed25519",
-			"revision": "51714a8c4ac1764f07ab4127d7f739351ced4759",
-			"revisionTime": "2017-07-04T13:41:27Z"
-		},
-		{
-			"checksumSHA1": "LXFcVx8I587SnWmKycSDEq9yvK8=",
-			"path": "golang.org/x/crypto/ed25519/internal/edwards25519",
-			"revision": "51714a8c4ac1764f07ab4127d7f739351ced4759",
-			"revisionTime": "2017-07-04T13:41:27Z"
-		},
-		{
-			"checksumSHA1": "RclWhAjKAvDg2tHsuqVYC7E7otE=",
-			"path": "golang.org/x/crypto/ssh",
-			"revision": "51714a8c4ac1764f07ab4127d7f739351ced4759",
-			"revisionTime": "2017-07-04T13:41:27Z"
 		}
 	],
 	"rootPath": "github.com/sky-uk/terraform-provider-nsx"

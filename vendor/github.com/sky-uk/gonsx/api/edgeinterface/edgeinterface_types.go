@@ -18,7 +18,7 @@ type EdgeInterface struct {
 	IsConnected   bool          `xml:"isConnected"`
 	ConnectedToID string        `xml:"connectedToId"`
 	AddressGroups AddressGroups `xml:"addressGroups"`
-	Index         int           `xml:"index,omitempty"`
+	Index         string        `xml:"index,omitempty"`
 }
 
 // AddressGroups within EdgeInterface.

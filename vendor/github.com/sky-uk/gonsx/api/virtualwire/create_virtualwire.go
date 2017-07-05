@@ -11,9 +11,16 @@ type CreateVirtualWireAPI struct {
 }
 
 // NewCreate returns a new object of CreateVirtualWireAPI.
-func NewCreate(virtualWireSpec CreateSpec, scopeID string) *CreateVirtualWireAPI {
+func NewCreate(name, desc, tenantID, scopeID string) *CreateVirtualWireAPI {
 	this := new(CreateVirtualWireAPI)
-	this.BaseAPI = api.NewBaseAPI(http.MethodPost, "/api/2.0/vdn/scopes/"+scopeID+"/virtualwires", virtualWireSpec, new(string))
+	requestPayload := new(CreateSpec)
+	requestPayload.Name = name
+	requestPayload.TenantID = tenantID
+	requestPayload.Description = desc
+	// TODO: need to make it argument
+	requestPayload.ControlPlaneMode = "UNICAST_MODE"
+
+	this.BaseAPI = api.NewBaseAPI(http.MethodPost, "/api/2.0/vdn/scopes/"+scopeID+"/virtualwires", requestPayload, new(string))
 	return this
 }
 

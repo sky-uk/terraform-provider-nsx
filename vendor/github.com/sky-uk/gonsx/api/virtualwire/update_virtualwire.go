@@ -10,9 +10,14 @@ type UpdateVirtualWireAPI struct {
 	*api.BaseAPI
 }
 
-// NewUpdate returns a new object of UpdateVirtualWireAPI. Returns response code 200 with no content.
-func NewUpdate(virtualWire VirtualWire) *UpdateVirtualWireAPI {
+// NewUpdate returns a new object of UpdateVirtualWireAPI.
+func NewUpdate(name, desc, virtualwireID string) *UpdateVirtualWireAPI {
 	this := new(UpdateVirtualWireAPI)
-	this.BaseAPI = api.NewBaseAPI(http.MethodPut, "/api/2.0/vdn/virtualwires/"+virtualWire.ObjectID, virtualWire, nil)
+	requestPayload := new(VirtualWire)
+	requestPayload.Name = name
+	requestPayload.ControlPlaneMode = "UNICAST_MODE"
+	requestPayload.Description = desc
+
+	this.BaseAPI = api.NewBaseAPI(http.MethodPut, "/api/2.0/vdn/virtualwires/"+virtualwireID, requestPayload, nil)
 	return this
 }
