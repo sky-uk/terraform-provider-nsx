@@ -30,33 +30,33 @@ func TestAccNSXLogicalSwitchBasic(t *testing.T) {
 		},
 		Steps: []resource.TestStep{
 			{
-				Config:      testAccInfobloxLogicalSwitchNoNameTemplate(scopeID),
+				Config:      testAccNSXLogicalSwitchNoNameTemplate(scopeID),
 				ExpectError: regexp.MustCompile(`required field is not set`),
 			},
 			{
-				Config:      testAccInfobloxLogicalSwitchNoDescriptionTemplate(switchName, scopeID),
+				Config:      testAccNSXLogicalSwitchNoDescriptionTemplate(switchName, scopeID),
 				ExpectError: regexp.MustCompile(`required field is not set`),
 			},
 			{
-				Config:      testAccInfobloxLogicalSwitchNoTenantIDTemplate(switchName, scopeID),
+				Config:      testAccNSXLogicalSwitchNoTenantIDTemplate(switchName, scopeID),
 				ExpectError: regexp.MustCompile(`required field is not set`),
 			},
 			{
-				Config:      testAccInfobloxLogicalSwitchNoScopeIDTemplate(switchName),
+				Config:      testAccNSXLogicalSwitchNoScopeIDTemplate(switchName),
 				ExpectError: regexp.MustCompile(`required field is not set`),
 			},
 			{
-				Config:      testAccInfobloxLogicalSwitchNoControlPlaneModeTemplate(switchName, scopeID),
+				Config:      testAccNSXLogicalSwitchNoControlPlaneModeTemplate(switchName, scopeID),
 				ExpectError: regexp.MustCompile(`required field is not set`),
 			},
 			{
-				Config:      testAccInfobloxLogicalSwitchInvalidControlPlaneModeTemplate(switchName, scopeID),
+				Config:      testAccNSXLogicalSwitchInvalidControlPlaneModeTemplate(switchName, scopeID),
 				ExpectError: regexp.MustCompile(`must be one of UNICAST_MODE, HYBRID_MODE or MULTICAST_MODE`),
 			},
 			{
-				Config: testAccInfobloxLogicalSwitchCreateTemplate(switchName, scopeID),
+				Config: testAccNSXLogicalSwitchCreateTemplate(switchName, scopeID),
 				Check: resource.ComposeTestCheckFunc(
-					testAccInfobloxLogicalSwitchExists(switchName, testResourceName),
+					testAccNSXLogicalSwitchExists(switchName, testResourceName),
 					resource.TestCheckResourceAttr(testResourceName, "name", switchName),
 					resource.TestCheckResourceAttr(testResourceName, "desc", "Acceptance Test"),
 					resource.TestCheckResourceAttr(testResourceName, "tenantid", "tf_testid"),
@@ -65,9 +65,9 @@ func TestAccNSXLogicalSwitchBasic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccInfobloxLogicalSwitchUpdateTemplate(updateSwitchName, scopeID),
+				Config: testAccNSXLogicalSwitchUpdateTemplate(updateSwitchName, scopeID),
 				Check: resource.ComposeTestCheckFunc(
-					testAccInfobloxLogicalSwitchExists(updateSwitchName, testResourceName),
+					testAccNSXLogicalSwitchExists(updateSwitchName, testResourceName),
 					resource.TestCheckResourceAttr(testResourceName, "name", updateSwitchName),
 					resource.TestCheckResourceAttr(testResourceName, "desc", "Acceptance Test Update"),
 					resource.TestCheckResourceAttr(testResourceName, "tenantid", "tf_testid"),
@@ -80,7 +80,7 @@ func TestAccNSXLogicalSwitchBasic(t *testing.T) {
 
 }
 
-func testAccInfobloxLogicalSwitchExists(name, resourceName string) resource.TestCheckFunc {
+func testAccNSXLogicalSwitchExists(name, resourceName string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 
 		nsxClient := testAccProvider.Meta().(*gonsx.NSXClient)
@@ -142,7 +142,7 @@ func testAccNSXLogicalSwitchCheckDestroy(state *terraform.State, name string) er
 	return nil
 }
 
-func testAccInfobloxLogicalSwitchNoNameTemplate(scopeID string) string {
+func testAccNSXLogicalSwitchNoNameTemplate(scopeID string) string {
 	return fmt.Sprintf(`
 resource "nsx_logical_switch" "acctest" {
 desc = "Acceptance Test No Name Template"
@@ -152,7 +152,7 @@ controlplanemode = "UNICAST_MODE"
 }`, scopeID)
 }
 
-func testAccInfobloxLogicalSwitchNoDescriptionTemplate(name, scopeID string) string {
+func testAccNSXLogicalSwitchNoDescriptionTemplate(name, scopeID string) string {
 	return fmt.Sprintf(`
 resource "nsx_logical_switch" "acctest" {
 name = "%s"
@@ -162,7 +162,7 @@ controlplanemode = "UNICAST_MODE"
 }`, name, scopeID)
 }
 
-func testAccInfobloxLogicalSwitchNoTenantIDTemplate(name, scopeID string) string {
+func testAccNSXLogicalSwitchNoTenantIDTemplate(name, scopeID string) string {
 	return fmt.Sprintf(`
 resource "nsx_logical_switch" "acctest" {
 name = "%s"
@@ -172,7 +172,7 @@ controlplanemode = "UNICAST_MODE"
 }`, name, scopeID)
 }
 
-func testAccInfobloxLogicalSwitchNoScopeIDTemplate(name string) string {
+func testAccNSXLogicalSwitchNoScopeIDTemplate(name string) string {
 	return fmt.Sprintf(`
 resource "nsx_logical_switch" "acctest" {
 name = "%s"
@@ -182,7 +182,7 @@ controlplanemode = "UNICAST_MODE"
 }`, name)
 }
 
-func testAccInfobloxLogicalSwitchNoControlPlaneModeTemplate(name, scopeID string) string {
+func testAccNSXLogicalSwitchNoControlPlaneModeTemplate(name, scopeID string) string {
 	return fmt.Sprintf(`
 resource "nsx_logical_switch" "acctest" {
 name = "%s"
@@ -192,7 +192,7 @@ scopeid = "%s"
 }`, name, scopeID)
 }
 
-func testAccInfobloxLogicalSwitchInvalidControlPlaneModeTemplate(switchName, scopeID string) string {
+func testAccNSXLogicalSwitchInvalidControlPlaneModeTemplate(switchName, scopeID string) string {
 	return fmt.Sprintf(`
 resource "nsx_logical_switch" "acctest" {
 name = "%s"
@@ -203,7 +203,7 @@ controlplanemode = "INVALID_CONTROL_PLANE_MODE"
 }`, switchName, scopeID)
 }
 
-func testAccInfobloxLogicalSwitchCreateTemplate(switchName, scopeID string) string {
+func testAccNSXLogicalSwitchCreateTemplate(switchName, scopeID string) string {
 	return fmt.Sprintf(`
 resource "nsx_logical_switch" "acctest" {
 name = "%s"
@@ -214,7 +214,7 @@ controlplanemode = "UNICAST_MODE"
 }`, switchName, scopeID)
 }
 
-func testAccInfobloxLogicalSwitchUpdateTemplate(switchUpdateName, scopeID string) string {
+func testAccNSXLogicalSwitchUpdateTemplate(switchUpdateName, scopeID string) string {
 	return fmt.Sprintf(`
 resource "nsx_logical_switch" "acctest" {
 name = "%s"
