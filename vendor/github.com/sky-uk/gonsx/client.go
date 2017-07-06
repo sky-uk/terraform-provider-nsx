@@ -13,6 +13,8 @@ import (
 	"strings"
 )
 
+var headerName, headerValue string
+
 // NewNSXClient  Creates a new nsxclient object.
 func NewNSXClient(url string, user string, password string, ignoreSSL bool, debug bool) *NSXClient {
 	nsxClient := new(NSXClient)
@@ -60,6 +62,10 @@ func (nsxClient *NSXClient) Do(api api.NSXApi) error {
 	req.SetBasicAuth(nsxClient.User, nsxClient.Password)
 	// TODO: remove this hardcoded value!
 	req.Header.Set("Content-Type", "application/xml")
+	if headerName != "" && headerValue != "" {
+		fmt.Println(headerValue)
+		req.Header.Set(headerName, headerValue)
+	}
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: nsxClient.IgnoreSSL},
@@ -85,19 +91,31 @@ func (nsxClient *NSXClient) handleResponse(api api.NSXApi, res *http.Response) e
 	api.SetRawResponse(bodyText)
 
 	if nsxClient.debug {
-		log.Println(string(bodyText))
+		log.Println("STATUS CODE: ", api.StatusCode())
 	}
-
 	if isXML(res.Header.Get("Content-Type")) && api.StatusCode() == 200 {
 		xmlerr := xml.Unmarshal(bodyText, api.ResponseObject())
 		if xmlerr != nil {
 			log.Println("ERROR unmarshalling response: ", err)
 			return err
 		}
+		if nsxClient.debug {
+			log.Printf("DECODED RESPONSE:\n%+v\n", api.ResponseObject())
+		}
 	} else {
 		api.SetResponseObject(string(bodyText))
+		if nsxClient.debug {
+			log.Println(string(bodyText))
+		}
 	}
 	return nil
+}
+
+// SetHeader - sets an http header
+func (nsxClient *NSXClient) SetHeader(HeaderName, HeaderValue string) {
+	headerName = HeaderName
+	headerValue = HeaderValue
+
 }
 
 func isXML(contentType string) bool {
