@@ -13,7 +13,7 @@ with the proper credentials before it can be used.
 |-------------------------|--------|-------|---------|--------|
 | DHCP Relay              |   Y    |   Y   |    Y    |   Y    |
 | Edge Interface          |   Y    |   Y   |    N    |   Y    |
-| Logical Switch          |   Y    |   Y   |    N    |   Y    |
+| Logical Switch          |   Y    |   Y   |    Y    |   Y    |
 | Security Group          |   Y    |   Y   |    Y    |   Y    |
 | Security Policy         |   Y    |   Y   |    Y    |   Y    |
 | Security Policy Rules   |   Y    |   Y   |    Y    |   Y    |
