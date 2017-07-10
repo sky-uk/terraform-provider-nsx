@@ -63,6 +63,43 @@ func resourceFirewallRule() *schema.Resource {
 				ForceNew:    false,
 				Description: "What to do with the packets that match this rule, allow,drop, etc",
 			},
+			"appliedto": &schema.Schema {
+				Type:        schema.TypeSet,
+				Optional:    true,
+				ForceNew:    false,
+				Description: "Where this rule is to be applied",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Optional:    true,
+							Type:        schema.TypeString,
+							ForceNew:    false,
+							Description: "Name of the applied to",
+						},
+						"type": {
+							Optional:    true,
+							Type:        schema.TypeString,
+							ForceNew:    false,
+							Description: "Type of applied to",
+						},
+						"value": {
+							Optional:    true,
+							Type:        schema.TypeString,
+							ForceNew:    false,
+							Description: "Value of the applied to",
+						},
+						"isvalid": {
+							Optional:    true,
+							Type:        schema.TypeBool,
+							ForceNew:    false,
+							Description: "Is the applied to valid",
+						},
+
+					},
+
+				},
+
+			},
 			"source": &schema.Schema{
 				Type:        schema.TypeSet,
 				Optional:    true,
@@ -149,6 +186,12 @@ func resourceFirewallRule() *schema.Resource {
 							ForceNew:    false,
 							Description: "Value of the service",
 						},
+						"type": {
+							Optional:    true,
+							Type:        schema.TypeString,
+							ForceNew:    false,
+							Description: "Type of  service",
+						},
 						"dstport": {
 							Optional:    true,
 							Type:        schema.TypeInt,
@@ -166,6 +209,12 @@ func resourceFirewallRule() *schema.Resource {
 							Type:        schema.TypeInt,
 							ForceNew:    false,
 							Description: "SubProtocol id ",
+						},
+						"isvalid": {
+							Optional:    true,
+							Type:        schema.TypeBool,
+							ForceNew:    false,
+							Description: "Is the source valid",
 						},
 					},
 				},
@@ -196,6 +245,9 @@ func resourceFirewallRule() *schema.Resource {
 func resourceFirewallRuleCreate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
 	var fwRule fwrules.Rule
+	var sourceList fwrules.SourceList
+	var dstList fwrules.DstList
+	var svcList fwrules.SvcList
 
 	if v, ok := d.GetOk("name"); ok {
 		fwRule.Name = v.(string)
@@ -243,11 +295,14 @@ func resourceFirewallRuleCreate(d *schema.ResourceData, m interface{}) error {
 				}
 
 				if sourceValidValue, ok := sourceObject["isvalid"]; ok {
-					newSource.IsValid = sourceValidValue.(bool)
+					isValid := sourceValidValue.(bool)
+					newSource.IsValid = &isValid
 				}
 
-				fwRule.Sources = append(fwRule.Sources, newSource)
+				sourceList.Sources = append(sourceList.Sources, newSource)
+				fwRule.Sources = &sourceList
 			}
+
 		}
 	} else {
 		return fmt.Errorf("Source  is required")
@@ -275,7 +330,8 @@ func resourceFirewallRuleCreate(d *schema.ResourceData, m interface{}) error {
 					newDestination.IsValid = destinationValidValue.(bool)
 				}
 
-				fwRule.Destinations = append(fwRule.Destinations, newDestination)
+				dstList.Destinations = append(dstList.Destinations, newDestination)
+				fwRule.Destinations = &dstList
 			}
 		}
 	}
@@ -306,13 +362,18 @@ func resourceFirewallRuleCreate(d *schema.ResourceData, m interface{}) error {
 				if serviceSubProtocolValue := serviceObject["subprotocol"]; ok {
 					newService.SubProtocol = serviceSubProtocolValue.(int)
 				}
-				fwRule.Services = append(fwRule.Services, newService)
-
+				svcList.Services = append(svcList.Services, newService)
+				fwRule.Services = &svcList
 			}
 		}
 
 	}
+	/*if v, ok := d.GetOk("appliedto"); ok {
 
+
+	} else {
+		return fmt.Errorf("no applied to")
+	}*/
 	if v, ok := d.GetOk("sectionid"); ok {
 
 		fwRule.SectionID = v.(int)
@@ -326,33 +387,45 @@ func resourceFirewallRuleCreate(d *schema.ResourceData, m interface{}) error {
 	} else {
 		return fmt.Errorf("Direction is required")
 	}
-	/*nsxMutexKV.Lock(fwRule.EdgeID)
-	defer nsxMutexKV.Unlock(fwRule.EdgeID)*/
+	if v, ok := d.GetOk("packettype"); ok {
+		fwRule.PacketType = v.(string)
+	} else {
+		return fmt.Errorf("PacketType is required")
+	}
+
+	nsxMutexKV.Lock(fwRule.Name)
+	defer nsxMutexKV.Unlock(fwRule.Name)
 	createFWRuleAPI := fwrules.NewCreate(fwRule)
 	timeStampCall := resourceGetSectionTimestamp(fwRule.SectionID, fwRule.RuleType, m )
+	log.Println(len(timeStampCall.Timestamp))
 	nsxclient.SetHeader("If-Match", timeStampCall.Timestamp)
-	log.Println(timeStampCall.Timestamp)
-	log.Println(fwRule.SectionID)
-	log.Println(fwRule.RuleType)
 	createErr := nsxclient.Do(createFWRuleAPI)
 	if createErr != nil {
 		return fmt.Errorf("Could not create firewall rule")
 	}
 
 	if createFWRuleAPI.StatusCode() != 201 {
+		log.Println("Response Status Code")
 		log.Println(createFWRuleAPI.StatusCode())
-		log.Println("COULD NOT CREATE !!!!!!!")
+		log.Println("Response Object")
+		log.Println(createFWRuleAPI.ResponseObject())
+		log.Println("Response Endpoint")
+		log.Println(createFWRuleAPI.Endpoint())
+		log.Println("Trying to create this rule")
+		log.Println(fwRule)
+		log.Println(fwRule.Services)
 		return fmt.Errorf("COULD NOT CREATE !!!!!!!")
 	}
+	log.Println(createFWRuleAPI.GetResponse().RuleID)
 
-	d.SetId(d.Get("ruleid").(string))
+	d.SetId(createFWRuleAPI.GetResponse().RuleID)
 	return nil
 
 }
 
 func resourceFirewallRuleRead(d *schema.ResourceData, m interface{}) error {
-	/*nsxclient := m.(*gonsx.NSXClient)
-	ReadRule = fwrules.NewGetSingle()*/
+	//nsxclient := m.(*gonsx.NSXClient)
+	//ReadRule = fwrules.NewGetSingle()
 	return nil
 
 }
@@ -363,6 +436,21 @@ func resourceFirewallRuleUpdate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceFirewallRuleDelete(d *schema.ResourceData, m interface{}) error {
+	/*nsxclient := m.(*gonsx.NSXClient)
+	var ruleType,sectionID string
+	if v, ok := d.GetOk("ruletype"); ok {
+		ruleType  = v.(string)
+	} else {
+		return fmt.Errorf("Rule Type is required")
+	}
+
+	if v, ok := d.GetOk("sectionid"); ok {
+		sectionID = v.(string)
+	} else {
+		return fmt.Errorf("Rule Type is required")
+	}
+
+*/
 	return nil
 
 }
