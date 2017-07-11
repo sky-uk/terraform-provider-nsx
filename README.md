@@ -6,7 +6,18 @@ with the proper credentials before it can be used.
 
 ## Wiki Pages
 * [Home](https://github.com/sky-uk/terraform-provider-nsx/wiki)
+* [Authentication](https://github.com/sky-uk/terraform-provider-nsx/wiki/Authentication)
 * [Getting Started Guide](https://github.com/sky-uk/terraform-provider-nsx/wiki/Getting-Started-Guide)
+* [NSX DHCP Relay Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-DHCP-Relay-Resource)
+* [NSX Edge Interface Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Edge-Interface-Resource)
+* [NSX Logical Switch Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Logical-Switch-Resource)
+* [NSX Security Group Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Security-Group-Resource)
+* [NSX Security Policy Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Security-Policy-Resource)
+* [NSX Security Policy Rule resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Security-Policy-Resource#nsx_security_policy_rule-resource)
+* [NSX Security Tag Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Security-Tag-Resource)
+* [NSX Security Tag Attachment Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Security-Tag-Resource#nsx_security_tag_attachment-resource)
+* [NSX Service Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Service-Resource)
+
 
 ## Features
 | Feature                 | Create | Read  | Update  | Delete |
