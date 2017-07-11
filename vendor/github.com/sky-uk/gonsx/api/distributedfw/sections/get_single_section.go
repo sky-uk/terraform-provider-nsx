@@ -30,6 +30,7 @@ func NewGetSingle(sectionID, sectionType string) *GetSingleSectionAPI {
 
 }
 
+// GetSectionTimestamp - Returns the timestamp for a section , required to create a new rule
 func GetSectionTimestamp(sectionID int, sectionType string) *GetSingleSectionAPI {
 	this := new(GetSingleSectionAPI)
 	var endpoint string
