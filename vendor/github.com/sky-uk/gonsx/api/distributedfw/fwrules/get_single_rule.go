@@ -12,7 +12,7 @@ type GetSingleRuleAPI struct {
 }
 
 // NewGetSingle - Returns all the rules in the specified context
-func NewGetSingle(ruleID, ruleType string,  ruleSection int) *GetSingleRuleAPI {
+func NewGetSingle(ruleID, ruleType string, ruleSection int) *GetSingleRuleAPI {
 	this := new(GetSingleRuleAPI)
 	var endpoint string
 	switch ruleType {

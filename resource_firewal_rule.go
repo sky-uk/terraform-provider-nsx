@@ -421,7 +421,7 @@ func resourceFirewallRuleCreate(d *schema.ResourceData, m interface{}) error {
 
 func resourceFirewallRuleRead(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var ruleID,  ruleType string
+	var ruleID, ruleType string
 	var ruleSection int
 	if v, ok := d.GetOk("id"); ok {
 		ruleID = v.(string)
