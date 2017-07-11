@@ -409,7 +409,7 @@ func resourceFirewallRuleCreate(d *schema.ResourceData, m interface{}) error {
 		log.Println("Trying to create this rule")
 		log.Println(fwRule)
 		log.Println(fwRule.Services)
-		return fmt.Errorf("COULD NOT CREATE !!!!!!!")
+		return fmt.Errorf("Unable to create firewall rule")
 	}
 	log.Println(createFWRuleAPI.GetResponse().RuleID)
 
