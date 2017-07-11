@@ -1,6 +1,7 @@
 package fwrules
 
 import (
+	"fmt"
 	"github.com/sky-uk/gonsx/api"
 	"net/http"
 )
@@ -16,10 +17,10 @@ func NewDelete(deleteRule Rule) *DeleteFWRuleAPI {
 	var endpoint string
 	switch deleteRule.RuleType {
 	case "LAYER3":
-		endpoint = "/api/4.0/firewall/globalroot-0/config/layer3sections"
+		endpoint = fmt.Sprintf("/api/4.0/firewall/globalroot-0/config/layer3sections/%d/rules/%s", deleteRule.SectionID, deleteRule.RuleID)
 
 	case "LAYER2":
-		endpoint = "/api/4.0/firewall/globalroot-0/config/layer2sections"
+		endpoint = fmt.Sprintf("/api/4.0/firewall/globalroot-0/config/layer2sections/%d/rules/%s", deleteRule.SectionID, deleteRule.RuleID)
 	}
 
 	this.BaseAPI = api.NewBaseAPI(http.MethodDelete, endpoint, deleteRule, new(string))

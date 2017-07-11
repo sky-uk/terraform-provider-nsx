@@ -585,8 +585,8 @@
 		{
 			"checksumSHA1": "1KwQ4O1Kk2aUgnPlCpt5E7iOhuk=",
 			"path": "github.com/sky-uk/gonsx/api",
-			"revision": "8a624441d7e0b16125029b05007bca6f1293764a",
-			"revisionTime": "2017-07-10T16:01:30Z",
+			"revision": "1982ff084bf86ecacc507d4af50c3500f2ea2409",
+			"revisionTime": "2017-07-11T14:15:01Z",
 			"version": "dfw",
 			"versionExact": "dfw"
 		},
@@ -599,10 +599,10 @@
 			"versionExact": "0.3.10"
 		},
 		{
-			"checksumSHA1": "tnlE3fdLZO7cM06VdDw5ssnhEao=",
+			"checksumSHA1": "5uTii8rpQdhj8NVnujDgS/wywLY=",
 			"path": "github.com/sky-uk/gonsx/api/distributedfw/fwrules",
-			"revision": "8a624441d7e0b16125029b05007bca6f1293764a",
-			"revisionTime": "2017-07-10T16:01:30Z",
+			"revision": "1982ff084bf86ecacc507d4af50c3500f2ea2409",
+			"revisionTime": "2017-07-11T14:15:01Z",
 			"version": "dfw",
 			"versionExact": "dfw"
 		},

@@ -5,10 +5,9 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sky-uk/gonsx"
 	"github.com/sky-uk/gonsx/api/distributedfw/fwrules"
-	"log"
 	"github.com/sky-uk/gonsx/api/distributedfw/sections"
+	"log"
 )
-
 
 func resourceGetSectionTimestamp(sectionID int, sectionType string, m interface{}) *sections.Section {
 	sectionNSXClient := m.(*gonsx.NSXClient)
@@ -63,7 +62,7 @@ func resourceFirewallRule() *schema.Resource {
 				ForceNew:    false,
 				Description: "What to do with the packets that match this rule, allow,drop, etc",
 			},
-			"appliedto": &schema.Schema {
+			"appliedto": &schema.Schema{
 				Type:        schema.TypeSet,
 				Optional:    true,
 				ForceNew:    false,
@@ -94,11 +93,8 @@ func resourceFirewallRule() *schema.Resource {
 							ForceNew:    false,
 							Description: "Is the applied to valid",
 						},
-
 					},
-
 				},
-
 			},
 			"source": &schema.Schema{
 				Type:        schema.TypeSet,
@@ -272,9 +268,8 @@ func resourceFirewallRuleCreate(d *schema.ResourceData, m interface{}) error {
 	if v, ok := d.GetOk("action"); ok {
 		fwRule.Action = v.(string)
 	} else {
-		return fmt.Errorf("Error needs to be set")
+		return fmt.Errorf("Action needs to be set")
 	}
-
 
 	if v, ok := d.GetOk("source"); ok {
 		if sources, ok := v.(*schema.Set); ok {
@@ -396,7 +391,7 @@ func resourceFirewallRuleCreate(d *schema.ResourceData, m interface{}) error {
 	nsxMutexKV.Lock(fwRule.Name)
 	defer nsxMutexKV.Unlock(fwRule.Name)
 	createFWRuleAPI := fwrules.NewCreate(fwRule)
-	timeStampCall := resourceGetSectionTimestamp(fwRule.SectionID, fwRule.RuleType, m )
+	timeStampCall := resourceGetSectionTimestamp(fwRule.SectionID, fwRule.RuleType, m)
 	log.Println(len(timeStampCall.Timestamp))
 	nsxclient.SetHeader("If-Match", timeStampCall.Timestamp)
 	createErr := nsxclient.Do(createFWRuleAPI)
@@ -419,13 +414,65 @@ func resourceFirewallRuleCreate(d *schema.ResourceData, m interface{}) error {
 	log.Println(createFWRuleAPI.GetResponse().RuleID)
 
 	d.SetId(createFWRuleAPI.GetResponse().RuleID)
-	return nil
+	return resourceFirewallRuleRead(d, m)
+	//return nil
 
 }
 
 func resourceFirewallRuleRead(d *schema.ResourceData, m interface{}) error {
-	//nsxclient := m.(*gonsx.NSXClient)
-	//ReadRule = fwrules.NewGetSingle()
+	nsxclient := m.(*gonsx.NSXClient)
+	var ruleID,  ruleType string
+	var ruleSection int
+	if v, ok := d.GetOk("id"); ok {
+		ruleID = v.(string)
+	} else {
+		fmt.Errorf("cannot find rule ID in status")
+	}
+
+	if v, ok := d.GetOk("ruletype"); ok {
+		ruleType = v.(string)
+	}
+
+	if v, ok := d.GetOk("sectionid"); ok {
+		ruleSection = v.(int)
+
+	}
+	log.Println(ruleID)
+	readRuleAPI := fwrules.NewGetSingle(d.Id(), ruleType, ruleSection)
+	readErr := nsxclient.Do(readRuleAPI)
+	log.Println(readRuleAPI.ResponseObject())
+	log.Println(readRuleAPI.Endpoint())
+	if readRuleAPI.StatusCode() != 200 {
+		return fmt.Errorf("Error Reading Firewall rule")
+	}
+
+	if readErr != nil {
+		return fmt.Errorf("Error Reading Firewall rule")
+	}
+
+	ReadRule := readRuleAPI.GetResponse()
+	d.Set("name", ReadRule.Name)
+	d.Set("disabled", ReadRule.Disabled)
+	if ReadRule.RuleType != "" {
+		d.Set("ruletype", ReadRule.RuleType)
+	} else {
+		fmt.Errorf("RuleType is empty from response")
+	}
+
+	d.Set("action", ReadRule.Action)
+	//d.Set("appliedto", ReadRule.AppliedToList)
+	/*if len(ReadRule.Sources) > 0 {
+		d.Set("source", ReadRule.Sources)
+	}
+	if len(ReadRule.Destinations) > 0 {
+		d.Set("destination", ReadRule.Destinations)
+	}
+	if len(ReadRule.Services) > 0 {
+		d.Set("service", ReadRule.Services)
+	}*/
+	d.Set("sectionid", ReadRule.SectionID)
+	d.Set("direction", ReadRule.Direction)
+	d.Set("packettype", ReadRule.PacketType)
 	return nil
 
 }
@@ -436,21 +483,35 @@ func resourceFirewallRuleUpdate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceFirewallRuleDelete(d *schema.ResourceData, m interface{}) error {
-	/*nsxclient := m.(*gonsx.NSXClient)
-	var ruleType,sectionID string
+	nsxclient := m.(*gonsx.NSXClient)
+	var ruleType string
+	var sectionID int
+	var deleteRule fwrules.Rule
+	deleteRule.RuleID = d.Id()
 	if v, ok := d.GetOk("ruletype"); ok {
-		ruleType  = v.(string)
+		ruleType = v.(string)
+		deleteRule.RuleType = ruleType
 	} else {
 		return fmt.Errorf("Rule Type is required")
 	}
 
 	if v, ok := d.GetOk("sectionid"); ok {
-		sectionID = v.(string)
+		sectionID = v.(int)
+		deleteRule.SectionID = sectionID
 	} else {
-		return fmt.Errorf("Rule Type is required")
+		return fmt.Errorf("section id is required")
 	}
+	timeStampCall := resourceGetSectionTimestamp(deleteRule.SectionID, deleteRule.RuleType, m)
+	log.Println(len(timeStampCall.Timestamp))
+	nsxclient.SetHeader("If-Match", timeStampCall.Timestamp)
+	deleteAPI := fwrules.NewDelete(deleteRule)
+	deleteError := nsxclient.Do(deleteAPI)
+	if deleteError != nil {
+		return fmt.Errorf("Could not delete the rule ", deleteAPI.StatusCode())
+	}
+	log.Println(deleteAPI.Endpoint())
+	log.Println(deleteAPI.StatusCode())
 
-*/
+	d.SetId("")
 	return nil
-
 }

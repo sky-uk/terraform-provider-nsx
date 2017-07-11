@@ -28,8 +28,7 @@ type Rule struct {
 	PacketType    string      `xml:"packetType"`
 }
 
-
-// Service List pointer destination
+// SvcList List pointer destination
 type SvcList struct {
 	Services []Service `xml:"services,omitempty>service"`
 }
@@ -45,6 +44,7 @@ type Service struct {
 	Type            string   `xml:"type,omitempty"`
 }
 
+// AppliedLst - Applied to list pointer points here
 type AppliedLst struct {
 	AppliedToList []AppliedTo `xml:"appliedToList"`
 }
@@ -57,7 +57,7 @@ type AppliedTo struct {
 	IsValid bool   `xml:"isValid"`
 }
 
-// Sources - List of source
+// SourceList - List of source
 type SourceList struct {
 	Excluded string   `xml:"excluded,attr,default:'false'"`
 	Sources  []Source `xml:"source,omitempty"`
@@ -65,12 +65,13 @@ type SourceList struct {
 
 // Source - The source for the rule
 type Source struct {
-	Name    string   `xml:"name,omitempty"`
-	Type    string   `xml:"type,omitempty"`
-	Value   string   `xml:"value,omitempty"`
-	IsValid *bool    `xml:"isValid,omitempty"`
+	Name    string `xml:"name,omitempty"`
+	Type    string `xml:"type,omitempty"`
+	Value   string `xml:"value,omitempty"`
+	IsValid *bool  `xml:"isValid,omitempty"`
 }
 
+// DstList - Destination List
 type DstList struct {
 	Excluded     string        `xml:"excluded,attr"`
 	Destinations []Destination `xml:"destination,omitempty"`

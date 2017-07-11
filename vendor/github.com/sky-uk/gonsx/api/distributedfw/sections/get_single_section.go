@@ -1,11 +1,10 @@
 package sections
 
 import (
-	"github.com/sky-uk/gonsx/api"
 	"fmt"
+	"github.com/sky-uk/gonsx/api"
 	"net/http"
 )
-
 
 // GetSingleSectionAPI default struct
 type GetSingleSectionAPI struct {
@@ -13,7 +12,7 @@ type GetSingleSectionAPI struct {
 }
 
 // NewGetSingle - Returns all the rules in the specified context
-func NewGetSingle(sectionID , sectionType string) *GetSingleSectionAPI {
+func NewGetSingle(sectionID, sectionType string) *GetSingleSectionAPI {
 	this := new(GetSingleSectionAPI)
 	/*
 		var endpoint string
@@ -31,8 +30,7 @@ func NewGetSingle(sectionID , sectionType string) *GetSingleSectionAPI {
 
 }
 
-
-func GetSectionTimestamp(sectionID int , sectionType string) *GetSingleSectionAPI{
+func GetSectionTimestamp(sectionID int, sectionType string) *GetSingleSectionAPI {
 	this := new(GetSingleSectionAPI)
 	var endpoint string
 	switch sectionType {
