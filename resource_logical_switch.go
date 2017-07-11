@@ -1,210 +1,222 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sky-uk/gonsx"
 	"github.com/sky-uk/gonsx/api/virtualwire"
-	"log"
+	"net/http"
+	"regexp"
 )
-
-func getSingleLogicalSwitch(scopeid, name string, nsxclient *gonsx.NSXClient) (*virtualwire.VirtualWire, error) {
-	getAllAPI := virtualwire.NewGetAll(scopeid)
-	err := nsxclient.Do(getAllAPI)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if getAllAPI.StatusCode() != 200 {
-		return nil, fmt.Errorf("Status code: %d, Response: %s", getAllAPI.StatusCode(), getAllAPI.ResponseObject())
-	}
-
-	service := getAllAPI.GetResponse().FilterByName(name)
-
-	if service.ObjectID == "" {
-		return nil, fmt.Errorf("Not found %s", name)
-	}
-
-	return service, nil
-}
 
 func resourceLogicalSwitch() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceLogicalSwitchCreate,
 		Read:   resourceLogicalSwitchRead,
+		Update: resourceLogicalSwitchUpdate,
 		Delete: resourceLogicalSwitchDelete,
 
 		Schema: map[string]*schema.Schema{
-			"desc": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The name of the logical switch",
 			},
-
+			"desc": {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "A description of the logical switch",
+			},
+			"controlplanemode": {
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "The control plane mode to use with the logical switch. Typically this will be UNICAST_MODE. Other valid options are HYBRID_MODE and MULTICAST_MODE",
+				ValidateFunc: validateLogicalSwitchControlPlaneMode,
+			},
 			"tenantid": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Virtual Wire tenant ID. Can't be changed after creation",
 			},
-
 			"scopeid": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The transport zone ID. Only required for creation.",
 			},
 		},
 	}
 }
 
+func validateLogicalSwitchControlPlaneMode(v interface{}, k string) (ws []string, errors []error) {
+	controlPlaneMode := v.(string)
+	controlPlaneModeOptions := regexp.MustCompilePOSIX(`^(UNICAST_MODE|HYBRID_MODE|MULTICAST_MODE)$`)
+	if !controlPlaneModeOptions.MatchString(controlPlaneMode) {
+		errors = append(errors, fmt.Errorf("%q must be one of UNICAST_MODE, HYBRID_MODE or MULTICAST_MODE", k))
+	}
+	return
+}
+
 func resourceLogicalSwitchCreate(d *schema.ResourceData, m interface{}) error {
-	nsxclient := m.(*gonsx.NSXClient)
-	var desc, name, tenantid, scopeid string
 
-	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("desc"); ok {
-		desc = v.(string)
+	nsxClient := m.(*gonsx.NSXClient)
+	var scopeID string
+	var logicalSwitchCreate virtualwire.CreateSpec
+
+	if v, ok := d.GetOk("name"); ok && v != "" {
+		logicalSwitchCreate.Name = v.(string)
 	} else {
-		return fmt.Errorf("desc argument is required")
+		return fmt.Errorf("Error logical switch create: name attribute is required")
 	}
-
-	if v, ok := d.GetOk("name"); ok {
-		name = v.(string)
+	if v, ok := d.GetOk("desc"); ok && v != "" {
+		logicalSwitchCreate.Description = v.(string)
 	} else {
-		return fmt.Errorf("name argument is required")
+		return fmt.Errorf("Error logical switch create: desc attribute is required")
 	}
-
-	if v, ok := d.GetOk("tenantid"); ok {
-		tenantid = v.(string)
+	if v, ok := d.GetOk("controlplanemode"); ok && v != "" {
+		logicalSwitchCreate.ControlPlaneMode = v.(string)
 	} else {
-		return fmt.Errorf("tenantid argument is required")
+		return fmt.Errorf("Error logical switch create: controlplanemode attribute is required")
 	}
-
-	if v, ok := d.GetOk("scopeid"); ok {
-		scopeid = v.(string)
+	if v, ok := d.GetOk("tenantid"); ok && v != "" {
+		logicalSwitchCreate.TenantID = v.(string)
 	} else {
-		return fmt.Errorf("scopeid argument is required")
+		return fmt.Errorf("Error logical switch create: tenantid attribute is required")
+	}
+	if v, ok := d.GetOk("scopeid"); ok && v != "" {
+		scopeID = v.(string)
+	} else {
+		return fmt.Errorf("Error logical switch create: scopeid attribute is required")
 	}
 
-	// Create the API, use it and check for errors.
-	log.Printf(fmt.Sprintf("[DEBUG] virtualwire.NewCreate(%s, %s, %s, %s)", name, desc, tenantid, scopeid))
-	createAPI := virtualwire.NewCreate(name, desc, tenantid, scopeid)
-	nsxclient.Do(createAPI)
-
-	if createAPI.StatusCode() != 201 {
-		return errors.New(createAPI.GetResponse())
+	createAPI := virtualwire.NewCreate(logicalSwitchCreate, scopeID)
+	err := nsxClient.Do(createAPI)
+	if err != nil {
+		return fmt.Errorf("Error while creating logical switch %s: %v", logicalSwitchCreate.Name, err)
+	}
+	createResponseCode := createAPI.StatusCode()
+	createResponse := createAPI.GetResponse()
+	if createResponseCode != http.StatusCreated {
+		return fmt.Errorf("Error while creating logical switch %s. Invalid HTTP response code %d received. Response: %v", logicalSwitchCreate.Name, createResponseCode, createResponse)
 	}
 
-	// If we go here, everything is OK.  Set the ID for the Terraform state
-	// and return the response from the READ method.
-	d.SetId(createAPI.GetResponse())
+	// NSX API returns the virtualwire ID as a string on successful creation and nothing else. E.g. virtualwire-101
+	d.SetId(createResponse)
 	return resourceLogicalSwitchRead(d, m)
 }
 
 func resourceLogicalSwitchRead(d *schema.ResourceData, m interface{}) error {
-	nsxclient := m.(*gonsx.NSXClient)
-	var name, scopeid string
 
-	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("name"); ok {
-		name = v.(string)
-	} else {
-		return fmt.Errorf("name argument is required")
+	nsxClient := m.(*gonsx.NSXClient)
+	logicalSwitchID := d.Id()
+	if logicalSwitchID == "" {
+		return fmt.Errorf("Error obtaining logical switch ID from state during read")
 	}
 
-	if v, ok := d.GetOk("scopeid"); ok {
-		scopeid = v.(string)
-	} else {
-		return fmt.Errorf("scopeid argument is required")
-	}
-
-	// Gather all the resources that are associated with the specified
-	// scopeid.
-	log.Printf(fmt.Sprintf("[DEBUG] virtualwire.NewGetAll(%s)", scopeid))
-	api := virtualwire.NewGetAll(scopeid)
-	err := nsxclient.Do(api)
-
+	getAPI := virtualwire.NewGet(logicalSwitchID)
+	err := nsxClient.Do(getAPI)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error while reading logical switch ID %s. Error: %v", logicalSwitchID, err)
 	}
-
-	// See if we can find our specifically named resource within the list of
-	// resources associated with the scopeid.
-	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", name))
-	logicalSwitchObject, err := getSingleLogicalSwitch(scopeid, name, nsxclient)
-
-	if err != nil {
-		return err
-	}
-
-	id := logicalSwitchObject.ObjectID
-	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
-
-	// If the resource has been removed manually, notify Terraform of this fact.
-	if id == "" {
-		d.SetId("")
-	}
-
-	return nil
-}
-
-func resourceLogicalSwitchDelete(d *schema.ResourceData, m interface{}) error {
-	nsxclient := m.(*gonsx.NSXClient)
-	var name, scopeid string
-
-	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("name"); ok {
-		name = v.(string)
-	} else {
-		return fmt.Errorf("name argument is required")
-	}
-
-	if v, ok := d.GetOk("scopeid"); ok {
-		scopeid = v.(string)
-	} else {
-		return fmt.Errorf("scopeid argument is required")
-	}
-
-	// Gather all the resources that are associated with the specified
-	// scopeid.
-	log.Printf(fmt.Sprintf("[DEBUG] virtualwire.NewGetAll(%s)", scopeid))
-	api := virtualwire.NewGetAll(scopeid)
-	err := nsxclient.Do(api)
-
-	if err != nil {
-		return err
-	}
-
-	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").ObjectID", name))
-	logicalSwitchObject, err := getSingleLogicalSwitch(scopeid, name, nsxclient)
-	id := logicalSwitchObject.ObjectID
-	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
-
-	// If the resource has been removed manually, notify Terraform of this fact.
-	if id == "" {
+	if getAPI.StatusCode() == http.StatusNotFound {
 		d.SetId("")
 		return nil
 	}
 
-	// If we got here, the resource exists, so we attempt to delete it.
-	deleteAPI := virtualwire.NewDelete(id)
-	err = nsxclient.Do(deleteAPI)
+	logicalSwitch := getAPI.GetResponse()
+	d.SetId(logicalSwitch.ObjectID)
+	d.Set("name", logicalSwitch.Name)
+	d.Set("desc", logicalSwitch.Description)
+	d.Set("controlplanemode", logicalSwitch.ControlPlaneMode)
+	d.Set("tenantid", logicalSwitch.TenantID)
 
-	if err != nil {
-		return err
+	return nil
+}
+
+func resourceLogicalSwitchUpdate(d *schema.ResourceData, m interface{}) error {
+
+	nsxClient := m.(*gonsx.NSXClient)
+	var updateVirtualWire virtualwire.VirtualWire
+	hasChanges := false
+	updateVirtualWire.ObjectID = d.Id()
+
+	if updateVirtualWire.ObjectID == "" {
+		return fmt.Errorf("Error obtaining logical switch ID from state during update")
 	}
 
-	// If we got here, the resource had existed, we deleted it and there was
-	// no error.  Notify Terraform of this fact and return successful
-	// completion.
+	// We need to send all attributes on each update, not just the changes.
+	if v, ok := d.GetOk("name"); ok && v != "" {
+		if d.HasChange("name") {
+			hasChanges = true
+		}
+		updateVirtualWire.Name = v.(string)
+	} else {
+		return fmt.Errorf("Error logical switch update: name attribute is required")
+	}
+	if v, ok := d.GetOk("desc"); ok && v != "" {
+		if d.HasChange("desc") {
+			hasChanges = true
+		}
+		updateVirtualWire.Description = v.(string)
+	} else {
+		return fmt.Errorf("Error logical switch update: desc attribute is required")
+	}
+	if v, ok := d.GetOk("controlplanemode"); ok && v != "" {
+		if d.HasChange("controlplanemode") {
+			hasChanges = true
+		}
+		updateVirtualWire.ControlPlaneMode = v.(string)
+	} else {
+		return fmt.Errorf("Error logical switch update: controlplanemode attribute is required")
+	}
+	// Tenant ID can't be updated. Update will return as successful, but doesn't change attribute.
+	if v, ok := d.GetOk("tenantid"); ok && v != "" {
+		if d.HasChange("tenantid") {
+			hasChanges = true
+		}
+		updateVirtualWire.TenantID = v.(string)
+	} else {
+		return fmt.Errorf("Error logical switch update: tenantid attribute is required")
+	}
+
+	if hasChanges {
+		updateLogicalSwitchAPI := virtualwire.NewUpdate(updateVirtualWire)
+		err := nsxClient.Do(updateLogicalSwitchAPI)
+		if err != nil {
+			return fmt.Errorf("Error while updating logical switch ID %s. Error %v", updateVirtualWire.ObjectID, err)
+		}
+		responseCode := updateLogicalSwitchAPI.StatusCode()
+		if responseCode != http.StatusOK {
+			return fmt.Errorf("Error while updating logical switch ID %s - invalid HTTP resposne code %d received", updateVirtualWire.ObjectID, responseCode)
+		}
+		// NSX API doesn't return any content when change is successful. Setting values read in from the template.
+		d.SetId(updateVirtualWire.ObjectID)
+		d.Set("name", updateVirtualWire.Name)
+		d.Set("desc", updateVirtualWire.Description)
+		d.Set("controlplanemode", updateVirtualWire.ControlPlaneMode)
+		d.Set("tenantid", updateVirtualWire.TenantID)
+	}
+	return resourceLogicalSwitchRead(d, m)
+}
+
+func resourceLogicalSwitchDelete(d *schema.ResourceData, m interface{}) error {
+	nsxClient := m.(*gonsx.NSXClient)
+	virtualWireID := d.Id()
+
+	if virtualWireID == "" {
+		return fmt.Errorf("Error obtaining logical switch ID from state during delete")
+	}
+
+	deleteAPI := virtualwire.NewDelete(virtualWireID)
+	err := nsxClient.Do(deleteAPI)
+	if err != nil {
+		return fmt.Errorf("Error while deleting logical switch ID %s. Error: %v", virtualWireID, err)
+	}
+
+	responseCode := deleteAPI.StatusCode()
+	if responseCode != http.StatusOK && responseCode != http.StatusNotFound {
+		return fmt.Errorf("Error while deleting logical switch ID %s. Received invalid HTTP response code %d", virtualWireID, responseCode)
+	}
+
 	d.SetId("")
-	log.Printf(fmt.Sprintf("[DEBUG] id %s deleted.", id))
 	return nil
 }

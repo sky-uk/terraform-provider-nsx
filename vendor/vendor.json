@@ -410,6 +410,14 @@
 			"versionExact": "v0.9.6"
 		},
 		{
+			"checksumSHA1": "ZcY9YbDucbey7sESh+e5JgU+sI4=",
+			"path": "github.com/hashicorp/terraform/helper/acctest",
+			"revision": "85e0979c6af6a15345c9131e4478ba712bb3c21d",
+			"revisionTime": "2017-05-25T15:56:03Z",
+			"version": "v0.9.6",
+			"versionExact": "v0.9.6"
+		},
+		{
 			"checksumSHA1": "uT6Q9RdSRAkDjyUgQlJ2XKJRab4=",
 			"path": "github.com/hashicorp/terraform/helper/config",
 			"revision": "85e0979c6af6a15345c9131e4478ba712bb3c21d",
@@ -655,12 +663,12 @@
 			"versionExact": "0.3.3"
 		},
 		{
-			"checksumSHA1": "14Q7FjC0yj57cT4bAZSIQvlCqWU=",
+			"checksumSHA1": "8RIuzZ0G3rpKehv5r/Zrl5jlruM=",
 			"path": "github.com/sky-uk/gonsx/api/virtualwire",
-			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
-			"revisionTime": "2017-04-07T10:17:16Z",
-			"version": "0.3.3",
-			"versionExact": "0.3.3"
+			"revision": "e0ab5b0cb742dd91b99da5768de99eedf0217ca5",
+			"revisionTime": "2017-07-05T10:17:22Z",
+			"version": "0.3.13",
+			"versionExact": "0.3.13"
 		},
 		{
 			"checksumSHA1": "iydUphwYqZRq3WhstEdGsbvBAKs=",
@@ -679,6 +687,30 @@
 			"path": "golang.org/x/crypto/blowfish",
 			"revision": "adbae1b6b6fb4b02448a0fc0dbbc9ba2b95b294d",
 			"revisionTime": "2017-06-19T06:03:41Z"
+		},
+		{
+			"checksumSHA1": "MlEHIE/60sB86Lmf0MPTIXHzKzE=",
+			"path": "golang.org/x/crypto/curve25519",
+			"revision": "51714a8c4ac1764f07ab4127d7f739351ced4759",
+			"revisionTime": "2017-07-04T13:41:27Z"
+		},
+		{
+			"checksumSHA1": "i3dNaI+oCYeDGIsNj7LwecTsIAs=",
+			"path": "golang.org/x/crypto/ed25519",
+			"revision": "51714a8c4ac1764f07ab4127d7f739351ced4759",
+			"revisionTime": "2017-07-04T13:41:27Z"
+		},
+		{
+			"checksumSHA1": "LXFcVx8I587SnWmKycSDEq9yvK8=",
+			"path": "golang.org/x/crypto/ed25519/internal/edwards25519",
+			"revision": "51714a8c4ac1764f07ab4127d7f739351ced4759",
+			"revisionTime": "2017-07-04T13:41:27Z"
+		},
+		{
+			"checksumSHA1": "RclWhAjKAvDg2tHsuqVYC7E7otE=",
+			"path": "golang.org/x/crypto/ssh",
+			"revision": "51714a8c4ac1764f07ab4127d7f739351ced4759",
+			"revisionTime": "2017-07-04T13:41:27Z"
 		}
 	],
 	"rootPath": "github.com/sky-uk/terraform-provider-nsx"
