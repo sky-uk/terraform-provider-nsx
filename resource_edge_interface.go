@@ -75,6 +75,10 @@ func resourceEdgeInterface() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
+			"index": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -189,6 +193,9 @@ func resourceEdgeInterfaceRead(d *schema.ResourceData, m interface{}) error {
 	edgeInterfaceObject, err := getSingleEdgeInterface(edgeid, name, nsxclient)
 	id := edgeInterfaceObject.Index
 	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
+
+	// expose the vnic index
+	// d.Set("index", edgeInterfaceObject.Index)
 
 	// If the resource has been removed manually, notify Terraform of this fact.
 	if id == "" {
