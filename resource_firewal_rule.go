@@ -426,7 +426,7 @@ func resourceFirewallRuleRead(d *schema.ResourceData, m interface{}) error {
 	if v, ok := d.GetOk("id"); ok {
 		ruleID = v.(string)
 	} else {
-		fmt.Errorf("cannot find rule ID in status")
+		return fmt.Errorf("cannot find rule ID in status")
 	}
 
 	if v, ok := d.GetOk("ruletype"); ok {
@@ -456,7 +456,7 @@ func resourceFirewallRuleRead(d *schema.ResourceData, m interface{}) error {
 	if ReadRule.RuleType != "" {
 		d.Set("ruletype", ReadRule.RuleType)
 	} else {
-		fmt.Errorf("RuleType is empty from response")
+		return fmt.Errorf("RuleType is empty from response")
 	}
 
 	d.Set("action", ReadRule.Action)
@@ -507,7 +507,7 @@ func resourceFirewallRuleDelete(d *schema.ResourceData, m interface{}) error {
 	deleteAPI := fwrules.NewDelete(deleteRule)
 	deleteError := nsxclient.Do(deleteAPI)
 	if deleteError != nil {
-		return fmt.Errorf("Could not delete the rule ", deleteAPI.StatusCode())
+		return fmt.Errorf("Could not delete the rule %d", deleteAPI.StatusCode())
 	}
 	log.Println(deleteAPI.Endpoint())
 	log.Println(deleteAPI.StatusCode())
