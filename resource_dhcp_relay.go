@@ -210,8 +210,8 @@ func resourceDHCPRelayRead(d *schema.ResourceData, m interface{}) error {
 						newAgent.GiAddress = giAddressValue.(string)
 					}
 
-					if dhcpServerIpValue, ok := agentObject["dhcpserverip"]; ok {
-						newAgent.GiAddress = dhcpServerIpValue.(string)
+					if dhcpServerIPValue, ok := agentObject["dhcpserverip"]; ok {
+						newAgent.GiAddress = dhcpServerIPValue.(string)
 					}
 
 					//finally add to the list
