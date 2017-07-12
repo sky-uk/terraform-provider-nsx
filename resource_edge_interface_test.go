@@ -21,8 +21,8 @@ func TestAccResourceEdgeInterface(t *testing.T) {
 			{
 				Config: testAccResourceEdgeInterfaceCreateTemplate(edgeid),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttrSet("nsx_edge_interface.testInterface", "edgeid"),
-					resource.TestCheckResourceAttr("nsx_edge_interface.testInterface", "edgeid", edgeid),
+					resource.TestCheckResourceAttrSet("nsx_edge_interface.testAccInterface", "edgeid"),
+					resource.TestCheckResourceAttr("nsx_edge_interface.testAccInterface", "edgeid", edgeid),
 				),
 			},
 		},
@@ -94,9 +94,9 @@ func testAccResourceEdgeInterfaceExists(edgeid string, index int, name string) r
 
 func testAccResourceEdgeInterfaceCreateTemplate(edgeid string) string {
 
-	return fmt.Sprintf(`resource "nsx_edge_interface" "testInterface" {
+	return fmt.Sprintf(`resource "nsx_edge_interface" "testAccInterface" {
     edgeid = "edge-7"
-    name = "edge_interface100"
+    name = "edge_interface_testacc"
     isconnected = true
     connectedtoid = "virtualwire-182"
     interfacetype = "internal"

@@ -148,7 +148,7 @@ func resourceEdgeInterfaceRead(d *schema.ResourceData, m interface{}) error {
 
 	if api.StatusCode() != http.StatusOK {
 		d.SetId("")
-		return fmt.Errorf("Error getting all interfaces: Status code: %s", api.StatusCode())
+		return fmt.Errorf("Error getting all interfaces: Status code: %d", api.StatusCode())
 	}
 
 	edge := api.GetResponse()
