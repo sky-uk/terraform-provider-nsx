@@ -69,7 +69,15 @@ slackHelper.notificationWrapper(slackChannel, currentBuild, env, true) {
 
                 stage 'testacc'
                 inContainer {
-                    goHelper.goTestAcc(project_src_path)
+                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'NSX_CREDENTIALS', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+                        environment { 
+                            NSXSERVER='apnsxa30'
+                            NSX_ALLOW_UNVERIFIED_SSL=true
+                            NSXUSERNAME=${env.USERNAME}
+                            NSXPASSWORD=${env.PASSWORD}
+                        }
+                        goHelper.goTestAcc(project_src_path)
+                    }
                 }
 
                 stage 'coverage'
