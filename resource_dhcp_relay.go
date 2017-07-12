@@ -125,8 +125,8 @@ func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
 					newAgent.GiAddress = giAddressValue.(string)
 				}
 
-				if dhcpServerIpValue, ok := agentObject["dhcpserverip"]; ok {
-					newAgent.GiAddress = dhcpServerIpValue.(string)
+				if dhcpServerIPValue, ok := agentObject["dhcpserverip"]; ok {
+					newAgent.GiAddress = dhcpServerIPValue.(string)
 				}
 
 				//finally add to the list
@@ -210,8 +210,8 @@ func resourceDHCPRelayRead(d *schema.ResourceData, m interface{}) error {
 						newAgent.GiAddress = giAddressValue.(string)
 					}
 
-					if dhcpServerIpValue, ok := agentObject["dhcpserverip"]; ok {
-						newAgent.GiAddress = dhcpServerIpValue.(string)
+					if dhcpServerIPValue, ok := agentObject["dhcpserverip"]; ok {
+						newAgent.GiAddress = dhcpServerIPValue.(string)
 					}
 
 					//finally add to the list
@@ -223,7 +223,7 @@ func resourceDHCPRelayRead(d *schema.ResourceData, m interface{}) error {
 			DHCPRelay.RelayAgents = agentList
 		}
 	} else {
-		return fmt.Errorf("RelayAgents should not be empty since this is not allowed by api ...")
+		return fmt.Errorf("RelayAgents should not be empty since this is not allowed by api")
 	}
 
 	return nil
@@ -296,8 +296,8 @@ func resourceDHCPRelayUpdate(d *schema.ResourceData, m interface{}) error {
 						newAgent.GiAddress = giAddressValue.(string)
 					}
 
-					if dhcpServerIpValue, ok := agentObject["dhcpserverip"]; ok {
-						newAgent.GiAddress = dhcpServerIpValue.(string)
+					if dhcpServerIPValue, ok := agentObject["dhcpserverip"]; ok {
+						newAgent.GiAddress = dhcpServerIPValue.(string)
 					}
 
 					//finally add to the list
@@ -322,7 +322,7 @@ func resourceDHCPRelayUpdate(d *schema.ResourceData, m interface{}) error {
 		}
 		if updateAPI.StatusCode() != 204 {
 			d.SetId("")
-			return fmt.Errorf("Error updating record : %s:", updateAPI.GetResponse())
+			return fmt.Errorf("Error updating record : %s", updateAPI.GetResponse())
 		}
 		return resourceDHCPRelayRead(d, m)
 	}

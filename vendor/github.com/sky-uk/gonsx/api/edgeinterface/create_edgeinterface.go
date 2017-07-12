@@ -11,25 +11,11 @@ type CreateEdgeInterfaceAPI struct {
 }
 
 // NewCreate returns a new object of CreateEdgeInterfaceAPI
-func NewCreate(edgeID, interfaceName, virtualWireID, gateway,
-	subnetMask, interfaceType string, mtu int) *CreateEdgeInterfaceAPI {
+func NewCreate(edgeInterfaceList *EdgeInterfaces, edgeID string) *CreateEdgeInterfaceAPI {
+
 	this := new(CreateEdgeInterfaceAPI)
 
-	addressGroup := AddressGroup{PrimaryAddress: gateway, SubnetMask: subnetMask}
-	addressGroupList := []AddressGroup{addressGroup}
-
-	edgeInterface := EdgeInterface{
-		Name:          interfaceName,
-		ConnectedToID: virtualWireID,
-		Type:          interfaceType,
-		Mtu:           mtu,
-		IsConnected:   true,
-		AddressGroups: AddressGroups{addressGroupList},
-	}
-	requestPayload := &EdgeInterfaces{}
-	requestPayload.Interfaces = []EdgeInterface{edgeInterface}
-
-	this.BaseAPI = api.NewBaseAPI(http.MethodPost, "/api/4.0/edges/"+edgeID+"/interfaces/?action=patch", requestPayload, new(EdgeInterfaces))
+	this.BaseAPI = api.NewBaseAPI(http.MethodPost, "/api/4.0/edges/"+edgeID+"/interfaces/?action=patch", edgeInterfaceList, new(EdgeInterfaces))
 	return this
 }
 

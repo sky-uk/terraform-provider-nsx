@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"testing"
 	"github.com/sky-uk/gonsx"
 	"github.com/sky-uk/gonsx/api/dhcprelay"
+	"testing"
 )
 
 func TestAccResourceDHCPRelay(t *testing.T) {
@@ -21,19 +21,17 @@ func TestAccResourceDHCPRelay(t *testing.T) {
 			{
 				Config: testAccResourceDHCPRelayCreateTemplate(edgeid),
 				Check: resource.ComposeTestCheckFunc(
-					testAccResourceDHCPRelayExists(edgeid,"nsx_dhcp_relay.testrelay"),
+					testAccResourceDHCPRelayExists(edgeid, "nsx_dhcp_relay.testrelay"),
 					resource.TestCheckResourceAttrSet("nsx_dhcp_relay.testrelay", "edgeid"),
 					resource.TestCheckResourceAttr("nsx_dhcp_relay.testrelay", "edgeid", edgeid),
 				),
-			},{
+			}, {
 				Config: testAccResourceDHCPRelayUpdateTemplate(edgeid),
 				Check: resource.ComposeTestCheckFunc(
-					testAccResourceDHCPRelayExists(edgeid,"nsx_dhcp_relay.testrelay"),
+					testAccResourceDHCPRelayExists(edgeid, "nsx_dhcp_relay.testrelay"),
 					resource.TestCheckResourceAttrSet("nsx_dhcp_relay.testrelay", "edgeid"),
 					resource.TestCheckResourceAttr("nsx_dhcp_relay.testrelay", "edgeid", edgeid),
-
 				),
-
 			},
 		},
 	})
@@ -42,7 +40,7 @@ func TestAccResourceDHCPRelay(t *testing.T) {
 
 func testAccResourceDHCPRelayCheckDestroy(state *terraform.State) error {
 	nsxClient := testAccProvider.Meta().(*gonsx.NSXClient)
-	for _, rs := range state.RootModule().Resources{
+	for _, rs := range state.RootModule().Resources {
 		if rs.Type != "nsx_dhcp_relay" {
 			continue
 		}
@@ -64,7 +62,7 @@ func testAccResourceDHCPRelayCheckDestroy(state *terraform.State) error {
 
 }
 
-func testAccResourceDHCPRelayExists(edgeid,resourcename string) resource.TestCheckFunc {
+func testAccResourceDHCPRelayExists(edgeid, resourcename string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		rs, ok := state.RootModule().Resources[resourcename]
 

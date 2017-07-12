@@ -67,6 +67,11 @@ slackHelper.notificationWrapper(slackChannel, currentBuild, env, true) {
                     goHelper.goTest(project_src_path)
                 }
 
+                stage 'testacc'
+                inContainer {
+                    goHelper.goTestAcc(project_src_path)
+                }
+
                 stage 'coverage'
                 inContainer {
                     goHelper.goCoverage(project_src_path)

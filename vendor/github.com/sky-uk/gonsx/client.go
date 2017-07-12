@@ -85,17 +85,22 @@ func (nsxClient *NSXClient) handleResponse(api api.NSXApi, res *http.Response) e
 	api.SetRawResponse(bodyText)
 
 	if nsxClient.debug {
-		log.Println(string(bodyText))
+		log.Println("STATUS CODE: ", api.StatusCode())
 	}
-
 	if isXML(res.Header.Get("Content-Type")) && api.StatusCode() == 200 {
 		xmlerr := xml.Unmarshal(bodyText, api.ResponseObject())
 		if xmlerr != nil {
 			log.Println("ERROR unmarshalling response: ", err)
 			return err
 		}
+		if nsxClient.debug {
+			log.Printf("DECODED RESPONSE:\n%+v\n", api.ResponseObject())
+		}
 	} else {
 		api.SetResponseObject(string(bodyText))
+		if nsxClient.debug {
+			log.Println(string(bodyText))
+		}
 	}
 	return nil
 }
