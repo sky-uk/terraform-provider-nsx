@@ -6,7 +6,6 @@ import (
 	"github.com/sky-uk/gonsx"
 	"github.com/sky-uk/gonsx/api/distributedfw/sections"
 	"log"
-
 )
 
 func resourceFirewallSection() *schema.Resource {
@@ -16,23 +15,22 @@ func resourceFirewallSection() *schema.Resource {
 		Update: resourceFirewallSectionUpdate,
 		Delete: resourceFirewallSectionDelete,
 		Schema: map[string]*schema.Schema{
-			"sectionid" : {
+			"sectionid": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"name" : {
-				Type: schema.TypeString,
-				Required: true,
-				ForceNew: false,
+			"name": {
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    false,
 				Description: "A name for the section",
 			},
 			"type": {
-				Type: schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 				Description: "Type of section, can be LAYER2 or LAYER3",
 			},
-
 		},
 	}
 }
@@ -40,7 +38,7 @@ func resourceFirewallSection() *schema.Resource {
 func resourceFirewallSectionCreate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
 	var createSection sections.Section
-	if v,ok := d.GetOk("name"); ok {
+	if v, ok := d.GetOk("name"); ok {
 		createSection.Name = v.(string)
 	} else {
 		return fmt.Errorf("Section name is required")
@@ -63,10 +61,33 @@ func resourceFirewallSectionCreate(d *schema.ResourceData, m interface{}) error 
 		return fmt.Errorf("Error creating section")
 	}
 	d.SetId(createSectionAPI.GetResponse().ID)
-	return nil
+	return resourceFirewallSectionRead(d, m)
 }
 
 func resourceFirewallSectionRead(d *schema.ResourceData, m interface{}) error {
+	nsxclient := m.(*gonsx.NSXClient)
+	var readSection *sections.Section
+	var sectionType string
+	if v, ok := d.GetOk("type"); ok {
+		sectionType = v.(string)
+	}
+	readSectionAPI := sections.NewGetSingle(d.Id(), sectionType)
+	readSectionErr := nsxclient.Do(readSectionAPI)
+	if readSectionErr != nil {
+		return fmt.Errorf("could not get the section")
+	}
+	if readSectionAPI.StatusCode() != 200 {
+		log.Println(readSectionAPI.StatusCode())
+		return fmt.Errorf("could not find the section")
+	}
+	log.Println("RESPONSE")
+	log.Println(readSectionAPI.GetResponse())
+	log.Println("SECTION")
+	log.Println(readSection)
+	readSection = readSectionAPI.GetResponse()
+	d.Set("name", readSection.Name)
+	d.Set("type", readSection.Type)
+	d.Set("sectionid", readSection.ID)
 	return nil
 }
 
@@ -75,5 +96,25 @@ func resourceFirewallSectionUpdate(d *schema.ResourceData, m interface{}) error 
 }
 
 func resourceFirewallSectionDelete(d *schema.ResourceData, m interface{}) error {
+	nsxclient := m.(*gonsx.NSXClient)
+	var deleteSection sections.Section
+	if v, ok := d.GetOk("sectionid"); ok {
+		deleteSection.ID  = v.(string)
+	}
+	if v,ok := d.GetOk("type"); ok {
+		deleteSection.Type = v.(string)
+	}
+	deleteSectionAPI := sections.NewDelete(deleteSection)
+	deleteError := nsxclient.Do(deleteSectionAPI)
+	if deleteError != nil {
+		return  fmt.Errorf("Could not delete the section")
+	}
+	if deleteSectionAPI.StatusCode() != 204 {
+		log.Println(deleteSectionAPI.Endpoint())
+		log.Println(deleteSectionAPI.ResponseObject())
+		return  fmt.Errorf("Could not delete the Section")
+	}
+
+	d.SetId("")
 	return nil
 }
