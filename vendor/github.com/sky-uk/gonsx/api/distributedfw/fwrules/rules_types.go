@@ -30,7 +30,7 @@ type Rule struct {
 
 // SvcList List pointer destination
 type SvcList struct {
-	Services []Service `xml:"services,omitempty>service"`
+	Services []Service `xml:"service,omitempty"`
 }
 
 // Service - Struct for the services
@@ -73,7 +73,7 @@ type Source struct {
 
 // DstList - Destination List
 type DstList struct {
-	Excluded     string        `xml:"excluded,attr"`
+	Excluded     string        `xml:"excluded,attr,default:'false'"`
 	Destinations []Destination `xml:"destination,omitempty"`
 }
 

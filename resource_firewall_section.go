@@ -92,6 +92,16 @@ func resourceFirewallSectionRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceFirewallSectionUpdate(d *schema.ResourceData, m interface{}) error {
+	nsxclient := m.(*gonsx.NSXClient)
+	var updateSection *sections.Section
+	updateSection.ID = d.Id()
+	if d.HasChange("name"){
+		_, updateSection.Name = d.GetChange("name")
+	}
+	if d.HasChange("type"){
+		_, updateSection.Type = d.GetChange("type")
+	}
+
 	return nil
 }
 

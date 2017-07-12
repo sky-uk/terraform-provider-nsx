@@ -17,10 +17,10 @@ func resourceGetSectionTimestamp(sectionID int, sectionType string, m interface{
 		log.Println("could not get timestamp")
 	}
 	if sectionTimestamp.StatusCode() != 200 {
-		return nil,fmt.Errorf("Could not find the timestamp for section %d", sectionID)
+		return nil, fmt.Errorf("Could not find the timestamp for section %d", sectionID)
 	}
 	//log.Println(sectionTimestamp.GetResponse())
-	return sectionTimestamp.GetResponse(),nil
+	return sectionTimestamp.GetResponse(), nil
 }
 
 func resourceFirewallRule() *schema.Resource {
@@ -394,7 +394,7 @@ func resourceFirewallRuleCreate(d *schema.ResourceData, m interface{}) error {
 	nsxMutexKV.Lock(fwRule.Name)
 	defer nsxMutexKV.Unlock(fwRule.Name)
 	createFWRuleAPI := fwrules.NewCreate(fwRule)
-	timeStampCall,_ := resourceGetSectionTimestamp(fwRule.SectionID, fwRule.RuleType, m)
+	timeStampCall, _ := resourceGetSectionTimestamp(fwRule.SectionID, fwRule.RuleType, m)
 	log.Println(len(timeStampCall.Timestamp))
 	nsxclient.SetHeader("If-Match", timeStampCall.Timestamp)
 	createErr := nsxclient.Do(createFWRuleAPI)
@@ -448,23 +448,19 @@ func resourceFirewallRuleRead(d *schema.ResourceData, m interface{}) error {
 	ReadRule := readRuleAPI.GetResponse()
 	d.Set("name", ReadRule.Name)
 	d.Set("disabled", ReadRule.Disabled)
-	/*if ReadRule.RuleType != "" {
-		d.Set("ruletype", ReadRule.RuleType)
-	} else {
-		return fmt.Errorf("RuleType is empty from response")
-	}*/
-
 	d.Set("action", ReadRule.Action)
 	//d.Set("appliedto", ReadRule.AppliedToList)
-	/*if len(ReadRule.Sources) > 0 {
-		d.Set("source", ReadRule.Sources)
+	if err := readSources(d, ReadRule); err != nil {
+		return err
 	}
-	if len(ReadRule.Destinations) > 0 {
-		d.Set("destination", ReadRule.Destinations)
+
+	if err := readDestinations(d, ReadRule); err != nil {
+		return err
 	}
-	if len(ReadRule.Services) > 0 {
-		d.Set("service", ReadRule.Services)
-	}*/
+
+	if err := readServices(d, ReadRule); err != nil {
+		return err
+	}
 	d.Set("sectionid", ReadRule.SectionID)
 	d.Set("direction", ReadRule.Direction)
 	d.Set("packettype", ReadRule.PacketType)
@@ -473,6 +469,29 @@ func resourceFirewallRuleRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceFirewallRuleUpdate(d *schema.ResourceData, m interface{}) error {
+	nsxclient := m.(*gonsx.NSXClient)
+	var updateRule fwrules.Rule
+	if d.HasChange("name"){
+		_,updateRule.Name = d.GetChange("name")
+
+	}
+	if d.HasChange("packettype"){
+		_,updateRule.PacketType = d.GetChange("packettype")
+	}
+
+	if d.HasChange("disabled"){
+		_, updateRule.Disabled = d.GetChange("disabled")
+	}
+
+	if d.HasChange("logged"){
+		_, updateRule.Logged = d.GetChange("logged")
+	}
+
+	if d.HasChange("action") {
+		_, updateRule.Action = d.GetChange("action")
+	}
+
+
 	return nil
 
 }
@@ -496,7 +515,7 @@ func resourceFirewallRuleDelete(d *schema.ResourceData, m interface{}) error {
 	} else {
 		return fmt.Errorf("section id is required")
 	}
-	timeStampCall,_ := resourceGetSectionTimestamp(deleteRule.SectionID, deleteRule.RuleType, m)
+	timeStampCall, _ := resourceGetSectionTimestamp(deleteRule.SectionID, deleteRule.RuleType, m)
 	log.Println(len(timeStampCall.Timestamp))
 	nsxclient.SetHeader("If-Match", timeStampCall.Timestamp)
 	deleteAPI := fwrules.NewDelete(deleteRule)
@@ -508,5 +527,57 @@ func resourceFirewallRuleDelete(d *schema.ResourceData, m interface{}) error {
 	log.Println(deleteAPI.StatusCode())
 
 	d.SetId("")
+	return nil
+}
+
+func readSources(d *schema.ResourceData, rule *fwrules.Rule) error {
+	sources := make([]map[string]interface{}, 0)
+	if v := d.Get("source"); v != nil {
+		for _, sourceItem := range rule.Sources.Sources {
+			source := make(map[string]interface{})
+			source["name"] = sourceItem.Name
+			source["type"] = sourceItem.Type
+			source["value"] = sourceItem.Value
+			source["isvalid"] = sourceItem.IsValid
+			sources = append(sources, source)
+		}
+		d.Set("source", sources)
+	}
+
+	return nil
+}
+
+func readDestinations(d *schema.ResourceData, rule *fwrules.Rule) error {
+	destinations := make([]map[string]interface{}, 0)
+	if v := d.Get("destination"); v != nil {
+		for _, destinationItem := range rule.Destinations.Destinations {
+			destination := make(map[string]interface{})
+			destination["name"] = destinationItem.Name
+			destination["type"] = destinationItem.Type
+			destination["value"] = destinationItem.Value
+			destination["isvalid"] = destinationItem.IsValid
+			destinations = append(destinations, destination)
+			log.Println(destination)
+		}
+		d.Set("destination", destinations)
+	}
+
+	return nil
+}
+
+func readServices(d *schema.ResourceData, rule *fwrules.Rule) error {
+	services := make([]map[string]interface{}, 0)
+	if v := d.Get("service"); v != nil {
+		for _, serviceItem := range rule.Services.Services {
+			service := make(map[string]interface{})
+			service["name"] = serviceItem.Name
+			service["type"] = serviceItem.Type
+			service["protocol"] = serviceItem.Protocol
+			service["value"] = serviceItem.Value
+			service["subprotocol"] = serviceItem.SubProtocol
+			services = append(services , service)
+		}
+		d.Set("service", services)
+	}
 	return nil
 }
