@@ -102,9 +102,8 @@ func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
 		for _, name := range v.([]interface{}) {
 			dhcpRelay.RelayServer.DomainName = append(dhcpRelay.RelayServer.DomainName, name.(string))
 		}
-	} else {
-		return fmt.Errorf("fqdn argument is required")
 	}
+
 	if len(dhcpRelay.RelayServer.DomainName) > 2 {
 		return fmt.Errorf("Error: Field fqdn only Supports 2 domains")
 	}
