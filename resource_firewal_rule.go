@@ -19,7 +19,7 @@ func resourceGetSectionTimestamp(sectionID int, sectionType string, m interface{
 	if sectionTimestamp.StatusCode() != 200 {
 		return nil, fmt.Errorf("Could not find the timestamp for section %d", sectionID)
 	}
-	//log.Println(sectionTimestamp.GetResponse())
+	log.Println(sectionTimestamp.ResponseObject())
 	return sectionTimestamp.GetResponse(), nil
 }
 
@@ -454,13 +454,13 @@ func resourceFirewallRuleRead(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	if err := readDestinations(d, ReadRule); err != nil {
+	/*if err := readDestinations(d, ReadRule); err != nil {
 		return err
 	}
 
 	if err := readServices(d, ReadRule); err != nil {
 		return err
-	}
+	}*/
 	d.Set("sectionid", ReadRule.SectionID)
 	d.Set("direction", ReadRule.Direction)
 	d.Set("packettype", ReadRule.PacketType)
@@ -470,30 +470,76 @@ func resourceFirewallRuleRead(d *schema.ResourceData, m interface{}) error {
 
 func resourceFirewallRuleUpdate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var updateRule fwrules.Rule
+	//var updateRule fwrules.Rule
+	var hasChanges bool
+	ruleType := d.Get("ruletype").(string)
+	ruleSection := d.Get("sectionid").(int)
+	updateRuleAPI := fwrules.NewGetSingle(d.Id(), ruleType,  ruleSection)
+	getRuleErr := nsxclient.Do(updateRuleAPI)
+
+	if getRuleErr != nil {
+		return fmt.Errorf("error getting the rule for edit")
+	}
+	if updateRuleAPI.StatusCode() == 200 {
+		//log.Println(updateRuleAPI.GetResponse())
+		log.Println(updateRuleAPI.ResponseObject())
+		log.Println(updateRuleAPI.Endpoint())
+	}
+
+	updateRule := updateRuleAPI.GetResponse()
 	if d.HasChange("name"){
-		_,updateRule.Name = d.GetChange("name")
+		hasChanges = true
+		_,nameValue  := d.GetChange("name")
+		updateRule.Name = nameValue.(string)
 
 	}
 	if d.HasChange("packettype"){
-		_,updateRule.PacketType = d.GetChange("packettype")
+		hasChanges = true
+		_, packetValue := d.GetChange("packettype")
+		updateRule.PacketType = packetValue.(string)
 	}
 
 	if d.HasChange("disabled"){
-		_, updateRule.Disabled = d.GetChange("disabled")
+		hasChanges = true
+		_, disabledValue := d.GetChange("disabled")
+		updateRule.Disabled = disabledValue.(bool)
 	}
 
 	if d.HasChange("logged"){
-		_, updateRule.Logged = d.GetChange("logged")
+		hasChanges = true
+		_,loggedValue := d.GetChange("logged")
+		updateRule.Logged = loggedValue.(string)
 	}
 
 	if d.HasChange("action") {
-		_, updateRule.Action = d.GetChange("action")
+		hasChanges = true
+		_,actionValue := d.GetChange("action")
+		updateRule.Action = actionValue.(string)
 	}
 
+	updateRule.RuleType = d.Get("ruletype").(string)
 
+	if hasChanges {
+		nsxMutexKV.Lock(updateRule.Name)
+		defer nsxMutexKV.Unlock(updateRule.Name)
+		timeStampCall, _ := resourceGetSectionTimestamp(updateRule.SectionID, updateRule.RuleType, m)
+		log.Println(len(timeStampCall.Timestamp))
+		nsxclient.SetHeader("If-Match", timeStampCall.Timestamp)
+		updateRuleAPI := fwrules.NewUpdate(updateRule)
+		updateErr := nsxclient.Do(updateRuleAPI)
+		if updateErr != nil {
+			return fmt.Errorf("Error updating the firewall rule ")
+		}
+		if updateRuleAPI.StatusCode() == 400 {
+			log.Println(updateRuleAPI.StatusCode())
+			log.Println(updateRuleAPI.ResponseObject())
+			return fmt.Errorf("could not update the firewall rule")
+		}
+		log.Println(updateRuleAPI.StatusCode())
+		log.Println(updateRuleAPI.ResponseObject())
+		return resourceFirewallRuleRead(d,m)
+	}
 	return nil
-
 }
 
 func resourceFirewallRuleDelete(d *schema.ResourceData, m interface{}) error {
@@ -525,12 +571,13 @@ func resourceFirewallRuleDelete(d *schema.ResourceData, m interface{}) error {
 	}
 	log.Println(deleteAPI.Endpoint())
 	log.Println(deleteAPI.StatusCode())
+	log.Println(deleteAPI.ResponseObject())
 
 	d.SetId("")
 	return nil
 }
 
-func readSources(d *schema.ResourceData, rule *fwrules.Rule) error {
+func readSources(d *schema.ResourceData, rule fwrules.Rule) error {
 	sources := make([]map[string]interface{}, 0)
 	if v := d.Get("source"); v != nil {
 		for _, sourceItem := range rule.Sources.Sources {
@@ -547,7 +594,7 @@ func readSources(d *schema.ResourceData, rule *fwrules.Rule) error {
 	return nil
 }
 
-func readDestinations(d *schema.ResourceData, rule *fwrules.Rule) error {
+func readDestinations(d *schema.ResourceData, rule fwrules.Rule) error {
 	destinations := make([]map[string]interface{}, 0)
 	if v := d.Get("destination"); v != nil {
 		for _, destinationItem := range rule.Destinations.Destinations {
@@ -565,7 +612,7 @@ func readDestinations(d *schema.ResourceData, rule *fwrules.Rule) error {
 	return nil
 }
 
-func readServices(d *schema.ResourceData, rule *fwrules.Rule) error {
+func readServices(d *schema.ResourceData, rule fwrules.Rule) error {
 	services := make([]map[string]interface{}, 0)
 	if v := d.Get("service"); v != nil {
 		for _, serviceItem := range rule.Services.Services {

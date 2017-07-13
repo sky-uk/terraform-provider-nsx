@@ -585,8 +585,8 @@
 		{
 			"checksumSHA1": "1KwQ4O1Kk2aUgnPlCpt5E7iOhuk=",
 			"path": "github.com/sky-uk/gonsx/api",
-			"revision": "f0a97c1bfb3b0e4c26d8fc3e9c7680fd7390769f",
-			"revisionTime": "2017-07-12T15:40:13Z",
+			"revision": "5a43b5172aa3fed4f0e11ae0f124887883a69fae",
+			"revisionTime": "2017-07-13T15:13:16Z",
 			"version": "dfw",
 			"versionExact": "dfw"
 		},
@@ -599,18 +599,18 @@
 			"versionExact": "0.3.10"
 		},
 		{
-			"checksumSHA1": "riBxPg696wIxgWtaAMo4ioOaZKw=",
+			"checksumSHA1": "fSrpexhxveWdn0l7hsUlkapAlcg=",
 			"path": "github.com/sky-uk/gonsx/api/distributedfw/fwrules",
-			"revision": "f0a97c1bfb3b0e4c26d8fc3e9c7680fd7390769f",
-			"revisionTime": "2017-07-12T15:40:13Z",
+			"revision": "5a43b5172aa3fed4f0e11ae0f124887883a69fae",
+			"revisionTime": "2017-07-13T15:13:16Z",
 			"version": "dfw",
 			"versionExact": "dfw"
 		},
 		{
-			"checksumSHA1": "KITLJpKCOLa4rktUExMV4E+bdWw=",
+			"checksumSHA1": "T/K4U8K7rng0Z1ioGdypC4SXKhw=",
 			"path": "github.com/sky-uk/gonsx/api/distributedfw/sections",
-			"revision": "f0a97c1bfb3b0e4c26d8fc3e9c7680fd7390769f",
-			"revisionTime": "2017-07-12T15:40:13Z",
+			"revision": "5a43b5172aa3fed4f0e11ae0f124887883a69fae",
+			"revisionTime": "2017-07-13T15:13:16Z",
 			"version": "dfw",
 			"versionExact": "dfw"
 		},

@@ -6,7 +6,10 @@ import (
 	"github.com/sky-uk/gonsx"
 	"github.com/sky-uk/gonsx/api/distributedfw/sections"
 	"log"
+	"strconv"
 )
+
+
 
 func resourceFirewallSection() *schema.Resource {
 	return &schema.Resource{
@@ -93,14 +96,30 @@ func resourceFirewallSectionRead(d *schema.ResourceData, m interface{}) error {
 
 func resourceFirewallSectionUpdate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var updateSection *sections.Section
+	var updateSection sections.Section
+	var hasChanges bool
 	updateSection.ID = d.Id()
+	updateSection.Type = d.Get("type").(string)
 	if d.HasChange("name"){
-		_, updateSection.Name = d.GetChange("name")
+		hasChanges = true
+		_,nameValue := d.GetChange("name")
+		updateSection.Name = nameValue.(string)
 	}
-	if d.HasChange("type"){
-		_, updateSection.Type = d.GetChange("type")
+	if hasChanges {
+		sectIDINT,_ := strconv.Atoi(updateSection.ID)
+		timeStampCall, _ := resourceGetSectionTimestamp(sectIDINT, updateSection.Type, m)
+		log.Println(len(timeStampCall.Timestamp))
+		nsxclient.SetHeader("If-Match", timeStampCall.Timestamp)
+		updateSectionAPI := sections.NewUpdate(updateSection)
+		updateErr := nsxclient.Do(updateSectionAPI)
+		if updateErr != nil {
+			return fmt.Errorf("could not update section")
+		}
+		log.Println("UPDATE")
+		log.Println(updateSectionAPI.ResponseObject())
+		return resourceFirewallSectionRead(d,m)
 	}
+
 
 	return nil
 }
