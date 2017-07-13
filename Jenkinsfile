@@ -25,7 +25,7 @@ slackChannel = '#ott-paas'
 loadHelpers()
 
 slackHelper.notificationWrapper(slackChannel, currentBuild, env, true) {
-    node {
+    node("master") {
         wrap([$class: 'TimestamperBuildWrapper']) {
             wrap([$class: 'AnsiColorBuildWrapper']) {
                 stage 'checkout'
