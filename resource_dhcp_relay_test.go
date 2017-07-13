@@ -97,7 +97,7 @@ func testAccResourceDHCPRelayCreateTemplate(edgeid string) string {
   		dhcpserverip = ["10.152.160.10"]
   		agent {
 	       		vnicindex="9"
-	       		giaddress="10.72.232.200"
+	       		giaddress="10.88.232.200"
 	  	}
 	}`, edgeid)
 }
@@ -111,7 +111,7 @@ func testAccResourceDHCPRelayUpdateTemplate(edgeid string) string {
   		dhcpserverip = ["10.152.160.10","10.152.160.11"]
   		agent {
 	       		vnicindex="9"
-	       		giaddress="10.72.232.200"
+	       		giaddress="10.88.232.200"
 	  	}
 	}`, edgeid)
 }
