@@ -67,6 +67,10 @@ func resourceEdgeInterface() *schema.Resource {
 					},
 				},
 			},
+			"index": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -146,7 +150,22 @@ func resourceEdgeInterfaceRead(d *schema.ResourceData, m interface{}) error {
 		return nil
 	}
 
+<<<<<<< HEAD
 	if api.StatusCode() != http.StatusOK {
+=======
+	// See if we can find our specifically named resource within the list of
+	// resources associated with the edgeid.
+	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").Index", name))
+	edgeInterfaceObject, err := getSingleEdgeInterface(edgeid, name, nsxclient)
+	id := edgeInterfaceObject.Index
+	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
+
+	// expose the vnic index
+	d.Set("index", edgeInterfaceObject.Index)
+
+	// If the resource has been removed manually, notify Terraform of this fact.
+	if id == "" {
+>>>>>>> ad5ea7b87d7dd82c5a6f54455d3177d1c35658c0
 		d.SetId("")
 		return fmt.Errorf("Error getting all interfaces: Status code: %d", api.StatusCode())
 	}

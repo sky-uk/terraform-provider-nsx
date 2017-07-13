@@ -38,13 +38,14 @@ func resourceDHCPRelay() *schema.Resource {
 				Optional: true,
 				ForceNew: false,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Description: "List of IPsets (at least one of ipsets, fqdn, dhcpserverip must be provided)",
 			},
 			"fqdn": {
 				Type:        schema.TypeList,
-				Required:    true,
+				Optional:    true,
 				ForceNew:    false,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: "Comma separated lists of Domain names (maximum 2)",
+				Description: "Comma separated lists of Domain names, max: 2 (at least one of ipsets, fqdn, dhcpserverip must be provided)",
 			},
 
 			"edgeid": {
@@ -54,10 +55,10 @@ func resourceDHCPRelay() *schema.Resource {
 			},
 			"dhcpserverip": {
 				Type:        schema.TypeList,
-				Required:    true,
+				Optional:    true,
 				ForceNew:    false,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: "Comma separated lists of IP Addresses (maximum 16)",
+				Description: "Comma separated lists of IP Addresses (at least one of ipsets, fqdn, dhcpserverip must be provided)",
 			},
 			"agent": &schema.Schema{
 				Type:     schema.TypeSet,
@@ -73,8 +74,9 @@ func resourceDHCPRelay() *schema.Resource {
 
 						"giaddress": {
 							Type:     schema.TypeString,
-							Required: true,
+							Optional: true,
 							ForceNew: false,
+							Description: "Gateway address of network attached to the vNic, defaults to the vNic primary address",
 						},
 					},
 				},
