@@ -1,0 +1,8 @@
+version: '2'
+services:
+    tf-nsx:
+        build: .
+        volumes: 
+            - ./:/go/src/github.com/sky-uk/terraform-provider-nsx
+
+
