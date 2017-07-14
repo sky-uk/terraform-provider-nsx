@@ -525,7 +525,7 @@ func resourceFirewallRuleUpdate(d *schema.ResourceData, m interface{}) error {
 		timeStampCall, _ := resourceGetSectionTimestamp(updateRule.SectionID, updateRule.RuleType, m)
 		log.Println(len(timeStampCall.Timestamp))
 		nsxclient.SetHeader("If-Match", timeStampCall.Timestamp)
-		updateRuleAPI := fwrules.NewUpdate(updateRule)
+		updateRuleAPI := fwrules.NewUpdate(*updateRule)
 		updateErr := nsxclient.Do(updateRuleAPI)
 		if updateErr != nil {
 			return fmt.Errorf("Error updating the firewall rule ")
@@ -577,7 +577,7 @@ func resourceFirewallRuleDelete(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func readSources(d *schema.ResourceData, rule fwrules.Rule) error {
+func readSources(d *schema.ResourceData, rule *fwrules.Rule) error {
 	sources := make([]map[string]interface{}, 0)
 	if v := d.Get("source"); v != nil {
 		for _, sourceItem := range rule.Sources.Sources {
@@ -594,7 +594,7 @@ func readSources(d *schema.ResourceData, rule fwrules.Rule) error {
 	return nil
 }
 
-func readDestinations(d *schema.ResourceData, rule fwrules.Rule) error {
+func readDestinations(d *schema.ResourceData, rule *fwrules.Rule) error {
 	destinations := make([]map[string]interface{}, 0)
 	if v := d.Get("destination"); v != nil {
 		for _, destinationItem := range rule.Destinations.Destinations {
@@ -612,7 +612,7 @@ func readDestinations(d *schema.ResourceData, rule fwrules.Rule) error {
 	return nil
 }
 
-func readServices(d *schema.ResourceData, rule fwrules.Rule) error {
+func readServices(d *schema.ResourceData, rule *fwrules.Rule) error {
 	services := make([]map[string]interface{}, 0)
 	if v := d.Get("service"); v != nil {
 		for _, serviceItem := range rule.Services.Services {
