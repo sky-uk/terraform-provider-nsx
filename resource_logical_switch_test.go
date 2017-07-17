@@ -62,7 +62,7 @@ func TestAccNSXLogicalSwitchBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(testResourceName, "tenantid", "tf_testid"),
 					resource.TestCheckResourceAttr(testResourceName, "scopeid", scopeID),
 					resource.TestCheckResourceAttr(testResourceName, "controlplanemode", "UNICAST_MODE"),
-					resource.TestCheckResourceAttrSet(testResourceName, "labels"),
+					resource.TestCheckResourceAttrSet(testResourceName, "labels.0"),
 				),
 			},
 			{
@@ -74,7 +74,7 @@ func TestAccNSXLogicalSwitchBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(testResourceName, "tenantid", "tf_testid"),
 					resource.TestCheckResourceAttr(testResourceName, "scopeid", scopeID),
 					resource.TestCheckResourceAttr(testResourceName, "controlplanemode", "UNICAST_MODE"),
-					resource.TestCheckResourceAttrSet(testResourceName, "labels"),
+					resource.TestCheckResourceAttrSet(testResourceName, "labels.0"),
 				),
 			},
 		},
