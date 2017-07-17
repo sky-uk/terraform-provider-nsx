@@ -43,6 +43,12 @@ func resourceLogicalSwitch() *schema.Resource {
 				Required:    true,
 				Description: "The transport zone ID. Only required for creation.",
 			},
+			"labels": {
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "The virtual wire labels",
+				Elem:        &schema.Schema{Type: schema.TypeString},
+			},
 		},
 	}
 }
@@ -128,6 +134,14 @@ func resourceLogicalSwitchRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("desc", logicalSwitch.Description)
 	d.Set("controlplanemode", logicalSwitch.ControlPlaneMode)
 	d.Set("tenantid", logicalSwitch.TenantID)
+
+	labelList := make([]string, 0)
+	for _, context := range logicalSwitch.VdsContext {
+		labelName := "vxw-" + context.Switch.ObjectID + "-" + logicalSwitch.ObjectID + "-sid-" + logicalSwitch.VdnID + "-" + logicalSwitch.Name
+		labelList = append(labelList, labelName)
+	}
+
+	d.Set("labels", labelList)
 
 	return nil
 }
