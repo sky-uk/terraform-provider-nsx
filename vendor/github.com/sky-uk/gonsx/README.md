@@ -9,7 +9,7 @@ This project is a NSXClient library for talking to NSX API.
 | Feature                 | Create | Read  | Update  | Delete |
 |-------------------------|--------|-------|---------|--------|
 | DHCP Relay              |   Y    |   Y   |    Y    |   Y    |
-| Edge Interface          |   Y    |   Y   |    N    |   Y    |
+| Edge Interface          |   Y    |   Y   |    Y    |   Y    |
 | Security Group          |   Y    |   Y   |    Y    |   Y    |
 | Security Policy         |   Y    |   Y   |    Y    |   Y    |
 | Security Tag            |   Y    |   Y   |    Y    |   Y    |
@@ -219,7 +219,7 @@ nsxclient.Do(delete_api)
 ```
 
 
-### Interface
+### Edge Interface
 
 Interface resource. This resource will call the interface api within NSX.
 Import the following class:
@@ -230,27 +230,29 @@ github.com/sky-uk/gonsx/api/edgeinterface
 Create:
 
 ```
- api := edgeinterface.NewCreate(edgeId, interfaceName, virtualWireId, gateway,
-                                        		subnetMask, interfaceType, mtu)
+ api := edgeinterface.NewCreate(&edgeInterfaces, edgeId)
  nsxclient.Do(api)
+ createdEdgeInterfaces := api.GetResponse()
 ```
 
 Read:
 ```
-api := edgeinterface.NewGetAll(edgeID)
+api := edgeinterface.NewGet((edgeid, index)
 nsxclient.Do(api)
-resp := api.GetResponse().FilterByName(interfaceName)
+edge := api.GetResponse()
 ```
 
 Update:
 ```
-Not yet implemented
+api := edgeinterface.NewUpdate(edgeid, index, edge)
+nsxclient.Do(api)
+
 ```
 
 Delete:
 ```
-api := edgeinterface.NewDelete(interfaceIndex, edgeId)
-nsxclient.Do(delete_api)
+api := edgeinterface.NewDelete(edgeid, index)
+nsxclient.Do(api)
 ```
 
 ### Dhcp Relay

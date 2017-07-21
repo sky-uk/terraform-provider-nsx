@@ -1,252 +1,272 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sky-uk/gonsx"
 	"github.com/sky-uk/gonsx/api/edgeinterface"
-	"log"
+	"net/http"
+	"strconv"
 )
-
-func getSingleEdgeInterface(edgeid, name string, nsxclient *gonsx.NSXClient) (*edgeinterface.EdgeInterface, error) {
-	getAllAPI := edgeinterface.NewGetAll(edgeid)
-	err := nsxclient.Do(getAllAPI)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if getAllAPI.StatusCode() != 200 {
-		return nil, fmt.Errorf("Status code: %d, Response: %s", getAllAPI.StatusCode(), getAllAPI.ResponseObject())
-	}
-
-	edgeinterface := getAllAPI.GetResponse().FilterByName(name)
-
-	if edgeinterface.Index == "" {
-		return nil, fmt.Errorf("Not found %s", name)
-	}
-
-	return edgeinterface, nil
-}
 
 func resourceEdgeInterface() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceEdgeInterfaceCreate,
 		Read:   resourceEdgeInterfaceRead,
 		Delete: resourceEdgeInterfaceDelete,
+		Update: resourceEdgeInterfaceUpdate,
 
 		Schema: map[string]*schema.Schema{
-			"edgeid": {
+			"edgeid": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
-
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
-
-			"virtualwireid": {
+			"label": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Optional: true,
+				Computed: true,
 			},
-
-			"gateway": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"subnetmask": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"interfacetype": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"mtu": {
+			"mtu": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
-				ForceNew: true,
+			},
+			"interfacetype": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+			"isconnected": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"index": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+				Computed: true,
+			},
+			"connectedtoid": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"addressgroups": &schema.Schema{
+				Type:     schema.TypeList,
+				Required: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"primaryaddress": &schema.Schema{
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"subnetmask": &schema.Schema{
+							Type:     schema.TypeString,
+							Required: true,
+						},
+					},
+				},
 			},
 		},
 	}
 }
 
+func buildAddressGroups(addressGroups []interface{}) []edgeinterface.AddressGroup {
+	var addressGroupList []edgeinterface.AddressGroup
+	for _, address := range addressGroups {
+		data := address.(map[string]interface{})
+		addr := edgeinterface.AddressGroup{
+			PrimaryAddress: data["primaryaddress"].(string),
+			SubnetMask:     data["subnetmask"].(string),
+		}
+		addressGroupList = append(addressGroupList, addr)
+	}
+	return addressGroupList
+}
+
 func resourceEdgeInterfaceCreate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var edgeid, name, virtualwireid, gateway, subnetmask, interfacetype string
-	var mtu int
 
-	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("edgeid"); ok {
-		edgeid = v.(string)
+	var edge edgeinterface.EdgeInterface
+
+	edgeid := d.Get("edgeid").(string)
+
+	edge.Name = d.Get("name").(string)
+	edge.Mtu = d.Get("mtu").(int)
+	edge.Type = d.Get("interfacetype").(string)
+
+	if v, ok := d.GetOk("isconnected"); ok {
+		edge.IsConnected = v.(bool)
 	} else {
-		return fmt.Errorf("edgeid argument is required")
+		edge.IsConnected = false
 	}
 
-	if v, ok := d.GetOk("name"); ok {
-		name = v.(string)
-	} else {
-		return fmt.Errorf("name argument is required")
+	if v, ok := d.GetOk("connectedtoid"); ok {
+		edge.ConnectedToID = v.(string)
 	}
 
-	if v, ok := d.GetOk("virtualwireid"); ok {
-		virtualwireid = v.(string)
-	} else {
-		return fmt.Errorf("virtualwireid argument is required")
+	if v, ok := d.GetOk("addressgroups"); ok {
+		edge.AddressGroups.AddressGroups = buildAddressGroups(v.([]interface{}))
 	}
 
-	if v, ok := d.GetOk("gateway"); ok {
-		gateway = v.(string)
-	} else {
-		return fmt.Errorf("gateway argument is required")
-	}
-
-	if v, ok := d.GetOk("subnetmask"); ok {
-		subnetmask = v.(string)
-	} else {
-		return fmt.Errorf("subnetmask argument is required")
-	}
-
-	if v, ok := d.GetOk("interfacetype"); ok {
-		interfacetype = v.(string)
-	} else {
-		return fmt.Errorf("interfacetype argument is required")
-	}
-
-	if v, ok := d.GetOk("mtu"); ok {
-		mtu = v.(int)
-	} else {
-		return fmt.Errorf("mtu argument is required")
-	}
+	requestPayload := new(edgeinterface.EdgeInterfaces)
+	requestPayload.Interfaces = append(requestPayload.Interfaces, edge)
 
 	nsxMutexKV.Lock(edgeid)
 	defer nsxMutexKV.Unlock(edgeid)
 
-	// Create the API, use it and check for errors.
-	log.Printf(fmt.Sprintf("[DEBUG] edgeinterface.NewCreate(%s, %s, %s, %s, %s, %s, %d)", edgeid, name, virtualwireid, gateway, subnetmask, interfacetype, mtu))
-	createAPI := edgeinterface.NewCreate(edgeid, name, virtualwireid, gateway, subnetmask, interfacetype, mtu)
+	createAPI := edgeinterface.NewCreate(requestPayload, edgeid)
 	err := nsxclient.Do(createAPI)
-
 	if err != nil {
 		return err
 	}
 
-	if createAPI.StatusCode() != 200 {
-		return fmt.Errorf("Failed to create edge interface:%s StatusCode:%s Response:%s", err, createAPI.StatusCode(), createAPI.RawResponse())
+	if createAPI.StatusCode() != http.StatusOK {
+		return fmt.Errorf("Failed to create edge interface, StatusCode:%d Response:%s",
+			createAPI.StatusCode(),
+			createAPI.RawResponse())
 	}
 
-	// If we go here, everything is OK.  Set the ID for the Terraform state
-	// and return the response from the READ method.
-	id := (createAPI.GetResponse().FilterByName(name).Index)
-
-	if id != "" {
-		d.SetId(id)
-	} else {
-		return errors.New("Can not establish the id of the created resource")
-	}
-
-	return resourceEdgeInterfaceRead(d, m)
+	edges := createAPI.GetResponse()
+	setEdge(d, edges.Interfaces[0])
+	d.SetId(edgeid + "_" + strconv.Itoa(edges.Interfaces[0].Index))
+	return nil
 }
 
 func resourceEdgeInterfaceRead(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var edgeid, name string
 
-	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("edgeid"); ok {
-		edgeid = v.(string)
-	} else {
-		return fmt.Errorf("edgeid argument is required")
-	}
+	edgeid := d.Get("edgeid").(string)
+	index := d.Get("index").(int)
 
-	if v, ok := d.GetOk("name"); ok {
-		name = v.(string)
-	} else {
-		return fmt.Errorf("name argument is required")
-	}
-
-	// Gather all the resources that are associated with the specified
-	// edgeid.
-	log.Printf(fmt.Sprintf("[DEBUG] edgeinterface.NewGetAll(%s)", edgeid))
-	api := edgeinterface.NewGetAll(edgeid)
+	api := edgeinterface.NewGet(edgeid, index)
 	err := nsxclient.Do(api)
-
 	if err != nil {
-		return err
-	}
-
-	// See if we can find our specifically named resource within the list of
-	// resources associated with the edgeid.
-	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").Index", name))
-	edgeInterfaceObject, err := getSingleEdgeInterface(edgeid, name, nsxclient)
-	id := edgeInterfaceObject.Index
-	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
-
-	// If the resource has been removed manually, notify Terraform of this fact.
-	if id == "" {
 		d.SetId("")
+		return nil
 	}
+
+	if api.StatusCode() != http.StatusOK {
+		d.SetId("")
+		return fmt.Errorf("Error getting all interfaces: Status code: %d", api.StatusCode())
+	}
+
+	edge := api.GetResponse()
+	setEdge(d, edge)
 
 	return nil
 }
 
+func setEdge(d *schema.ResourceData, edge edgeinterface.EdgeInterface) {
+	d.Set("name", edge.Name)
+	d.Set("label", edge.Label)
+	d.Set("mtu", edge.Mtu)
+	d.Set("interfacetype", edge.Type)
+	d.Set("isconnected", edge.IsConnected)
+	d.Set("connectedtoid", edge.ConnectedToID)
+	var adrGroupList []map[string]string
+	for _, adrGroup := range edge.AddressGroups.AddressGroups {
+		adrgrpResource := make(map[string]string)
+		adrgrpResource["primaryaddress"] = adrGroup.PrimaryAddress
+		adrgrpResource["subnetmask"] = adrGroup.SubnetMask
+		adrGroupList = append(adrGroupList, adrgrpResource)
+	}
+	d.Set("addressgroups", adrGroupList)
+	d.Set("index", edge.Index)
+}
+
 func resourceEdgeInterfaceDelete(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var edgeid, name string
 
-	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("edgeid"); ok {
-		edgeid = v.(string)
+	edgeid := d.Get("edgeid").(string)
+	if index, ok := d.GetOk("index"); ok {
+		nsxMutexKV.Lock(edgeid)
+		defer nsxMutexKV.Unlock(edgeid)
+		deleteAPI := edgeinterface.NewDelete(edgeid, index.(int))
+		err := nsxclient.Do(deleteAPI)
+		if err != nil {
+			return err
+		}
+		if deleteAPI.StatusCode() == http.StatusNoContent {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("Error deleting interface from NSX, Status code: %d", deleteAPI.StatusCode())
+	}
+	return fmt.Errorf("Error deleting resource %s, index not set", d.Get("Name").(string))
+}
+
+func resourceEdgeInterfaceUpdate(d *schema.ResourceData, m interface{}) error {
+
+	nsxclient := m.(*gonsx.NSXClient)
+	hasChanges := false
+
+	var updatedEdge edgeinterface.EdgeInterface
+
+	edgeid := d.Get("edgeid").(string)
+	index := d.Get("index").(int)
+
+	oldName, newName := d.GetChange("name")
+	if d.HasChange("name") {
+		hasChanges = true
+		updatedEdge.Name = newName.(string)
 	} else {
-		return fmt.Errorf("edgeid argument is required")
+		updatedEdge.Name = oldName.(string)
 	}
 
-	if v, ok := d.GetOk("name"); ok {
-		name = v.(string)
+	oldMtu, newMtu := d.GetChange("mtu")
+	if d.HasChange("mtu") {
+		hasChanges = true
+		updatedEdge.Mtu = newMtu.(int)
 	} else {
-		return fmt.Errorf("name argument is required")
+		updatedEdge.Mtu = oldMtu.(int)
 	}
 
-	nsxMutexKV.Lock(edgeid)
-	defer nsxMutexKV.Unlock(edgeid)
-
-	// Gather all the resources that are associated with the specified
-	// edgeid.
-	log.Printf(fmt.Sprintf("[DEBUG] edgeinterface.NewGetAll(%s)", edgeid))
-	api := edgeinterface.NewGetAll(edgeid)
-	err := nsxclient.Do(api)
-
-	if err != nil {
-		return err
+	oldType, newType := d.GetChange("interfacetype")
+	if d.HasChange("interfacetype") {
+		hasChanges = true
+		updatedEdge.Type = newType.(string)
+	} else {
+		updatedEdge.Type = oldType.(string)
 	}
 
-	// See if we can find our specifically named resource within the list of
-	// resources associated with the edgeid.
-	log.Printf(fmt.Sprintf("[DEBUG] api.GetResponse().FilterByName(\"%s\").Index", name))
-	edgeInterfaceObject, err := getSingleEdgeInterface(edgeid, name, nsxclient)
-	id := edgeInterfaceObject.Index
-	log.Printf(fmt.Sprintf("[DEBUG] id := %s", id))
-
-	// If we got here, the resource exists, so we attempt to delete it.
-	deleteAPI := edgeinterface.NewDelete(id, edgeid)
-	err = nsxclient.Do(deleteAPI)
-
-	if err != nil {
-		return err
+	oldIsConn, newIsConn := d.GetChange("isconnected")
+	if d.HasChange("isconnected") {
+		hasChanges = true
+		updatedEdge.IsConnected = newIsConn.(bool)
+	} else {
+		updatedEdge.IsConnected = oldIsConn.(bool)
 	}
 
-	// If we got here, the resource had existed, we deleted it and there was
-	// no error.  Notify Terraform of this fact and return successful
-	// completion.
-	d.SetId("")
-	log.Printf(fmt.Sprintf("[DEBUG] id %s deleted.", id))
+	oldConnID, newConnID := d.GetChange("connectedtoid")
+	if d.HasChange("connectedtoid") {
+		hasChanges = true
+		updatedEdge.ConnectedToID = newConnID.(string)
+	} else {
+		updatedEdge.ConnectedToID = oldConnID.(string)
+	}
+
+	if d.HasChange("addressgroups") {
+		hasChanges = true
+		v := d.Get("addressgroups")
+		updatedEdge.AddressGroups.AddressGroups = buildAddressGroups(v.([]interface{}))
+	}
+
+	if hasChanges {
+		updateAPI := edgeinterface.NewUpdate(edgeid, index, updatedEdge)
+
+		nsxMutexKV.Lock(edgeid)
+		defer nsxMutexKV.Unlock(edgeid)
+
+		err := nsxclient.Do(updateAPI)
+		if err != nil {
+			return err
+		}
+
+		if updateAPI.StatusCode() != http.StatusNoContent {
+			return fmt.Errorf("Error updating resource: status code: %d", updateAPI.StatusCode())
+		}
+	}
+
 	return nil
 }

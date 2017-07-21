@@ -314,9 +314,18 @@ var awsPartition = partition{
 		"athena": service{
 
 			Endpoints: endpoints{
+<<<<<<< HEAD
 				"us-east-1": endpoint{},
 				"us-east-2": endpoint{},
 				"us-west-2": endpoint{},
+=======
+				"ap-northeast-1": endpoint{},
+				"ap-southeast-1": endpoint{},
+				"eu-west-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-2":      endpoint{},
+>>>>>>> origin
 			},
 		},
 		"autoscaling": service{
@@ -466,10 +475,20 @@ var awsPartition = partition{
 				"ap-northeast-1": endpoint{},
 				"ap-southeast-1": endpoint{},
 				"ap-southeast-2": endpoint{},
+<<<<<<< HEAD
 				"eu-central-1":   endpoint{},
 				"eu-west-1":      endpoint{},
 				"us-east-1":      endpoint{},
 				"us-east-2":      endpoint{},
+=======
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+>>>>>>> origin
 				"us-west-2":      endpoint{},
 			},
 		},
@@ -478,8 +497,15 @@ var awsPartition = partition{
 			Endpoints: endpoints{
 				"ap-northeast-1": endpoint{},
 				"ap-northeast-2": endpoint{},
+<<<<<<< HEAD
 				"ap-southeast-1": endpoint{},
 				"ap-southeast-2": endpoint{},
+=======
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+>>>>>>> origin
 				"eu-central-1":   endpoint{},
 				"eu-west-1":      endpoint{},
 				"eu-west-2":      endpoint{},
@@ -515,11 +541,22 @@ var awsPartition = partition{
 				"ap-northeast-1": endpoint{},
 				"ap-southeast-1": endpoint{},
 				"ap-southeast-2": endpoint{},
+<<<<<<< HEAD
 				"eu-central-1":   endpoint{},
 				"eu-west-1":      endpoint{},
 				"sa-east-1":      endpoint{},
 				"us-east-1":      endpoint{},
 				"us-east-2":      endpoint{},
+=======
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+>>>>>>> origin
 				"us-west-2":      endpoint{},
 			},
 		},
@@ -1883,6 +1920,21 @@ var awscnPartition = partition{
 				},
 			},
 		},
+<<<<<<< HEAD
+=======
+		"ecr": service{
+
+			Endpoints: endpoints{
+				"cn-north-1": endpoint{},
+			},
+		},
+		"ecs": service{
+
+			Endpoints: endpoints{
+				"cn-north-1": endpoint{},
+			},
+		},
+>>>>>>> origin
 		"elasticache": service{
 
 			Endpoints: endpoints{
@@ -1996,6 +2048,15 @@ var awscnPartition = partition{
 				"cn-north-1": endpoint{},
 			},
 		},
+<<<<<<< HEAD
+=======
+		"ssm": service{
+
+			Endpoints: endpoints{
+				"cn-north-1": endpoint{},
+			},
+		},
+>>>>>>> origin
 		"storagegateway": service{
 
 			Endpoints: endpoints{
@@ -2270,6 +2331,15 @@ var awsusgovPartition = partition{
 				},
 			},
 		},
+<<<<<<< HEAD
+=======
+		"ssm": service{
+
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+>>>>>>> origin
 		"streams.dynamodb": service{
 			Defaults: endpoint{
 				CredentialScope: credentialScope{

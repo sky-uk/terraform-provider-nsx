@@ -96,7 +96,7 @@ func resourceSecurityPolicyCreate(d *schema.ResourceData, meta interface{}) erro
 		securitygroups = make([]string, 0)
 	}
 
-	log.Printf(fmt.Sprintf("[DEBUG] securitypolicy.NewCreate(%s, %s, %s, %s, %s)", name, precedence, description, securitygroups, actions))
+	log.Printf(fmt.Sprintf("[DEBUG] securitypolicy.NewCreate(%s, %s, %s, %s, %v)", name, precedence, description, securitygroups, actions))
 	createAPI := securitypolicy.NewCreate(name, precedence, description, securitygroups, actions)
 	err := nsxclient.Do(createAPI)
 

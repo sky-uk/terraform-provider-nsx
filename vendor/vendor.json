@@ -80,14 +80,14 @@
 		{
 			"checksumSHA1": "NUJUTWlc1sV8b7WjfiYc4JZbXl0=",
 			"path": "github.com/aws/aws-sdk-go/aws/credentials/endpointcreds",
-			"revision": "f3ac54faf9e04717021b2869de31bd7037f1e6ec",
-			"revisionTime": "2017-07-05T17:51:13Z"
+			"revision": "aafdacd0d6e625a7a2782bef5f9942d6fc4c9f30",
+			"revisionTime": "2017-07-14T21:00:53Z"
 		},
 		{
 			"checksumSHA1": "JEYqmF83O5n5bHkupAzA6STm0no=",
 			"path": "github.com/aws/aws-sdk-go/aws/credentials/stscreds",
-			"revision": "f3ac54faf9e04717021b2869de31bd7037f1e6ec",
-			"revisionTime": "2017-07-05T17:51:13Z"
+			"revision": "aafdacd0d6e625a7a2782bef5f9942d6fc4c9f30",
+			"revisionTime": "2017-07-14T21:00:53Z"
 		},
 		{
 			"checksumSHA1": "ZdtYh3ZHSgP/WEIaqwJHTEhpkbs=",
@@ -106,12 +106,10 @@
 			"versionExact": "v1.10.7"
 		},
 		{
-			"checksumSHA1": "foSSBWvPjhrq2pHdTFdpyWJub1U=",
+			"checksumSHA1": "vUT1+nhQHFsMQ9AQtF+3jbEOmjM=",
 			"path": "github.com/aws/aws-sdk-go/aws/endpoints",
-			"revision": "a5f553bccbe022ff6ac8079509d9d91da1992e2e",
-			"revisionTime": "2017-07-05T17:19:55Z",
-			"version": "v1.10.7",
-			"versionExact": "v1.10.7"
+			"revision": "aafdacd0d6e625a7a2782bef5f9942d6fc4c9f30",
+			"revisionTime": "2017-07-14T21:00:53Z"
 		},
 		{
 			"checksumSHA1": "8eN3YdBuWsN8bTC7/OGuzREf+oA=",
@@ -131,16 +129,14 @@
 		{
 			"checksumSHA1": "M11PbBLBimxBByeaakhFkhp7t7s=",
 			"path": "github.com/aws/aws-sdk-go/aws/signer/v4",
-			"revision": "f3ac54faf9e04717021b2869de31bd7037f1e6ec",
-			"revisionTime": "2017-07-05T17:51:13Z"
+			"revision": "aafdacd0d6e625a7a2782bef5f9942d6fc4c9f30",
+			"revisionTime": "2017-07-14T21:00:53Z"
 		},
 		{
 			"checksumSHA1": "04ypv4x12l4q0TksA1zEVsmgpvw=",
 			"path": "github.com/aws/aws-sdk-go/internal/shareddefaults",
-			"revision": "a5f553bccbe022ff6ac8079509d9d91da1992e2e",
-			"revisionTime": "2017-07-05T17:19:55Z",
-			"version": "v1.10.7",
-			"versionExact": "v1.10.7"
+			"revision": "aafdacd0d6e625a7a2782bef5f9942d6fc4c9f30",
+			"revisionTime": "2017-07-14T21:00:53Z"
 		},
 		{
 			"checksumSHA1": "sgft7A0lRCVD7QBogydg46lr3NM=",
@@ -218,10 +214,8 @@
 		{
 			"checksumSHA1": "VH5y62f+SDyEIqnTibiPtQ687i8=",
 			"path": "github.com/aws/aws-sdk-go/service/sts",
-			"revision": "a5f553bccbe022ff6ac8079509d9d91da1992e2e",
-			"revisionTime": "2017-07-05T17:19:55Z",
-			"version": "v1.10.7",
-			"versionExact": "v1.10.7"
+			"revision": "aafdacd0d6e625a7a2782bef5f9942d6fc4c9f30",
+			"revisionTime": "2017-07-14T21:00:53Z"
 		},
 		{
 			"checksumSHA1": "nqw2Qn5xUklssHTubS5HDvEL9L4=",
@@ -575,100 +569,84 @@
 			"revision": "a422bbe96644373c5753384a59d678f7d261ff10"
 		},
 		{
-			"checksumSHA1": "xxjPNVwWs31kNW/O+6iwjgGjDcw=",
+			"checksumSHA1": "1Y9wM964dYhkdDH1AFVGdB9Yl+4=",
 			"path": "github.com/sky-uk/gonsx",
-			"revision": "8a624441d7e0b16125029b05007bca6f1293764a",
-			"revisionTime": "2017-07-10T16:01:30Z",
-			"version": "dfw",
-			"versionExact": "dfw"
+			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
+			"revisionTime": "2017-07-17T13:40:10Z",
+			"version": "0.3.15",
+			"versionExact": "0.3.15"
 		},
 		{
 			"checksumSHA1": "1KwQ4O1Kk2aUgnPlCpt5E7iOhuk=",
 			"path": "github.com/sky-uk/gonsx/api",
-			"revision": "5a43b5172aa3fed4f0e11ae0f124887883a69fae",
-			"revisionTime": "2017-07-13T15:13:16Z",
-			"version": "dfw",
-			"versionExact": "dfw"
+			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
+			"revisionTime": "2017-07-17T13:40:10Z",
+			"version": "0.3.15",
+			"versionExact": "0.3.15"
 		},
 		{
 			"checksumSHA1": "UqvzMuZlz/W4tS93GfxXO0puuLc=",
 			"path": "github.com/sky-uk/gonsx/api/dhcprelay",
-			"revision": "06b76c1d8c6dea3684ab903b2e66e395df77da17",
-			"revisionTime": "2017-06-27T10:15:15Z",
-			"version": "0.3.10",
-			"versionExact": "0.3.10"
+			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
+			"revisionTime": "2017-07-17T13:40:10Z",
+			"version": "0.3.15",
+			"versionExact": "0.3.15"
 		},
 		{
-			"checksumSHA1": "fSrpexhxveWdn0l7hsUlkapAlcg=",
-			"path": "github.com/sky-uk/gonsx/api/distributedfw/fwrules",
-			"revision": "5a43b5172aa3fed4f0e11ae0f124887883a69fae",
-			"revisionTime": "2017-07-13T15:13:16Z",
-			"version": "dfw",
-			"versionExact": "dfw"
-		},
-		{
-			"checksumSHA1": "T/K4U8K7rng0Z1ioGdypC4SXKhw=",
-			"path": "github.com/sky-uk/gonsx/api/distributedfw/sections",
-			"revision": "5a43b5172aa3fed4f0e11ae0f124887883a69fae",
-			"revisionTime": "2017-07-13T15:13:16Z",
-			"version": "dfw",
-			"versionExact": "dfw"
-		},
-		{
-			"checksumSHA1": "HOAJv0BVJy4Q8v5K8qWJ+G8ace4=",
+			"checksumSHA1": "dwovzfjI3QqFpqzuKWOqoP6ZxGc=",
 			"path": "github.com/sky-uk/gonsx/api/edgeinterface",
-			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
-			"revisionTime": "2017-04-07T10:17:16Z",
-			"version": "0.3.3",
-			"versionExact": "0.3.3"
+			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
+			"revisionTime": "2017-07-17T13:40:10Z",
+			"version": "0.3.15",
+			"versionExact": "0.3.15"
 		},
 		{
 			"checksumSHA1": "gc2GfFksjfEeXxWUmcclCGKcZv8=",
 			"path": "github.com/sky-uk/gonsx/api/securitygroup",
-			"revision": "0bc192581ae28af8a1da7ad91816f2d139606caa",
-			"revisionTime": "2017-04-25T16:24:44Z",
-			"version": "0.3.6",
-			"versionExact": "0.3.6"
+			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
+			"revisionTime": "2017-07-17T13:40:10Z",
+			"version": "0.3.15",
+			"versionExact": "0.3.15"
 		},
 		{
 			"checksumSHA1": "75L6Iipw6U7O0SQE78e8Uv+zvig=",
 			"path": "github.com/sky-uk/gonsx/api/securitypolicy",
-			"revision": "06b76c1d8c6dea3684ab903b2e66e395df77da17",
-			"revisionTime": "2017-06-27T10:15:15Z",
-			"version": "0.3.10",
-			"versionExact": "0.3.10"
+			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
+			"revisionTime": "2017-07-17T13:40:10Z",
+			"version": "0.3.15",
+			"versionExact": "0.3.15"
 		},
 		{
 			"checksumSHA1": "aFuZIGmIb9qnv2pohE2hY8kgn9A=",
 			"path": "github.com/sky-uk/gonsx/api/securitytag",
-			"revision": "06b76c1d8c6dea3684ab903b2e66e395df77da17",
-			"revisionTime": "2017-06-27T10:15:15Z",
-			"version": "0.3.10",
-			"versionExact": "0.3.10"
+			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
+			"revisionTime": "2017-07-17T13:40:10Z",
+			"version": "0.3.15",
+			"versionExact": "0.3.15"
 		},
 		{
 			"checksumSHA1": "UpbA43PSGyAOp3WfQlMvKitZTKI=",
 			"path": "github.com/sky-uk/gonsx/api/service",
-			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
-			"revisionTime": "2017-04-07T10:17:16Z",
-			"version": "0.3.3",
-			"versionExact": "0.3.3"
+			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
+			"revisionTime": "2017-07-17T13:40:10Z",
+			"version": "0.3.15",
+			"versionExact": "0.3.15"
 		},
 		{
 			"checksumSHA1": "K1PMAqhEoFwvMc4aZbJEEyssovo=",
 			"path": "github.com/sky-uk/gonsx/api/tzone",
-			"revision": "49712965d094f37a2e64858279929dbd0c7f9880",
-			"revisionTime": "2017-04-25T16:24:44Z",
-			"version": "0.3.3",
-			"versionExact": "0.3.3"
+			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
+			"revisionTime": "2017-07-17T13:40:10Z",
+			"version": "0.3.15",
+			"versionExact": "0.3.15"
 		},
 		{
-			"checksumSHA1": "8RIuzZ0G3rpKehv5r/Zrl5jlruM=",
+			"checksumSHA1": "OEOTXFIfxP8BcVfwuo4zhwWNq6M=",
 			"path": "github.com/sky-uk/gonsx/api/virtualwire",
-			"revision": "e0ab5b0cb742dd91b99da5768de99eedf0217ca5",
-			"revisionTime": "2017-07-05T10:17:22Z",
-			"version": "0.3.13",
-			"versionExact": "0.3.13"
+			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
+			"revisionTime": "2017-07-17T13:40:10Z",
+			"version": "0.3.15",
+			"versionExact": "0.3.15"
 		},
 		{
 			"checksumSHA1": "iydUphwYqZRq3WhstEdGsbvBAKs=",
@@ -679,14 +657,14 @@
 		{
 			"checksumSHA1": "UWjVYmoHlIfHzVIskELHiJQtMOI=",
 			"path": "golang.org/x/crypto/bcrypt",
-			"revision": "adbae1b6b6fb4b02448a0fc0dbbc9ba2b95b294d",
-			"revisionTime": "2017-06-19T06:03:41Z"
+			"revision": "7f7c0c2d75ebb4e32a21396ce36e87b6dadc91c9",
+			"revisionTime": "2017-07-15T17:57:27Z"
 		},
 		{
-			"checksumSHA1": "JsJdKXhz87gWenMwBeejTOeNE7k=",
+			"checksumSHA1": "oVPHWesOmZ02vLq2fglGvf+AMgk=",
 			"path": "golang.org/x/crypto/blowfish",
-			"revision": "adbae1b6b6fb4b02448a0fc0dbbc9ba2b95b294d",
-			"revisionTime": "2017-06-19T06:03:41Z"
+			"revision": "7f7c0c2d75ebb4e32a21396ce36e87b6dadc91c9",
+			"revisionTime": "2017-07-15T17:57:27Z"
 		},
 		{
 			"checksumSHA1": "MlEHIE/60sB86Lmf0MPTIXHzKzE=",
