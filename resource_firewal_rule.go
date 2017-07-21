@@ -450,9 +450,9 @@ func resourceFirewallRuleRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("disabled", ReadRule.Disabled)
 	d.Set("action", ReadRule.Action)
 	//d.Set("appliedto", ReadRule.AppliedToList)
-	if err := readSources(d, ReadRule); err != nil {
+	/*if err := readSources(d, ReadRule); err != nil {
 		return err
-	}
+	}*/
 
 	/*if err := readDestinations(d, ReadRule); err != nil {
 		return err
@@ -525,7 +525,7 @@ func resourceFirewallRuleUpdate(d *schema.ResourceData, m interface{}) error {
 		timeStampCall, _ := resourceGetSectionTimestamp(updateRule.SectionID, updateRule.RuleType, m)
 		log.Println(len(timeStampCall.Timestamp))
 		nsxclient.SetHeader("If-Match", timeStampCall.Timestamp)
-		updateRuleAPI := fwrules.NewUpdate(*updateRule)
+		updateRuleAPI := fwrules.NewUpdate(updateRule)
 		updateErr := nsxclient.Do(updateRuleAPI)
 		if updateErr != nil {
 			return fmt.Errorf("Error updating the firewall rule ")
