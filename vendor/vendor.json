@@ -593,6 +593,22 @@
 			"versionExact": "0.3.15"
 		},
 		{
+			"checksumSHA1": "EBXGPEb9nc2QO/CFbAKQzZsS2i4=",
+			"path": "github.com/sky-uk/gonsx/api/distributedfw/fwrules",
+			"revision": "c6231ecb5b51c702219d3d8a5aace013fd34c32b",
+			"revisionTime": "2017-07-13T17:16:38Z",
+			"version": "dfw",
+			"versionExact": "dfw"
+		},
+		{
+			"checksumSHA1": "T/K4U8K7rng0Z1ioGdypC4SXKhw=",
+			"path": "github.com/sky-uk/gonsx/api/distributedfw/sections",
+			"revision": "c6231ecb5b51c702219d3d8a5aace013fd34c32b",
+			"revisionTime": "2017-07-13T17:16:38Z",
+			"version": "dfw",
+			"versionExact": "dfw"
+		},
+		{
 			"checksumSHA1": "dwovzfjI3QqFpqzuKWOqoP6ZxGc=",
 			"path": "github.com/sky-uk/gonsx/api/edgeinterface",
 			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",

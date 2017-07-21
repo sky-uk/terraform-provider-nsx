@@ -474,7 +474,7 @@ func resourceFirewallRuleUpdate(d *schema.ResourceData, m interface{}) error {
 	var hasChanges bool
 	ruleType := d.Get("ruletype").(string)
 	ruleSection := d.Get("sectionid").(int)
-	updateRuleAPI := fwrules.NewGetSingle(d.Id(), ruleType,  ruleSection)
+	updateRuleAPI := fwrules.NewGetSingle(d.Id(), ruleType, ruleSection)
 	getRuleErr := nsxclient.Do(updateRuleAPI)
 
 	if getRuleErr != nil {
@@ -487,33 +487,33 @@ func resourceFirewallRuleUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	updateRule := updateRuleAPI.GetResponse()
-	if d.HasChange("name"){
+	if d.HasChange("name") {
 		hasChanges = true
-		_,nameValue  := d.GetChange("name")
+		_, nameValue := d.GetChange("name")
 		updateRule.Name = nameValue.(string)
 
 	}
-	if d.HasChange("packettype"){
+	if d.HasChange("packettype") {
 		hasChanges = true
 		_, packetValue := d.GetChange("packettype")
 		updateRule.PacketType = packetValue.(string)
 	}
 
-	if d.HasChange("disabled"){
+	if d.HasChange("disabled") {
 		hasChanges = true
 		_, disabledValue := d.GetChange("disabled")
 		updateRule.Disabled = disabledValue.(bool)
 	}
 
-	if d.HasChange("logged"){
+	if d.HasChange("logged") {
 		hasChanges = true
-		_,loggedValue := d.GetChange("logged")
+		_, loggedValue := d.GetChange("logged")
 		updateRule.Logged = loggedValue.(string)
 	}
 
 	if d.HasChange("action") {
 		hasChanges = true
-		_,actionValue := d.GetChange("action")
+		_, actionValue := d.GetChange("action")
 		updateRule.Action = actionValue.(string)
 	}
 
@@ -537,7 +537,7 @@ func resourceFirewallRuleUpdate(d *schema.ResourceData, m interface{}) error {
 		}
 		log.Println(updateRuleAPI.StatusCode())
 		log.Println(updateRuleAPI.ResponseObject())
-		return resourceFirewallRuleRead(d,m)
+		return resourceFirewallRuleRead(d, m)
 	}
 	return nil
 }
@@ -622,7 +622,7 @@ func readServices(d *schema.ResourceData, rule *fwrules.Rule) error {
 			service["protocol"] = serviceItem.Protocol
 			service["value"] = serviceItem.Value
 			service["subprotocol"] = serviceItem.SubProtocol
-			services = append(services , service)
+			services = append(services, service)
 		}
 		d.Set("service", services)
 	}

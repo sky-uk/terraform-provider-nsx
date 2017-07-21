@@ -9,8 +9,6 @@ import (
 	"strconv"
 )
 
-
-
 func resourceFirewallSection() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceFirewallSectionCreate,
@@ -100,13 +98,13 @@ func resourceFirewallSectionUpdate(d *schema.ResourceData, m interface{}) error 
 	var hasChanges bool
 	updateSection.ID = d.Id()
 	updateSection.Type = d.Get("type").(string)
-	if d.HasChange("name"){
+	if d.HasChange("name") {
 		hasChanges = true
-		_,nameValue := d.GetChange("name")
+		_, nameValue := d.GetChange("name")
 		updateSection.Name = nameValue.(string)
 	}
 	if hasChanges {
-		sectIDINT,_ := strconv.Atoi(updateSection.ID)
+		sectIDINT, _ := strconv.Atoi(updateSection.ID)
 		timeStampCall, _ := resourceGetSectionTimestamp(sectIDINT, updateSection.Type, m)
 		log.Println(len(timeStampCall.Timestamp))
 		nsxclient.SetHeader("If-Match", timeStampCall.Timestamp)
@@ -117,9 +115,8 @@ func resourceFirewallSectionUpdate(d *schema.ResourceData, m interface{}) error 
 		}
 		log.Println("UPDATE")
 		log.Println(updateSectionAPI.ResponseObject())
-		return resourceFirewallSectionRead(d,m)
+		return resourceFirewallSectionRead(d, m)
 	}
-
 
 	return nil
 }
@@ -128,20 +125,20 @@ func resourceFirewallSectionDelete(d *schema.ResourceData, m interface{}) error 
 	nsxclient := m.(*gonsx.NSXClient)
 	var deleteSection sections.Section
 	if v, ok := d.GetOk("sectionid"); ok {
-		deleteSection.ID  = v.(string)
+		deleteSection.ID = v.(string)
 	}
-	if v,ok := d.GetOk("type"); ok {
+	if v, ok := d.GetOk("type"); ok {
 		deleteSection.Type = v.(string)
 	}
 	deleteSectionAPI := sections.NewDelete(deleteSection)
 	deleteError := nsxclient.Do(deleteSectionAPI)
 	if deleteError != nil {
-		return  fmt.Errorf("Could not delete the section")
+		return fmt.Errorf("Could not delete the section")
 	}
 	if deleteSectionAPI.StatusCode() != 204 {
 		log.Println(deleteSectionAPI.Endpoint())
 		log.Println(deleteSectionAPI.ResponseObject())
-		return  fmt.Errorf("Could not delete the Section")
+		return fmt.Errorf("Could not delete the Section")
 	}
 
 	d.SetId("")

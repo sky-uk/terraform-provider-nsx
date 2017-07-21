@@ -30,6 +30,6 @@ func NewGetAll(ruleType, section string) *GetAllRulesAPI {
 }
 
 // GetResponse - Returns ResponseObject from GetAllFirewallRulesAPI of Rule type.
-func (getAllAPI GetAllRulesAPI) GetResponse() *Section {
-	return getAllAPI.ResponseObject().(*Section)
+func (getAllAPI GetAllRulesAPI) GetResponse() Section {
+	return *getAllAPI.ResponseObject().(*Section)
 }
