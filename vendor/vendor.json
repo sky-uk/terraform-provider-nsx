@@ -525,8 +525,10 @@
 		{
 			"checksumSHA1": "yFWmdS6yEJZpRJzUqd/mULqCYGk=",
 			"path": "github.com/hashicorp/terraform/moduledeps",
-			"revision": "e3785e1bcbb4f5259c3bc8114cc4d2c60ab86e6b",
-			"revisionTime": "2017-08-24T18:16:07Z"
+			"revision": "a1d06eb97378d097d4175c3284ea026937618477",
+			"revisionTime": "2017-08-16T17:25:37Z",
+			"version": "v0.10.2",
+			"versionExact": "v0.10.2"
 		},
 		{
 			"checksumSHA1": "UP4cxEFYzncmyG/irQ4CP9HrTic=",
