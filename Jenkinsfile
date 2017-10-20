@@ -118,7 +118,7 @@ slackHelper.notificationWrapper(slackChannel, currentBuild, env, true) {
 }
 
 def loadHelpers() {
-    fileLoader.withGit('git@github.com:sky-uk/paas-jenkins-pipelines.git', 'testing', git_credentials_id, '') {
+    fileLoader.withGit('git@github.com:sky-uk/paas-jenkins-pipelines.git', 'master', git_credentials_id, '') {
         this.gitHelper = fileLoader.load('lib/helpers/git')
         this.shellHelper = fileLoader.load('lib/helpers/shell')
         this.goHelper = fileLoader.load('lib/helpers/go')
