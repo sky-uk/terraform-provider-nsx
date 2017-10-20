@@ -12,7 +12,7 @@ major_version = null
 minor_version = null
 patch_version = null
 
-docker_image = "paas/golang-img:0.8.8"
+docker_image = "paas/golang-img:0.10.7"
 
 // helpers
 gitHelper = null
@@ -118,7 +118,7 @@ slackHelper.notificationWrapper(slackChannel, currentBuild, env, true) {
 }
 
 def loadHelpers() {
-    fileLoader.withGit('git@github.com:sky-uk/paas-jenkins-pipelines.git', 'master', git_credentials_id, '') {
+    fileLoader.withGit('git@github.com:sky-uk/paas-jenkins-pipelines.git', 'testing', git_credentials_id, '') {
         this.gitHelper = fileLoader.load('lib/helpers/git')
         this.shellHelper = fileLoader.load('lib/helpers/shell')
         this.goHelper = fileLoader.load('lib/helpers/go')
@@ -151,7 +151,7 @@ def setVersion(major, minor, patch) {
 }
 
 def inContainer(Closure body) {
-    docker.image(this.docker_image).inside("-v ${pwd()}:/paas/go/src/${project_src_path} -v ${System.getProperty('java.io.tmpdir')}:${System.getProperty('java.io.tmpdir')}") {
+    docker.image(this.docker_image).inside("-v ${pwd()}:/gows/src/${project_src_path} -v ${System.getProperty('java.io.tmpdir')}:${System.getProperty('java.io.tmpdir')}") {
         body()
     }
 }
