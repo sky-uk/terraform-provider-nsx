@@ -17,6 +17,7 @@ with the proper credentials before it can be used.
 * [NSX Security Tag Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Security-Tag-Resource)
 * [NSX Security Tag Attachment Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Security-Tag-Resource#nsx_security_tag_attachment-resource)
 * [NSX Service Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Service-Resource)
+* [NSX Firewall Exclusion Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Firewall-Exclusion)
 
 
 ## Features
@@ -31,6 +32,7 @@ with the proper credentials before it can be used.
 | Security Tag            | Y      | Y    | Y      | Y      |
 | Security Tag Attachment | Y      | Y    | Y      | Y      |
 | Service                 | Y      | Y    | Y      | Y      |
+| Firewall Exclusion      | Y      | Y    | N      | Y      |
 
 
 ### Limitations
