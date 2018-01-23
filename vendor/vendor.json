@@ -692,6 +692,12 @@
 			"versionExact": "0.3.15"
 		},
 		{
+			"checksumSHA1": "9hgCL2CHhwP5vHeNuQFtj/5HgZM=",
+			"path": "github.com/sky-uk/gonsx/api/firewallexclusion",
+			"revision": "c3caef9aee9b17b491e2937c0a36040c5a7b24db",
+			"revisionTime": "2018-01-22T15:37:24Z"
+		},
+		{
 			"checksumSHA1": "gc2GfFksjfEeXxWUmcclCGKcZv8=",
 			"path": "github.com/sky-uk/gonsx/api/securitygroup",
 			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
