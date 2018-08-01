@@ -18,6 +18,7 @@ with the proper credentials before it can be used.
 * [NSX Security Tag Attachment Resource](https://github.com/tadaweb/terraform-provider-nsx/wiki/NSX-Security-Tag-Resource#nsx_security_tag_attachment-resource)
 * [NSX Service Resource](https://github.com/tadaweb/terraform-provider-nsx/wiki/NSX-Service-Resource)
 * [NSX Firewall Exclusion Resource](https://github.com/tadaweb/terraform-provider-nsx/wiki/NSX-Firewall-Exclusion)
+* [NSX IPSet Resource](https://github.com/tadaweb/terraform-provider-nsx/wiki/NSX-IPSet-Resource)
 
 
 ## Features
@@ -33,6 +34,7 @@ with the proper credentials before it can be used.
 | Security Tag Attachment | Y      | Y    | Y      | Y      |
 | Service                 | Y      | Y    | Y      | Y      |
 | Firewall Exclusion      | Y      | Y    | N      | Y      |
+| IPSet                   | Y      | Y    | Y      | Y      |
 
 
 ### Limitations
