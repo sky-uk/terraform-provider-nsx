@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sky-uk/gonsx"
-	"github.com/sky-uk/gonsx/api/firewallexclusion"
+	"github.com/tadaweb/gonsx"
+	"github.com/tadaweb/gonsx/api/firewallexclusion"
 	"log"
 )
 
