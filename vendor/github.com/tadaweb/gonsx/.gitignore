@@ -1,0 +1,11 @@
+.DS_Store
+.idea/
+*.iml
+*.coverprofile
+*.swp
+coverage.html
+coverage-gocov.xml
+coverage-gocov.html
+build/
+gonsx-cli
+.gopath~/

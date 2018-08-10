@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sky-uk/gonsx"
-	"github.com/sky-uk/gonsx/api/securitytag"
+	"github.com/tadaweb/gonsx"
+	"github.com/tadaweb/gonsx/api/securitytag"
 	"log"
 )
 

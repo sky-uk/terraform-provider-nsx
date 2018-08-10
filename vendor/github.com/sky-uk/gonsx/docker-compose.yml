@@ -1,8 +1,0 @@
-version: '2'
-services:
-    gonsx:
-        build: .
-        volumes: 
-            - ./:/go/src/github.com/sky-uk/gonsx
-
-
