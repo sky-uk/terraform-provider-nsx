@@ -51,6 +51,7 @@ func Provider() terraform.ResourceProvider {
 			"nsx_security_policy":         resourceSecurityPolicy(),
 			"nsx_security_policy_rule":    resourceSecurityPolicyRule(),
 			"nsx_firewall_exclusion":      resourceFirewallExclusion(),
+			"nsx_ipset":                   resourceIPSet(),
 		},
 
 		ConfigureFunc: providerConfigure,

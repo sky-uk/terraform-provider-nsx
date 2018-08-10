@@ -3,6 +3,6 @@ services:
     tf-nsx:
         build: .
         volumes: 
-            - ./:/go/src/github.com/sky-uk/terraform-provider-nsx
+            - ./:/go/src/github.com/tadaweb/terraform-provider-nsx
 
 

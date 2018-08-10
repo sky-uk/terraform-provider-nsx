@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sky-uk/gonsx"
-	"github.com/sky-uk/gonsx/api/dhcprelay"
+	"github.com/tadaweb/gonsx"
+	"github.com/tadaweb/gonsx/api/dhcprelay"
 	"testing"
 )
 

@@ -32,7 +32,7 @@ RUN go get github.com/pilu/fresh
 RUN go get -u github.com/kardianos/govendor
 
 # Grab the source code and add it to the workspace.
-ENV PATHWORK=/go/src/github.com/sky-uk/terraform-provider-nsx/
+ENV PATHWORK=/go/src/github.com/tadaweb/terraform-provider-nsx/
 ADD ./ $PATHWORK
 WORKDIR $PATHWORK
 
