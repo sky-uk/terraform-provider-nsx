@@ -135,15 +135,15 @@ func resourceSecurityPolicyRuleCreate(d *schema.ResourceData, m interface{}) err
 
 	if direction == "inbound" {
 		log.Printf(fmt.Sprintf("[DEBUG] policyToModify.AddInboundFirewallAction(%s, %s, %s, %s)", name, action, direction, serviceids))
-		err = policyToModify.AddInboundFirewallAction(name, action, direction, serviceids)
+		modifyErr := policyToModify.AddInboundFirewallAction(name, action, direction, securitygroupids, serviceids)
 		if err != nil {
-			return fmt.Errorf("Error in adding the rule to policy object: %s", err)
+			return fmt.Errorf("Error in adding the rule to policy object: %s", modifyErr)
 		}
 	} else {
 		log.Printf(fmt.Sprintf("[DEBUG] policyToModify.AddOutboundFirewallAction(%s, %s, %s, %s, %s)", name, action, direction, securitygroupids, serviceids))
-		err = policyToModify.AddOutboundFirewallAction(name, action, direction, securitygroupids, serviceids)
+		modifyErr := policyToModify.AddOutboundFirewallAction(name, action, direction, securitygroupids, serviceids)
 		if err != nil {
-			return fmt.Errorf("Error in adding the rule to policy object: %s", err)
+			return fmt.Errorf("Error in adding the rule to policy object: %s", modifyErr)
 		}
 	}
 
