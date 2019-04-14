@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sky-uk/gonsx"
@@ -57,7 +58,7 @@ func resourceDHCPRelayAgent() *schema.Resource {
 			"giaddress": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				ForceNew:    true,
+				Computed:    true,
 				Description: "Gateway address of network attached to the vNic, defaults to the vNic primary address",
 			},
 		},
@@ -66,52 +67,34 @@ func resourceDHCPRelayAgent() *schema.Resource {
 
 func resourceDHCPRelayAgentCreate(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var edgeid string
-	var vnicindex string
-	var giaddress string
-
-	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("edgeid"); ok {
-		edgeid = v.(string)
-	} else {
-		return fmt.Errorf("edgeid argument is required")
-	}
-
-	if v, ok := d.GetOk("vnicindex"); ok {
-		vnicindex = v.(string)
-	} else {
-		return fmt.Errorf("vnicindex argument is required")
-	}
-
-	if v, ok := d.GetOk("giaddress"); ok {
-		giaddress = v.(string)
-	} else {
-		return fmt.Errorf("giaddress argument is required")
-	}
+	edgeid := d.Get("edgeid").(string)
+	vnicindex := d.Get("vnicindex").(string)
 
 	var id = edgeid + ":" + vnicindex
-	log.Printf("ID: %s", id)
 
 	nsxMutexKV.Lock(edgeid)
 	defer nsxMutexKV.Unlock(edgeid)
 
-	DHCPRelay, _ := getAllDhcpRelayAgents(edgeid, nsxclient)
+	// Get existing Configuration
+	dhcpRelay, _ := getAllDhcpRelayAgents(edgeid, nsxclient)
 
-	for _, element := range DHCPRelay.RelayAgents {
-		log.Printf("VnicIndex %v", element.VnicIndex)
-		log.Printf("GiAddress %v", element.GiAddress)
+	// Check if already in list
+	for _, element := range dhcpRelay.RelayAgents {
 		if element.VnicIndex == vnicindex {
 			return fmt.Errorf("Relay Agent does already exist: vnicindex: %s", vnicindex)
 		}
 	}
 
+	// Add to list
 	newAgent := dhcprelay.RelayAgent{}
 	newAgent.VnicIndex = vnicindex
-	newAgent.GiAddress = giaddress
+	if giaddress, ok := d.GetOk("giaddress"); ok {
+		newAgent.GiAddress = giaddress.(string)
+	}
+	dhcpRelay.RelayAgents = append(dhcpRelay.RelayAgents, newAgent)
 
-	DHCPRelay.RelayAgents = append(DHCPRelay.RelayAgents, newAgent)
-
-	updateAPI := dhcprelay.NewUpdate(edgeid, *DHCPRelay)
+	// API Update
+	updateAPI := dhcprelay.NewUpdate(edgeid, *dhcpRelay)
 	err := nsxclient.Do(updateAPI)
 
 	if err != nil {
@@ -126,88 +109,48 @@ func resourceDHCPRelayAgentCreate(d *schema.ResourceData, m interface{}) error {
 
 func resourceDHCPRelayAgentRead(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var edgeid string
-	var vnicindex string
-	var giaddress string
 
-	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("edgeid"); ok {
-		edgeid = v.(string)
-	} else {
-		return fmt.Errorf("edgeid argument is required")
-	}
+	s := strings.Split(d.Id(), ":")
+	edgeid, vnicindex := s[0], s[1]
 
-	if v, ok := d.GetOk("vnicindex"); ok {
-		vnicindex = v.(string)
-	} else {
-		return fmt.Errorf("vnicindex argument is required")
-	}
+	dhcpRelay, _ := getAllDhcpRelayAgents(edgeid, nsxclient)
 
-	if v, ok := d.GetOk("giaddress"); ok {
-		giaddress = v.(string)
-	} else {
-		return fmt.Errorf("giaddress argument is required")
-	}
-
-	var id = edgeid + ":" + vnicindex
-	log.Printf("ID: %s", id)
-
-	DHCPRelay, _ := getAllDhcpRelayAgents(edgeid, nsxclient)
-
-	for _, element := range DHCPRelay.RelayAgents {
-		if element.VnicIndex == vnicindex || element.GiAddress == giaddress {
-			d.SetId(id)
+	for _, element := range dhcpRelay.RelayAgents {
+		if element.VnicIndex == vnicindex {
+			// Found
+			d.Set("vnicindex", element.VnicIndex)
+			d.Set("giaddress", element.GiAddress)
 			return nil
 		}
 	}
 
+	// Not found
 	d.SetId("")
 	return nil
 }
 
 func resourceDHCPRelayAgentDelete(d *schema.ResourceData, m interface{}) error {
 	nsxclient := m.(*gonsx.NSXClient)
-	var edgeid string
-	var vnicindex string
-	var giaddress string
 
-	// Gather the attributes for the resource.
-	if v, ok := d.GetOk("edgeid"); ok {
-		edgeid = v.(string)
-	} else {
-		return fmt.Errorf("edgeid argument is required")
-	}
-
-	if v, ok := d.GetOk("vnicindex"); ok {
-		vnicindex = v.(string)
-	} else {
-		return fmt.Errorf("vnicindex argument is required")
-	}
-
-	if v, ok := d.GetOk("giaddress"); ok {
-		giaddress = v.(string)
-	} else {
-		return fmt.Errorf("giaddress argument is required")
-	}
-
-	var id = edgeid + ":" + vnicindex
-	log.Printf("ID: %s", id)
+	s := strings.Split(d.Id(), ":")
+	edgeid, vnicindex := s[0], s[1]
 
 	nsxMutexKV.Lock(edgeid)
 	defer nsxMutexKV.Unlock(edgeid)
 
-	DHCPRelay, _ := getAllDhcpRelayAgents(edgeid, nsxclient)
+	// Get existing Configuration
+	dhcpRelay, _ := getAllDhcpRelayAgents(edgeid, nsxclient)
 
-	for i, element := range DHCPRelay.RelayAgents {
-		log.Printf("VnicIndex %v", element.VnicIndex)
-		log.Printf("GiAddress %v", element.GiAddress)
-		if element.VnicIndex == vnicindex || element.GiAddress == giaddress {
-			DHCPRelay.RelayAgents = append(DHCPRelay.RelayAgents[:i], DHCPRelay.RelayAgents[i+1:]...)
+	// Remove (if exists)
+	for i, element := range dhcpRelay.RelayAgents {
+		if element.VnicIndex == vnicindex {
+			dhcpRelay.RelayAgents = append(dhcpRelay.RelayAgents[:i], dhcpRelay.RelayAgents[i+1:]...)
 			break
 		}
 	}
 
-	updateAPI := dhcprelay.NewUpdate(edgeid, *DHCPRelay)
+	// Update
+	updateAPI := dhcprelay.NewUpdate(edgeid, *dhcpRelay)
 	err := nsxclient.Do(updateAPI)
 
 	if err != nil {

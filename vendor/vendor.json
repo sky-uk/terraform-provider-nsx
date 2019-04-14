@@ -678,13 +678,14 @@
 			"versionExact": "0.3.15"
 		},
 		{
-			"checksumSHA1": "UqvzMuZlz/W4tS93GfxXO0puuLc=",
+			"checksumSHA1": "1xhn4+hzuTHPK6Daaqq6+Dfzdoo=",
 			"origin": "github.com/sgdigital-devops/gonsx/api/dhcprelay",
 			"path": "github.com/sky-uk/gonsx/api/dhcprelay",
-			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
-			"revisionTime": "2017-07-17T13:40:10Z",
-			"version": "0.3.15",
-			"versionExact": "0.3.15"
+			"revision": "c652bbe2e3469123e74356a9718835ff30f8af5b",
+			"revisionTime": "2019-04-14T20:52:36Z",
+			"tree": true,
+			"version": "feature/dhcp-relay",
+			"versionExact": "feature/dhcp-relay"
 		},
 		{
 			"checksumSHA1": "dwovzfjI3QqFpqzuKWOqoP6ZxGc=",
