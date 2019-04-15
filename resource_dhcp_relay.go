@@ -63,7 +63,7 @@ func resourceDHCPRelay() *schema.Resource {
 			},
 			"agent": &schema.Schema{
 				Type:     schema.TypeSet,
-				Required: true,
+				Optional: true,
 				ForceNew: false,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -138,8 +138,6 @@ func resourceDHCPRelayCreate(d *schema.ResourceData, m interface{}) error {
 		}
 
 		dhcpRelay.RelayAgents = agentList
-	} else {
-		return fmt.Errorf("agent parameter is required (DHCP Relay Agent) ")
 	}
 
 	if v, ok := d.GetOk("dhcpserverip"); ok {
@@ -198,34 +196,30 @@ func resourceDHCPRelayRead(d *schema.ResourceData, m interface{}) error {
 		d.Set("dhcpserverip", DHCPRelay.RelayServer.IPAddress)
 	}
 
-	if len(DHCPRelay.RelayAgents) > 0 {
-		if v, ok := d.GetOk("agent"); ok {
-			if agents, ok := v.(*schema.Set); ok {
-				for _, value := range agents.List() {
-					agentObject := value.(map[string]interface{})
-					newAgent := dhcprelay.RelayAgent{}
-					if vnicIndexValue, ok := agentObject["vnicindex"]; ok {
-						newAgent.VnicIndex = vnicIndexValue.(string)
-					}
-
-					if giAddressValue, ok := agentObject["giaddress"]; ok {
-						newAgent.GiAddress = giAddressValue.(string)
-					}
-
-					if dhcpServerIPValue, ok := agentObject["dhcpserverip"]; ok {
-						newAgent.GiAddress = dhcpServerIPValue.(string)
-					}
-
-					//finally add to the list
-					agentList = append(agentList, newAgent)
+	if v, ok := d.GetOk("agent"); ok {
+		if agents, ok := v.(*schema.Set); ok {
+			for _, value := range agents.List() {
+				agentObject := value.(map[string]interface{})
+				newAgent := dhcprelay.RelayAgent{}
+				if vnicIndexValue, ok := agentObject["vnicindex"]; ok {
+					newAgent.VnicIndex = vnicIndexValue.(string)
 				}
 
+				if giAddressValue, ok := agentObject["giaddress"]; ok {
+					newAgent.GiAddress = giAddressValue.(string)
+				}
+
+				if dhcpServerIPValue, ok := agentObject["dhcpserverip"]; ok {
+					newAgent.GiAddress = dhcpServerIPValue.(string)
+				}
+
+				//finally add to the list
+				agentList = append(agentList, newAgent)
 			}
 
-			DHCPRelay.RelayAgents = agentList
 		}
-	} else {
-		return fmt.Errorf("RelayAgents should not be empty since this is not allowed by api")
+
+		DHCPRelay.RelayAgents = agentList
 	}
 
 	return nil
@@ -237,6 +231,10 @@ func resourceDHCPRelayUpdate(d *schema.ResourceData, m interface{}) error {
 	var currentRelay *dhcprelay.DhcpRelay
 	var hasChanges bool
 	var updateObject dhcprelay.DhcpRelay
+
+	nsxMutexKV.Lock(d.Id())
+	defer nsxMutexKV.Unlock(d.Id())
+
 	currentRelay, getAllErr := getAllDhcpRelays(d.Id(), nsxclient)
 	if getAllErr != nil {
 		return fmt.Errorf("Error: %v", getAllErr)
@@ -315,8 +313,6 @@ func resourceDHCPRelayUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if hasChanges {
-		nsxMutexKV.Lock(d.Id())
-		defer nsxMutexKV.Unlock(d.Id())
 		updateAPI := dhcprelay.NewUpdate(d.Id(), updateObject)
 		err := nsxclient.Do(updateAPI)
 		if err != nil {

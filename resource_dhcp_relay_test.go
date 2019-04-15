@@ -10,9 +10,7 @@ import (
 )
 
 func TestAccResourceDHCPRelay(t *testing.T) {
-	edgeid := "edge-5"
-	//resourceName := "nsx_dhcp_relay.testrelay"
-	//domainList := "[\"testdomain.paas.bskyb.com\",\"testdomain2.paas.bskyb.com\"]"
+	edgeid := "edge-16"
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -35,7 +33,6 @@ func TestAccResourceDHCPRelay(t *testing.T) {
 			},
 		},
 	})
-
 }
 
 func testAccResourceDHCPRelayCheckDestroy(state *terraform.State) error {
@@ -53,8 +50,10 @@ func testAccResourceDHCPRelayCheckDestroy(state *terraform.State) error {
 		if err != nil {
 			return err
 		}
-		if len(api.GetResponse().RelayAgents) > 0 {
-			return fmt.Errorf("Resource still exists")
+
+		// Check if RelayServer is not set
+		if len(api.GetResponse().RelayServer.IPAddress) > 0 {
+			return fmt.Errorf("DHCP Relay still exists")
 
 		}
 	}
@@ -79,11 +78,13 @@ func testAccResourceDHCPRelayExists(edgeid, resourcename string) resource.TestCh
 		if err != nil {
 			return err
 		}
-		if len(api.GetResponse().RelayAgents) > 1 {
-			return fmt.Errorf("Resource exists")
 
+		// Check if RelayServer is set
+		if len(api.GetResponse().RelayServer.IPAddress) > 0 {
+			return nil
 		}
-		return nil
+
+		return fmt.Errorf("Relay does not exist")
 	}
 
 }
@@ -91,13 +92,11 @@ func testAccResourceDHCPRelayExists(edgeid, resourcename string) resource.TestCh
 func testAccResourceDHCPRelayCreateTemplate(edgeid string) string {
 	return fmt.Sprintf(`
 	resource "nsx_dhcp_relay" "testrelay" {
-		ipsets	     = ["ipset-3"]
-  		fqdn = ["testdomain.paas.bskyb.com","testdomain2.paas.bskyb.com"]
   		edgeid       = "%s"
   		dhcpserverip = ["10.152.160.10"]
   		agent {
-	       		vnicindex="9"
-	       		giaddress="10.88.232.200"
+	       		vnicindex="10"
+	       		giaddress="192.168.1.1"
 	  	}
 	}`, edgeid)
 }
@@ -105,13 +104,11 @@ func testAccResourceDHCPRelayCreateTemplate(edgeid string) string {
 func testAccResourceDHCPRelayUpdateTemplate(edgeid string) string {
 	return fmt.Sprintf(`
 	resource "nsx_dhcp_relay" "testrelay" {
-		ipsets = ["ipset-3"]
-  		fqdn = ["testdomain.paas.bskyb.com"]
   		edgeid       = "%s"
   		dhcpserverip = ["10.152.160.10","10.152.160.11"]
   		agent {
-	       		vnicindex="9"
-	       		giaddress="10.88.232.200"
+	       		vnicindex="10"
+	       		giaddress="192.168.1.1"
 	  	}
 	}`, edgeid)
 }

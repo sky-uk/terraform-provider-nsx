@@ -20,5 +20,5 @@ type RelayServer struct {
 type RelayAgent struct {
 	XMLName   xml.Name `xml:"relayAgent"`
 	VnicIndex string   `xml:"vnicIndex"`
-	GiAddress string   `xml:"giAddress"`
+	GiAddress string   `xml:"giAddress,omitempty"`
 }
