@@ -681,11 +681,11 @@
 			"checksumSHA1": "1xhn4+hzuTHPK6Daaqq6+Dfzdoo=",
 			"origin": "github.com/sgdigital-devops/gonsx/api/dhcprelay",
 			"path": "github.com/sky-uk/gonsx/api/dhcprelay",
-			"revision": "c652bbe2e3469123e74356a9718835ff30f8af5b",
-			"revisionTime": "2019-04-14T20:52:36Z",
+			"revision": "4d3b752c95ce0d4bdb4e609894fc4e339b82f6e7",
+			"revisionTime": "2019-04-15T10:55:56Z",
 			"tree": true,
-			"version": "feature/dhcp-relay",
-			"versionExact": "feature/dhcp-relay"
+			"version": "0.3.17-2",
+			"versionExact": "0.3.17-2"
 		},
 		{
 			"checksumSHA1": "dwovzfjI3QqFpqzuKWOqoP6ZxGc=",
