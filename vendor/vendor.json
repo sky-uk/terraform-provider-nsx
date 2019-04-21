@@ -523,6 +523,20 @@
 			"versionExact": "v0.10.2"
 		},
 		{
+			"checksumSHA1": "Fzbv+N7hFXOtrR6E7ZcHT3jEE9s=",
+			"path": "github.com/hashicorp/terraform/helper/structure",
+			"revision": "ce1fba5817b00d4b4efc81d5195b91dc6ec1b87c",
+			"revisionTime": "2019-04-19T18:54:19Z"
+		},
+		{
+			"checksumSHA1": "+JXuXusZkWFE3QgCiOHV/X/omZs=",
+			"path": "github.com/hashicorp/terraform/helper/validation",
+			"revision": "d48069534832fdb09919a5fe46500755540cbf0a",
+			"revisionTime": "2019-03-11T18:44:01Z",
+			"version": "v0.11.13",
+			"versionExact": "v0.11.13"
+		},
+		{
 			"checksumSHA1": "yFWmdS6yEJZpRJzUqd/mULqCYGk=",
 			"path": "github.com/hashicorp/terraform/moduledeps",
 			"revision": "a1d06eb97378d097d4175c3284ea026937618477",
@@ -702,6 +716,15 @@
 			"path": "github.com/sky-uk/gonsx/api/firewallexclusion",
 			"revision": "c3caef9aee9b17b491e2937c0a36040c5a7b24db",
 			"revisionTime": "2018-01-22T15:37:24Z"
+		},
+		{
+			"checksumSHA1": "hDt3bNK+TIzRLdLTCnYEh454moc=",
+			"origin": "github.com/sgdigital-devops/gonsx/api/nat",
+			"path": "github.com/sky-uk/gonsx/api/nat",
+			"revision": "ec4b81dc9af4c36f0f29ec639ef551008076aed2",
+			"revisionTime": "2019-04-10T22:01:08Z",
+			"version": "feature/nat",
+			"versionExact": "feature/nat"
 		},
 		{
 			"checksumSHA1": "gc2GfFksjfEeXxWUmcclCGKcZv8=",
