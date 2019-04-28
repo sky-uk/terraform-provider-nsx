@@ -44,6 +44,7 @@ func Provider() terraform.ResourceProvider {
 			"nsx_logical_switch":          resourceLogicalSwitch(),
 			"nsx_edge_interface":          resourceEdgeInterface(),
 			"nsx_dhcp_relay":              resourceDHCPRelay(),
+			"nsx_dhcp_relay_agent":        resourceDHCPRelayAgent(),
 			"nsx_service":                 resourceService(),
 			"nsx_security_group":          resourceSecurityGroup(),
 			"nsx_security_tag":            resourceSecurityTag(),
@@ -51,6 +52,7 @@ func Provider() terraform.ResourceProvider {
 			"nsx_security_policy":         resourceSecurityPolicy(),
 			"nsx_security_policy_rule":    resourceSecurityPolicyRule(),
 			"nsx_firewall_exclusion":      resourceFirewallExclusion(),
+			"nsx_nat_rule":                resourceNatRule(),
 		},
 
 		ConfigureFunc: providerConfigure,

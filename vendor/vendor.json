@@ -523,6 +523,20 @@
 			"versionExact": "v0.10.2"
 		},
 		{
+			"checksumSHA1": "Fzbv+N7hFXOtrR6E7ZcHT3jEE9s=",
+			"path": "github.com/hashicorp/terraform/helper/structure",
+			"revision": "ce1fba5817b00d4b4efc81d5195b91dc6ec1b87c",
+			"revisionTime": "2019-04-19T18:54:19Z"
+		},
+		{
+			"checksumSHA1": "+JXuXusZkWFE3QgCiOHV/X/omZs=",
+			"path": "github.com/hashicorp/terraform/helper/validation",
+			"revision": "d48069534832fdb09919a5fe46500755540cbf0a",
+			"revisionTime": "2019-03-11T18:44:01Z",
+			"version": "v0.11.13",
+			"versionExact": "v0.11.13"
+		},
+		{
 			"checksumSHA1": "yFWmdS6yEJZpRJzUqd/mULqCYGk=",
 			"path": "github.com/hashicorp/terraform/moduledeps",
 			"revision": "a1d06eb97378d097d4175c3284ea026937618477",
@@ -661,6 +675,7 @@
 		},
 		{
 			"checksumSHA1": "1Y9wM964dYhkdDH1AFVGdB9Yl+4=",
+			"origin": "github.com/sgdigital-devops/gonsx",
 			"path": "github.com/sky-uk/gonsx",
 			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
 			"revisionTime": "2017-07-17T13:40:10Z",
@@ -669,6 +684,7 @@
 		},
 		{
 			"checksumSHA1": "1KwQ4O1Kk2aUgnPlCpt5E7iOhuk=",
+			"origin": "github.com/sgdigital-devops/gonsx/api",
 			"path": "github.com/sky-uk/gonsx/api",
 			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
 			"revisionTime": "2017-07-17T13:40:10Z",
@@ -676,15 +692,18 @@
 			"versionExact": "0.3.15"
 		},
 		{
-			"checksumSHA1": "UqvzMuZlz/W4tS93GfxXO0puuLc=",
+			"checksumSHA1": "1xhn4+hzuTHPK6Daaqq6+Dfzdoo=",
+			"origin": "github.com/sgdigital-devops/gonsx/api/dhcprelay",
 			"path": "github.com/sky-uk/gonsx/api/dhcprelay",
-			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
-			"revisionTime": "2017-07-17T13:40:10Z",
-			"version": "0.3.15",
-			"versionExact": "0.3.15"
+			"revision": "4d3b752c95ce0d4bdb4e609894fc4e339b82f6e7",
+			"revisionTime": "2019-04-15T10:55:56Z",
+			"tree": true,
+			"version": "0.3.17-2",
+			"versionExact": "0.3.17-2"
 		},
 		{
 			"checksumSHA1": "dwovzfjI3QqFpqzuKWOqoP6ZxGc=",
+			"origin": "github.com/sgdigital-devops/gonsx/api/edgeinterface",
 			"path": "github.com/sky-uk/gonsx/api/edgeinterface",
 			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
 			"revisionTime": "2017-07-17T13:40:10Z",
@@ -693,12 +712,23 @@
 		},
 		{
 			"checksumSHA1": "9hgCL2CHhwP5vHeNuQFtj/5HgZM=",
+			"origin": "github.com/sgdigital-devops/gonsx/api/firewallexclusion",
 			"path": "github.com/sky-uk/gonsx/api/firewallexclusion",
 			"revision": "c3caef9aee9b17b491e2937c0a36040c5a7b24db",
 			"revisionTime": "2018-01-22T15:37:24Z"
 		},
 		{
+			"checksumSHA1": "hDt3bNK+TIzRLdLTCnYEh454moc=",
+			"origin": "github.com/sgdigital-devops/gonsx/api/nat",
+			"path": "github.com/sky-uk/gonsx/api/nat",
+			"revision": "46ed706098b85a9bf91b74eb638912aac66fb60e",
+			"revisionTime": "2019-04-23T21:09:13Z",
+			"version": "0.3.17-3",
+			"versionExact": "0.3.17-3"
+		},
+		{
 			"checksumSHA1": "gc2GfFksjfEeXxWUmcclCGKcZv8=",
+			"origin": "github.com/sgdigital-devops/gonsx/api/securitygroup",
 			"path": "github.com/sky-uk/gonsx/api/securitygroup",
 			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
 			"revisionTime": "2017-07-17T13:40:10Z",
@@ -706,15 +736,17 @@
 			"versionExact": "0.3.15"
 		},
 		{
-			"checksumSHA1": "75L6Iipw6U7O0SQE78e8Uv+zvig=",
+			"checksumSHA1": "8cXSz7uNmXtOiwBBJ4uKzvgAYB4=",
+			"origin": "github.com/sgdigital-devops/gonsx/api/securitypolicy",
 			"path": "github.com/sky-uk/gonsx/api/securitypolicy",
-			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
-			"revisionTime": "2017-07-17T13:40:10Z",
-			"version": "0.3.15",
-			"versionExact": "0.3.15"
+			"revision": "9ab2830c83a852e0152dd852eadd7550c649d877",
+			"revisionTime": "2019-04-10T22:13:53Z",
+			"version": "0.3.17-1",
+			"versionExact": "0.3.17-1"
 		},
 		{
 			"checksumSHA1": "aFuZIGmIb9qnv2pohE2hY8kgn9A=",
+			"origin": "github.com/sgdigital-devops/gonsx/api/securitytag",
 			"path": "github.com/sky-uk/gonsx/api/securitytag",
 			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
 			"revisionTime": "2017-07-17T13:40:10Z",
@@ -723,6 +755,7 @@
 		},
 		{
 			"checksumSHA1": "UpbA43PSGyAOp3WfQlMvKitZTKI=",
+			"origin": "github.com/sgdigital-devops/gonsx/api/service",
 			"path": "github.com/sky-uk/gonsx/api/service",
 			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
 			"revisionTime": "2017-07-17T13:40:10Z",
@@ -731,6 +764,7 @@
 		},
 		{
 			"checksumSHA1": "K1PMAqhEoFwvMc4aZbJEEyssovo=",
+			"origin": "github.com/sgdigital-devops/gonsx/api/tzone",
 			"path": "github.com/sky-uk/gonsx/api/tzone",
 			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
 			"revisionTime": "2017-07-17T13:40:10Z",
@@ -739,6 +773,7 @@
 		},
 		{
 			"checksumSHA1": "OEOTXFIfxP8BcVfwuo4zhwWNq6M=",
+			"origin": "github.com/sgdigital-devops/gonsx/api/virtualwire",
 			"path": "github.com/sky-uk/gonsx/api/virtualwire",
 			"revision": "470fc62aec5424c99581cbd02944b3e2f5617644",
 			"revisionTime": "2017-07-17T13:40:10Z",

@@ -146,12 +146,18 @@ func (sp *SecurityPolicy) AddOutboundFirewallAction(name, action, direction stri
 }
 
 // AddInboundFirewallAction adds outbound firewall action rule into security policy.
-func (sp *SecurityPolicy) AddInboundFirewallAction(name, action, direction string, applicationObjectIDs []string) error {
+func (sp *SecurityPolicy) AddInboundFirewallAction(name, action, direction string, secGroupObjectIDs, applicationObjectIDs []string) error {
 	if action != "allow" && action != "block" {
 		return errors.New("Action can be only 'allow' or 'block'")
 	}
 	if direction != "inbound" {
 		return errors.New("Direction can only be 'inbound'")
+	}
+
+	var secondarySecurityGroupList = []SecurityGroup{}
+	for _, secGroupID := range secGroupObjectIDs {
+		securityGroup := SecurityGroup{ObjectID: secGroupID}
+		secondarySecurityGroupList = append(secondarySecurityGroupList, securityGroup)
 	}
 
 	var secondaryApplicationsList = &Applications{}
@@ -169,13 +175,14 @@ func (sp *SecurityPolicy) AddInboundFirewallAction(name, action, direction strin
 	}
 
 	newAction := Action{
-		Class:        "firewallSecurityAction",
-		Name:         name,
-		Action:       action,
-		Category:     "firewall",
-		Direction:    direction,
-		IsEnabled:    true,
-		Applications: secondaryApplicationsList,
+		Class:                  "firewallSecurityAction",
+		Name:                   name,
+		Action:                 action,
+		Category:               "firewall",
+		Direction:              direction,
+		IsEnabled:              true,
+		SecondarySecurityGroup: secondarySecurityGroupList,
+		Applications:           secondaryApplicationsList,
 	}
 
 	if sp.ActionsByCategory.Category == "firewall" && len(sp.ActionsByCategory.Actions) >= 1 {
