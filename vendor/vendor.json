@@ -721,10 +721,10 @@
 			"checksumSHA1": "hDt3bNK+TIzRLdLTCnYEh454moc=",
 			"origin": "github.com/sgdigital-devops/gonsx/api/nat",
 			"path": "github.com/sky-uk/gonsx/api/nat",
-			"revision": "ec4b81dc9af4c36f0f29ec639ef551008076aed2",
-			"revisionTime": "2019-04-10T22:01:08Z",
-			"version": "feature/nat",
-			"versionExact": "feature/nat"
+			"revision": "46ed706098b85a9bf91b74eb638912aac66fb60e",
+			"revisionTime": "2019-04-23T21:09:13Z",
+			"version": "0.3.17-3",
+			"versionExact": "0.3.17-3"
 		},
 		{
 			"checksumSHA1": "gc2GfFksjfEeXxWUmcclCGKcZv8=",

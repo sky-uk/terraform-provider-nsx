@@ -19,13 +19,14 @@ with the proper credentials before it can be used.
 * [NSX Security Tag Attachment Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Security-Tag-Resource#nsx_security_tag_attachment-resource)
 * [NSX Service Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Service-Resource)
 * [NSX Firewall Exclusion Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Firewall-Exclusion)
+* [NSX Nat Rules Resource] (https://github.com/sgdigital-devops/terraform-provider-nsx/wiki/NSX-Nat-Rules-Resource)
 
 
 ## Features
 | Feature                 | Create | Read | Update | Delete |
 |:------------------------|:-------|:-----|:-------|:-------|
 | DHCP Relay              | Y      | Y    | Y      | Y      |
-| DHCP Relay Agent        | Y      | Y    | Y      | Y      |
+| DHCP Relay Agent        | Y      | Y    | N      | Y      |
 | Edge Interface          | Y      | Y    | N      | Y      |
 | Logical Switch          | Y      | Y    | Y      | Y      |
 | Security Group          | Y      | Y    | Y      | Y      |
@@ -35,6 +36,7 @@ with the proper credentials before it can be used.
 | Security Tag Attachment | Y      | Y    | Y      | Y      |
 | Service                 | Y      | Y    | Y      | Y      |
 | Firewall Exclusion      | Y      | Y    | N      | Y      |
+| Nat Rule                | Y      | Y    | Y      | Y      |
 
 
 ### Limitations
