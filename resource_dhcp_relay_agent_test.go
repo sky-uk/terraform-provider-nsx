@@ -10,7 +10,7 @@ import (
 )
 
 func TestAccResourceDHCPRelayAgent(t *testing.T) {
-	edgeid := "edge-16"
+	edgeid := loadDLRId(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -87,7 +87,7 @@ func TestAccResourceDHCPRelayAgent(t *testing.T) {
 }
 
 func TestAccResourceDHCPRelayAgentGIAddressDefault(t *testing.T) {
-	edgeid := "edge-16"
+	edgeid := loadDLRId(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,

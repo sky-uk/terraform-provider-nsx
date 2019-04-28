@@ -12,14 +12,15 @@ import (
 )
 
 func TestAccResourceEdgeInterface(t *testing.T) {
-	edgeid := "edge-7"
+	edgeid := loadDLRId(t)
+	virtualwireid := loadVirtualwireId(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccResourceEdgeInterfaceCheckDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccResourceEdgeInterfaceCreateTemplate(edgeid),
+				Config: testAccResourceEdgeInterfaceCreateTemplate(edgeid, virtualwireid),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("nsx_edge_interface.testAccInterface", "edgeid"),
 					resource.TestCheckResourceAttr("nsx_edge_interface.testAccInterface", "edgeid", edgeid),
@@ -92,13 +93,13 @@ func testAccResourceEdgeInterfaceExists(edgeid string, index int, name string) r
 	}
 }
 
-func testAccResourceEdgeInterfaceCreateTemplate(edgeid string) string {
+func testAccResourceEdgeInterfaceCreateTemplate(edgeid string, virtualwireid string) string {
 
 	return fmt.Sprintf(`resource "nsx_edge_interface" "testAccInterface" {
-    edgeid = "edge-7"
+    edgeid = "%s"
     name = "edge_interface_testacc"
     isconnected = true
-    connectedtoid = "virtualwire-182"
+    connectedtoid = "%s"
     interfacetype = "internal"
     mtu = 1500
     addressgroups = [
@@ -109,5 +110,5 @@ func testAccResourceEdgeInterfaceCreateTemplate(edgeid string) string {
         },
         */
     ]
-}`)
+}`, edgeid, virtualwireid)
 }
