@@ -19,7 +19,7 @@ with the proper credentials before it can be used.
 * [NSX Security Tag Attachment Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Security-Tag-Resource#nsx_security_tag_attachment-resource)
 * [NSX Service Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Service-Resource)
 * [NSX Firewall Exclusion Resource](https://github.com/sky-uk/terraform-provider-nsx/wiki/NSX-Firewall-Exclusion)
-* [NSX Nat Rules Resource] (https://github.com/sgdigital-devops/terraform-provider-nsx/wiki/NSX-Nat-Rules-Resource)
+* [NSX Nat Rules Resource](https://github.com/sgdigital-devops/terraform-provider-nsx/wiki/NSX-Nat-Rules-Resource)
 
 
 ## Features
