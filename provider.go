@@ -53,6 +53,10 @@ func Provider() terraform.ResourceProvider {
 			"nsx_firewall_exclusion":      resourceFirewallExclusion(),
 		},
 
+		DataSourcesMap: map[string]*schema.Resource{
+			"nsx_security_group": dataSourceSecurityGroup(),
+		},
+
 		ConfigureFunc: providerConfigure,
 	}
 }
