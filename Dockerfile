@@ -1,4 +1,4 @@
-FROM golang:1.8
+FROM golang:1.24.3
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN  apt-get update \
